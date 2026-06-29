@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// ============================================================
+//  Firebase Storage rules — Kurdistan Hotels
+//  Deploy: Firebase console > Storage > Rules > paste > Publish
+//
+//  Hotel images: anyone can VIEW them, only signed-in
+//  owner/admins can UPLOAD or delete.
+// ============================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /hotels/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.resource.size < 8 * 1024 * 1024          // max 8 MB
+        && request.resource.contentType.matches('image/.*'); // images only
+    }
+  }
+}

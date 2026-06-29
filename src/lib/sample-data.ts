@@ -8,6 +8,7 @@ export const SAMPLE_HOTELS: Hotel[] = [
   {
     id: "sample-grand-dukan",
     name: "Grand Dukan Lake Resort",
+    nameI18n: { ckb: "ریزۆرتی دەریاچەی دووکان", ar: "منتجع بحيرة دوكان" },
     city: "Dukan",
     price: 140,
     rating: 4.8,
@@ -28,6 +29,7 @@ export const SAMPLE_HOTELS: Hotel[] = [
   {
     id: "sample-erbil-citadel",
     name: "Erbil Citadel Hotel",
+    nameI18n: { ckb: "هۆتێلی قەڵای هەولێر", ar: "فندق قلعة أربيل" },
     city: "Erbil",
     price: 110,
     rating: 4.6,
@@ -48,6 +50,7 @@ export const SAMPLE_HOTELS: Hotel[] = [
   {
     id: "sample-sulaymaniyah-palace",
     name: "Sulaymaniyah Palace",
+    nameI18n: { ckb: "کۆشکی سلێمانی", ar: "قصر السليمانية" },
     city: "Sulaymaniyah",
     price: 90,
     rating: 4.4,
@@ -68,6 +71,7 @@ export const SAMPLE_HOTELS: Hotel[] = [
   {
     id: "sample-halabja-garden",
     name: "Halabja Garden Inn",
+    nameI18n: { ckb: "نزڵگەی باخچەی هەڵەبجە", ar: "نزل حديقة حلبجة" },
     city: "Halabja",
     price: 65,
     rating: 4.2,
@@ -88,6 +92,7 @@ export const SAMPLE_HOTELS: Hotel[] = [
   {
     id: "sample-duhok-heights",
     name: "Duhok Heights Hotel",
+    nameI18n: { ckb: "هۆتێلی بەرزاییەکانی دهۆک", ar: "فندق مرتفعات دهوك" },
     city: "Duhok",
     price: 85,
     rating: 4.5,
@@ -108,6 +113,7 @@ export const SAMPLE_HOTELS: Hotel[] = [
   {
     id: "sample-kirkuk-baba-gurgur",
     name: "Kirkuk Baba Gurgur Hotel",
+    nameI18n: { ckb: "هۆتێلی بابە گوڕگوڕی کەرکوک", ar: "فندق بابا كركر كركوك" },
     city: "Kirkuk",
     price: 70,
     rating: 4.0,

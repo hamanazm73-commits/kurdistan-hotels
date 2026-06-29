@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,15 +19,18 @@ export const firebaseEnabled = Boolean(firebaseConfig.apiKey);
 let app: FirebaseApp | undefined;
 let authInstance: Auth | undefined;
 let dbInstance: Firestore | undefined;
+let storageInstance: FirebaseStorage | undefined;
 
 if (firebaseEnabled) {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   authInstance = getAuth(app);
   dbInstance = getFirestore(app);
+  storageInstance = getStorage(app);
 }
 
 export const auth = authInstance;
 export const db = dbInstance;
+export const storage = storageInstance;
 export const OWNER_EMAIL = (
   process.env.NEXT_PUBLIC_OWNER_EMAIL || ""
 ).toLowerCase();

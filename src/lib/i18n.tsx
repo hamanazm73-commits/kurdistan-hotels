@@ -126,6 +126,29 @@ const ckb: Dict = {
   role_owner: "خاوەن",
   role_admin: "بەڕێوەبەر",
 
+  admin_description: "وەسف",
+  admin_address: "ناونیشان",
+  admin_phone: "ژمارەی پەیوەندی",
+  admin_rooms: "ژوورەکان",
+  admin_room_type: "جۆری ژوور",
+  admin_room_price: "نرخ ($)",
+  admin_add_room: "زیادکردنی ژوور",
+  admin_cover_image: "وێنەی سەرەکی",
+  admin_gallery: "وێنەی زیاتر (گالێری)",
+  admin_upload: "بارکردنی وێنە",
+  admin_uploading: "بارکردن...",
+  admin_image_url: "یان بەستەری وێنە بنووسە",
+  admin_translations: "ناو و وەسف بە زمانی تر (ئارەزوومەندانە)",
+  admin_name_in: "ناو بە",
+  admin_desc_in: "وەسف بە",
+  detail_about: "دەربارەی هۆتێل",
+  detail_rooms: "ژوور و نرخەکان",
+  detail_amenities: "خزمەتگوزارییەکان",
+  detail_location: "شوێن",
+  detail_contact: "پەیوەندی",
+  detail_back: "گەڕانەوە",
+  detail_gallery: "وێنەکان",
+
   loading: "چاوەڕێبە...",
 };
 
@@ -233,6 +256,29 @@ const en: Dict = {
   admin_deleted: "Deleted",
   role_owner: "Owner",
   role_admin: "Admin",
+
+  admin_description: "Description",
+  admin_address: "Address",
+  admin_phone: "Contact phone",
+  admin_rooms: "Rooms",
+  admin_room_type: "Room type",
+  admin_room_price: "Price ($)",
+  admin_add_room: "Add room",
+  admin_cover_image: "Cover image",
+  admin_gallery: "More images (gallery)",
+  admin_upload: "Upload image",
+  admin_uploading: "Uploading...",
+  admin_image_url: "or paste an image URL",
+  admin_translations: "Name & description in other languages (optional)",
+  admin_name_in: "Name in",
+  admin_desc_in: "Description in",
+  detail_about: "About this hotel",
+  detail_rooms: "Rooms & prices",
+  detail_amenities: "Amenities",
+  detail_location: "Location",
+  detail_contact: "Contact",
+  detail_back: "Back",
+  detail_gallery: "Photos",
 
   loading: "Loading...",
 };
@@ -342,6 +388,29 @@ const ar: Dict = {
   role_owner: "المالك",
   role_admin: "مدير",
 
+  admin_description: "الوصف",
+  admin_address: "العنوان",
+  admin_phone: "رقم التواصل",
+  admin_rooms: "الغرف",
+  admin_room_type: "نوع الغرفة",
+  admin_room_price: "السعر ($)",
+  admin_add_room: "إضافة غرفة",
+  admin_cover_image: "الصورة الرئيسية",
+  admin_gallery: "صور إضافية (معرض)",
+  admin_upload: "رفع صورة",
+  admin_uploading: "جاري الرفع...",
+  admin_image_url: "أو الصق رابط الصورة",
+  admin_translations: "الاسم والوصف بلغات أخرى (اختياري)",
+  admin_name_in: "الاسم بـ",
+  admin_desc_in: "الوصف بـ",
+  detail_about: "عن الفندق",
+  detail_rooms: "الغرف والأسعار",
+  detail_amenities: "الخدمات",
+  detail_location: "الموقع",
+  detail_contact: "تواصل",
+  detail_back: "رجوع",
+  detail_gallery: "الصور",
+
   loading: "جاري التحميل...",
 };
 
@@ -357,12 +426,31 @@ const CITY_KEYS: Record<string, Dict> = {
   Kirkuk: { ckb: "کەرکوک", en: "Kirkuk", ar: "كركوك" },
 };
 
+/** Common amenities -> translations (keyed by the lowercased English term). */
+const FEATURE_KEYS: Record<string, Dict> = {
+  "wi-fi": { ckb: "وای‌فای", en: "Wi-Fi", ar: "واي فاي" },
+  wifi: { ckb: "وای‌فای", en: "Wi-Fi", ar: "واي فاي" },
+  restaurant: { ckb: "ڕیستۆرانت", en: "Restaurant", ar: "مطعم" },
+  parking: { ckb: "پارکینگ", en: "Parking", ar: "موقف سيارات" },
+  pool: { ckb: "مەلەوانگە", en: "Pool", ar: "مسبح" },
+  gym: { ckb: "هۆڵی وەرزش", en: "Gym", ar: "صالة رياضية" },
+  spa: { ckb: "سپا", en: "Spa", ar: "سبا" },
+  bar: { ckb: "بار", en: "Bar", ar: "بار" },
+  garden: { ckb: "باخچە", en: "Garden", ar: "حديقة" },
+  breakfast: { ckb: "نانی بەیانی", en: "Breakfast", ar: "فطور" },
+  "lake view": { ckb: "دیمەنی دەریاچە", en: "Lake view", ar: "إطلالة على البحيرة" },
+  "mountain view": { ckb: "دیمەنی شاخ", en: "Mountain view", ar: "إطلالة على الجبل" },
+  ac: { ckb: "ئەیرکۆندیشن", en: "AC", ar: "تكييف" },
+  elevator: { ckb: "ئاسانسۆر", en: "Elevator", ar: "مصعد" },
+};
+
 interface I18nValue {
   lang: Lang;
   dir: "rtl" | "ltr";
   setLang: (l: Lang) => void;
   t: (key: string, vars?: Record<string, string | number>) => string;
   tCity: (city: string) => string;
+  tFeature: (feature: string) => string;
 }
 
 const I18nContext = createContext<I18nValue | null>(null);
@@ -401,9 +489,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     [lang],
   );
 
+  const tFeature = useCallback(
+    (feature: string) =>
+      FEATURE_KEYS[feature.trim().toLowerCase()]?.[lang] ?? feature,
+    [lang],
+  );
+
   return (
     <I18nContext.Provider
-      value={{ lang, dir: LANGS[lang].dir, setLang, t, tCity }}
+      value={{ lang, dir: LANGS[lang].dir, setLang, t, tCity, tFeature }}
     >
       {children}
     </I18nContext.Provider>

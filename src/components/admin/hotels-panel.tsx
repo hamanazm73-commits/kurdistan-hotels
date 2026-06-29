@@ -10,10 +10,13 @@ import {
   Star,
   BadgePercent,
   Loader2,
+  X,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -32,7 +35,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useI18n } from "@/lib/i18n";
+import { ImageUpload, GalleryUpload } from "./image-upload";
+import { useI18n, LANGS } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 import { useHotels } from "@/lib/use-hotels";
 import {
   addHotel,
@@ -43,13 +48,34 @@ import {
 import { effectivePrice, type Hotel, type HotelInput } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
-function genRooms(price: number) {
+function defaultRooms() {
   return [
-    { type: "Single", price },
-    { type: "Double", price: Math.round(price * 1.3) },
-    { type: "Suite", price: Math.round(price * 2) },
+    { type: "Single", price: 75 },
+    { type: "Double", price: 105 },
+    { type: "Suite", price: 170 },
   ];
 }
+
+/** Build a {ckb,en,ar} map, skipping empty values (Firestore-safe). */
+function i18nObj(ckb: string, en: string, ar: string) {
+  const o: { ckb?: string; en?: string; ar?: string } = {};
+  if (ckb.trim()) o.ckb = ckb.trim();
+  if (en.trim()) o.en = en.trim();
+  if (ar.trim()) o.ar = ar.trim();
+  return o;
+}
+
+const NAME_FIELDS = [
+  { lang: "ckb", key: "nameCkb" },
+  { lang: "en", key: "nameEn" },
+  { lang: "ar", key: "nameAr" },
+] as const;
+
+const DESC_FIELDS = [
+  { lang: "ckb", key: "descCkb" },
+  { lang: "en", key: "descEn" },
+  { lang: "ar", key: "descAr" },
+] as const;
 
 const empty = {
   name: "",
@@ -58,13 +84,24 @@ const empty = {
   rating: 4.5,
   image:
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
+  images: [] as string[],
   available: 10,
   features: "Wi-Fi, Restaurant, Parking",
+  description: "",
+  address: "",
+  phone: "",
+  rooms: defaultRooms(),
   featured: false,
   recommended: false,
   discountActive: false,
   oldPrice: 0,
   newPrice: 0,
+  nameCkb: "",
+  nameEn: "",
+  nameAr: "",
+  descCkb: "",
+  descEn: "",
+  descAr: "",
 };
 
 export function HotelsPanel() {
@@ -120,10 +157,7 @@ export function HotelsPanel() {
         {hotels.map((h) => {
           const isSample = h.id.startsWith("sample-");
           return (
-            <Card
-              key={h.id}
-              className="flex flex-row items-center gap-4 p-3"
-            >
+            <Card key={h.id} className="flex flex-row items-center gap-4 p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={h.image}
@@ -209,16 +243,28 @@ function HotelFormDialog({
           price: hotel.price,
           rating: hotel.rating,
           image: hotel.image,
+          images: hotel.images ?? [],
           available: hotel.available,
           features: hotel.features.join(", "),
+          description: hotel.description ?? "",
+          address: hotel.address ?? "",
+          phone: hotel.phone ?? "",
+          rooms: hotel.rooms?.length ? hotel.rooms : defaultRooms(),
           featured: hotel.featured,
           recommended: hotel.recommended,
           discountActive: hotel.discount?.active ?? false,
           oldPrice: hotel.discount?.oldPrice ?? 0,
           newPrice: hotel.discount?.newPrice ?? 0,
+          nameCkb: hotel.nameI18n?.ckb ?? "",
+          nameEn: hotel.nameI18n?.en ?? "",
+          nameAr: hotel.nameI18n?.ar ?? "",
+          descCkb: hotel.descriptionI18n?.ckb ?? "",
+          descEn: hotel.descriptionI18n?.en ?? "",
+          descAr: hotel.descriptionI18n?.ar ?? "",
         }
       : empty,
   );
+  const [showI18n, setShowI18n] = useState(false);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -231,16 +277,24 @@ function HotelFormDialog({
     }
     const data: HotelInput = {
       name: form.name.trim(),
+      nameI18n: i18nObj(form.nameCkb, form.nameEn, form.nameAr),
       city: form.city,
       price: Number(form.price),
       rating: Number(form.rating),
       image: form.image.trim(),
+      images: form.images.filter(Boolean),
       available: Number(form.available),
       features: form.features
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean),
-      rooms: genRooms(Number(form.price)),
+      description: form.description.trim(),
+      descriptionI18n: i18nObj(form.descCkb, form.descEn, form.descAr),
+      address: form.address.trim(),
+      phone: form.phone.trim(),
+      rooms: form.rooms
+        .map((r) => ({ type: r.type.trim(), price: Number(r.price) }))
+        .filter((r) => r.type),
       featured: form.featured,
       recommended: form.recommended,
       discount: {
@@ -279,6 +333,47 @@ function HotelFormDialog({
               onChange={(e) => set("name", e.target.value)}
             />
           </Field>
+
+          {/* optional per-language name & description */}
+          <div className="rounded-lg border p-3">
+            <button
+              type="button"
+              onClick={() => setShowI18n((v) => !v)}
+              className="flex w-full items-center justify-between text-sm font-medium"
+            >
+              {t("admin_translations")}
+              <ChevronDown
+                className={cn("size-4 transition", showI18n && "rotate-180")}
+              />
+            </button>
+            {showI18n && (
+              <div className="mt-3 space-y-3">
+                {NAME_FIELDS.map(({ lang, key }) => (
+                  <Field
+                    key={key}
+                    label={`${t("admin_name_in")} ${LANGS[lang].label}`}
+                  >
+                    <Input
+                      value={form[key]}
+                      onChange={(e) => set(key, e.target.value)}
+                    />
+                  </Field>
+                ))}
+                {DESC_FIELDS.map(({ lang, key }) => (
+                  <Field
+                    key={key}
+                    label={`${t("admin_desc_in")} ${LANGS[lang].label}`}
+                  >
+                    <Textarea
+                      rows={2}
+                      value={form[key]}
+                      onChange={(e) => set(key, e.target.value)}
+                    />
+                  </Field>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Field label={t("admin_city")}>
@@ -327,18 +422,107 @@ function HotelFormDialog({
             </Field>
           </div>
 
-          <Field label={t("admin_image")}>
-            <Input
-              value={form.image}
-              onChange={(e) => set("image", e.target.value)}
+          <Field label={t("admin_cover_image")}>
+            <ImageUpload value={form.image} onChange={(url) => set("image", url)} />
+          </Field>
+
+          <Field label={t("admin_gallery")}>
+            <GalleryUpload
+              value={form.images}
+              onChange={(urls) => set("images", urls)}
             />
           </Field>
+
+          <Field label={t("admin_description")}>
+            <Textarea
+              rows={3}
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+            />
+          </Field>
+
+          <div className="grid grid-cols-2 gap-3">
+            <Field label={t("admin_address")}>
+              <Input
+                value={form.address}
+                onChange={(e) => set("address", e.target.value)}
+              />
+            </Field>
+            <Field label={t("admin_phone")}>
+              <Input
+                dir="ltr"
+                value={form.phone}
+                onChange={(e) => set("phone", e.target.value)}
+              />
+            </Field>
+          </div>
 
           <Field label={t("admin_features")}>
             <Input
               value={form.features}
               onChange={(e) => set("features", e.target.value)}
             />
+          </Field>
+
+          {/* rooms editor */}
+          <Field label={t("admin_rooms")}>
+            <div className="space-y-2">
+              {form.rooms.map((r, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Input
+                    placeholder={t("admin_room_type")}
+                    value={r.type}
+                    onChange={(e) =>
+                      set(
+                        "rooms",
+                        form.rooms.map((x, j) =>
+                          j === i ? { ...x, type: e.target.value } : x,
+                        ),
+                      )
+                    }
+                  />
+                  <Input
+                    type="number"
+                    className="w-28"
+                    placeholder={t("admin_room_price")}
+                    value={r.price}
+                    onChange={(e) =>
+                      set(
+                        "rooms",
+                        form.rooms.map((x, j) =>
+                          j === i ? { ...x, price: Number(e.target.value) } : x,
+                        ),
+                      )
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() =>
+                      set(
+                        "rooms",
+                        form.rooms.filter((_, j) => j !== i),
+                      )
+                    }
+                  >
+                    <X className="size-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() =>
+                  set("rooms", [...form.rooms, { type: "", price: 0 }])
+                }
+              >
+                <Plus className="size-4" />
+                {t("admin_add_room")}
+              </Button>
+            </div>
           </Field>
 
           <div className="grid grid-cols-2 gap-3">

@@ -1,15 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "motion/react";
 import { MapPin, Star, BedDouble } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, type Hotel } from "@/lib/types";
+import { effectivePrice, pickLang, type Hotel } from "@/lib/types";
 import { BookingDialog } from "./booking-dialog";
 
 export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }) {
-  const { t, tCity } = useI18n();
+  const { t, tCity, tFeature, lang } = useI18n();
+  const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const price = effectivePrice(hotel);
   const hasDiscount = hotel.discount?.active;
   const pct = hasDiscount
@@ -25,13 +27,15 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
     >
       <Card className="group h-full overflow-hidden p-0 transition-shadow hover:shadow-xl">
         <div className="relative aspect-[16/10] overflow-hidden">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={hotel.image}
-            alt={hotel.name}
-            className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+          <Link href={`/hotels/${hotel.id}`} className="block size-full">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={hotel.image}
+              alt={hotel.name}
+              className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          </Link>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
           <div className="absolute start-3 top-3 flex flex-wrap gap-1.5">
             {hotel.featured && (
@@ -57,7 +61,11 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
 
         <div className="flex flex-col gap-3 p-5">
           <div>
-            <h3 className="line-clamp-1 text-lg font-bold">{hotel.name}</h3>
+            <Link href={`/hotels/${hotel.id}`}>
+              <h3 className="line-clamp-1 text-lg font-bold transition-colors hover:text-primary">
+                {name}
+              </h3>
+            </Link>
             <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
               <MapPin className="size-3.5" />
               {tCity(hotel.city)}
@@ -70,7 +78,7 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                 key={f}
                 className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
               >
-                {f}
+                {tFeature(f)}
               </span>
             ))}
           </div>
