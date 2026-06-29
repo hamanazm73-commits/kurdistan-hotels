@@ -10,9 +10,9 @@ import { getFirestore } from "firebase-admin/firestore";
  * transactions (decrementing room availability).
  *
  * Credentials, easiest first:
- *   1. a `service-account.json` file in the project root, OR
- *   2. the raw `*firebase-adminsdk*.json` you downloaded (any name), OR
- *   3. FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY in .env.local
+ *   1. FIREBASE_SERVICE_ACCOUNT env var = the whole JSON (best for Vercel), OR
+ *   2. a `service-account.json` / `*firebase-adminsdk*.json` file locally, OR
+ *   3. FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY env vars
  * Returns null when none are present so callers degrade gracefully.
  */
 function findServiceAccountFile(): string | null {
@@ -33,10 +33,18 @@ function findServiceAccountFile(): string | null {
 export function getAdminDb() {
   if (getApps().length) return getFirestore(getApp());
 
+  const saJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   const jsonPath = findServiceAccountFile();
 
   let credential;
-  if (jsonPath) {
+  if (saJson) {
+    const j = JSON.parse(saJson);
+    credential = cert({
+      projectId: j.project_id,
+      clientEmail: j.client_email,
+      privateKey: j.private_key,
+    });
+  } else if (jsonPath) {
     credential = cert(jsonPath);
   } else if (
     process.env.FIREBASE_CLIENT_EMAIL &&
