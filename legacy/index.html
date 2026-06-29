@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ckb" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>هۆتێلەکانی کوردستان</title>
+<script>
+  /* پاسەوانی چوونەژوورەوە — ئەگەر نەچووبێتە ژوورەوە، بیبە بۆ پەڕەی چوونەژوورەوە */
+  if (sessionStorage.getItem("hotelLoggedIn") !== "yes") {
+    window.location.href = "login.html";
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="translations.js"></script>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+   <nav class="navbar">
+    <div class="dropdown">
+        <button class="dropbtn" id="weatherBtn" data-i18n="nav_weather">کەشوهەوا ▾</button>
+        <div class="dropdown-content" id="weatherDropdown">
+            <select id="citySelect">
+                <option value="Sulaymaniyah">سلێمانی</option>
+                <option value="Erbil">هەولێر</option>
+                <option value="Duhok">دهۆک</option>
+                <option value="Halabja">هەڵەبجە</option>
+                <option value="Kirkuk">کەرکوک</option>
+            </select>
+            <p id="weatherInfo" data-i18n="weather_wait">چاوەڕێ بکە...</p>
+        </div>
+    </div>
+<div class="dropdown">
+        <button class="dropbtn" id="mapBtn" data-i18n="nav_map">نەخشە ▾</button>
+        <div class="dropdown-content" id="mapDropdown">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d103992.74325046473!2d44.284340809944894!3d35.46040825122247!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1554d6034577edc9%3A0x5890c4555c9da475!2sKirkuk%2C%20Kirkuk%20Governorate!5e0!3m2!1sen!2siq!4v1782541967794!5m2!1sen!2siq" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </div>
+    </div>
+
+    <!-- هەڵبژاردنی زمان -->
+    <div class="dropdown">
+        <button class="dropbtn" id="langBtn" data-i18n="nav_lang">🌐 زمان ▾</button>
+        <div class="dropdown-content lang-dropdown" id="langDropdown">
+            <button class="lang-chip" data-lang="ckb" onclick="applyLanguage('ckb')">🇹🇯 کوردی</button>
+            <button class="lang-chip" data-lang="en" onclick="applyLanguage('en')">🇬🇧 English</button>
+            <button class="lang-chip" data-lang="ar" onclick="applyLanguage('ar')">🇮🇶 العراقي</button>
+        </div>
+    </div>
+
+    <!-- چوونەدەرەوە -->
+    <button class="dropbtn logout-btn" id="logoutBtn" data-i18n="logout">چوونەدەرەوە</button>
+</nav>
+
+<header class="hero">
+    <!-- چینەکانی پاشبنەمای ئەنیمەیتکراو -->
+    <div class="hero-bg" aria-hidden="true">
+        <span class="particle"></span><span class="particle"></span>
+        <span class="particle"></span><span class="particle"></span>
+        <span class="particle"></span><span class="particle"></span>
+        <span class="particle"></span><span class="particle"></span>
+        <span class="particle"></span><span class="particle"></span>
+        <svg class="mountains" viewBox="0 0 1440 320" preserveAspectRatio="none">
+            <path class="m-back" d="M0,224 L240,128 L480,224 L720,96 L960,208 L1200,112 L1440,208 L1440,320 L0,320 Z"></path>
+            <path class="m-front" d="M0,288 L180,200 L360,288 L540,176 L720,272 L900,168 L1080,272 L1260,192 L1440,272 L1440,320 L0,320 Z"></path>
+        </svg>
+    </div>
+
+    <div class="hero-content">
+        <h1 data-i18n="hero_title">🏨 هۆتێلەکانی کوردستان</h1>
+        <p data-i18n="hero_sub">باشترین هۆتێلەکان لە کوردستان</p>
+        <div class="hero-actions">
+            <a href="#searchSection" class="hero-cta" data-i18n="hero_cta">هۆتێل بدۆزەرەوە</a>
+            <button id="darkModeToggle" data-i18n="darkmode">🌙 دۆخی تاریک</button>
+        </div>
+    </div>
+
+    <a href="#searchSection" class="scroll-indicator" aria-label="scroll down">⌄</a>
+</header>
+
+
+<div class="search-bar" id="searchSection">
+    <input type="text" data-i18n-ph="search_ph" placeholder="🔍 گەڕان بەدوای هۆتێل...">
+    <button data-i18n="search_btn">گەڕان</button>
+</div>
+
+<div class="city-filter">
+    <button class="city-button active" data-city="all" data-i18n="city_all">هەموو</button>
+    <button class="city-button" data-city="sulaymaniyah" data-i18n="city_sulaymaniyah">سلێمانی</button>
+    <button class="city-button" data-city="erbil" data-i18n="city_erbil">هەولێر</button>
+    <button class="city-button" data-city="duhok" data-i18n="city_duhok">دهۆک</button>
+    <button class="city-button" data-city="halabja" data-i18n="city_halabja">هەڵەبجە</button>
+    <button class="city-button" data-city="kirkuk" data-i18n="city_kirkuk">کەرکوک</button>
+</div>
+<div class="price-filter">
+    <label><span data-i18n="price_label">نرخی زۆرترین:</span> <span id="priceValue">500</span>$</label>
+    <input type="range" id="priceSlider" min="0" max="500" value="500">
+</div>
+<div class="sort-bar">
+    <button id="sortPrice" data-i18n="sort_price">💰 ڕیزکردن بە نرخ (هەرزان → گران)</button>
+</div>
+<p id="hotelCount" class="hotel-count">١٥ هۆتێل دۆزرایەوە</p>
+
+
+<div class="hotels-container">
+    <div class="hotels-grid">
+        <p id="noResults" class="no-results">هیچ هۆتێلێک نەدۆزرایەوە 😔</p>
+    </div>
+</div>
+     <section class="contact-form-section">
+    <h2 data-i18n="contact_title">پەیوەندیمان پێوە بکە</h2>
+    <form id="contactForm" action="https://formspree.io/f/mvzjkyno" method="POST">
+      <input type="text" id="name" name="name" data-i18n-ph="contact_name" placeholder="ناوت">
+<input type="email" id="email" name="email" data-i18n-ph="contact_email" placeholder="ئیمەیلت">
+<textarea id="message" name="message" data-i18n-ph="contact_message" placeholder="نامەکەت" rows="5"></textarea>
+        <button type="submit" data-i18n="contact_send">ناردن</button>
+        <p id="formMessage"></p>
+    </form>
+</section>
+<footer>
+    <div class="footer-content">
+        
+        <div class="footer-section">
+            <h3 data-i18n="footer_about_title">🏨هۆتێلەکانی کوردستان</h3>
+            <p data-i18n="footer_about_text">باشترین پلاتفۆڕم بۆ دۆزینەوەی هۆتێل لە کوردستان</p>
+        </div>
+
+        <div class="footer-section">
+            <h3 data-i18n="footer_contact_title">📞 پەیوەندی</h3>
+            <p><a href="tel:+9647700572004">📱 07700572004</a></p>
+            <p><a href="mailto:info@hotels-sulaymaniyah.com">📧 hamanazm73@gmail.com</a></p>
+            <p><a href="https://wa.me/9647700572004" target="_blank">💬 WhatsApp</a></p>
+        </div>
+
+        <div class="footer-section">
+            <h3 data-i18n="footer_social_title">🌐 سۆشیاڵ میدیا</h3>
+            <p><a href="https://facebook.com" target="_blank">📘 Facebook</a></p>
+            <p><a href="https://instagram.com" target="_blank">📷 Instagram</a></p>
+            <p><a href="https://twitter.com" target="_blank">🐦 Twitter</a></p>
+        </div>
+
+    </div>
+
+    <p class="footer-bottom" data-i18n="footer_bottom">© 2026 - دروستکراوە لەلایەن محەممەد ⚡</p>
+</footer>
+<button id="backToTop" data-i18n-title="back_to_top" title="بڕۆ سەرەوە">⬆️</button>
+<script type="module">
+import { db } from "./firebase-config.js";
+    
+    window.db = db;
+    import { doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  window.bookRoom = function(hotelName) {
+    const modal = document.getElementById("bookingModal");
+    const modalHotelName = document.getElementById("modalHotelName");
+    
+    modalHotelName.textContent = t("modal_hotel_prefix") + " " + hotelName;
+    modal.classList.add("show");
+    modal.dataset.hotelName = hotelName;
+
+    // دۆزینەوەی هۆتێلەکە لە data.js
+    const hotel = hotels.find(function(h) {
+        return h.name === hotelName;
+    });
+
+    // پڕکردنەوەی dropdown بە جۆرەکانی ژوور
+    const roomTypeSelect = document.getElementById("roomType");
+    roomTypeSelect.innerHTML = '<option value="">' + t("modal_select_room") + '</option>';
+
+    if (hotel && hotel.rooms) {
+        hotel.rooms.forEach(function(room) {
+            const option = document.createElement("option");
+            option.value = room.type;
+            option.textContent = room.type + " - " + room.price + "$";
+            option.dataset.price = room.price;
+            roomTypeSelect.appendChild(option);
+        });
+    }
+
+    // سڕینەوەی نرخی کۆن
+    document.getElementById("roomPriceDisplay").textContent = "";
+}
+document.getElementById("roomType").addEventListener("change", function() {
+    const selectedOption = this.options[this.selectedIndex];
+    const price = selectedOption.dataset.price;
+
+    if (price) {
+        document.getElementById("roomPriceDisplay").textContent = t("price_for_night").replace("{p}", price);
+    } else {
+        document.getElementById("roomPriceDisplay").textContent = "";
+    }
+});
+   import { addDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    window.processBooking = async function() {
+        const modal = document.getElementById("bookingModal");
+        const hotelName = modal.dataset.hotelName;
+        
+        const guestName = document.getElementById("guestName").value.trim();
+        const guestPhone = document.getElementById("guestPhone").value.trim();
+        const checkInDate = document.getElementById("checkInDate").value;
+        const nights = document.getElementById("nights").value;
+        const roomTypeSelect = document.getElementById("roomType");
+        const roomType = roomTypeSelect.value;
+        const roomPrice = roomTypeSelect.options[roomTypeSelect.selectedIndex].dataset.price;
+        
+        if (guestName === "" || guestPhone === "" || checkInDate === "" || nights === "" || roomType === "") {
+            showToast(t("booking_required"), "error");
+            return;
+        }
+        
+        const hotelRef = doc(db, "bookings", hotelName);
+        
+        try {
+            const hotelSnap = await getDoc(hotelRef);
+            let currentAvailable;
+            
+            if (hotelSnap.exists()) {
+                currentAvailable = hotelSnap.data().available;
+            } else {
+                currentAvailable = 9;
+                await setDoc(hotelRef, { available: 9 });
+            }
+            
+            if (currentAvailable > 0) {
+                await updateDoc(hotelRef, {
+                    available: currentAvailable - 1
+                });
+                
+               await addDoc(collection(db, "reservations"), {
+                    hotel: hotelName,
+                    name: guestName,
+                    phone: guestPhone,
+                    roomType: roomType,
+                    roomPrice: roomPrice,
+                    checkIn: checkInDate,
+                    nights: nights,
+                    time: new Date().toLocaleString()
+                });
+
+                
+                showToast(hotelName + " — " + t("booking_ok") + " " + (currentAvailable - 1), "success");
+                modal.classList.remove("show");
+                document.getElementById("guestName").value = "";
+                document.getElementById("guestPhone").value = "";
+                document.getElementById("checkInDate").value = "";
+                document.getElementById("nights").value = "";
+                document.getElementById("roomType").value = "";
+                document.getElementById("roomPriceDisplay").textContent = "";
+            } else {
+                showToast(t("booking_full"), "error");
+            }
+        } catch (error) {
+            showToast(t("booking_err") + " " + error.message, "error");
+        }
+    }
+import { collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+window.listenToRooms = function (callback) {
+    onSnapshot(collection(db, "bookings"), function (snapshot) {
+        const rooms = {};
+        snapshot.forEach(function (docItem) {
+            rooms[docItem.id] = docItem.data().available;
+        });
+        callback(rooms);
+    });
+};
+
+    window.getAvailableRooms = async function() {
+        const roomData = {};
+        try {
+            const querySnapshot = await getDocs(collection(db, "bookings"));
+            querySnapshot.forEach(function(docItem) {
+                roomData[docItem.id] = docItem.data().available;
+            });
+        } catch (error) {
+            console.log("هەڵە:", error.message);
+        }
+        return roomData;
+    }
+    window.showToast = function(message, type) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("show");
+        
+        if (type === "success") {
+            toast.classList.add("success");
+        } else if (type === "error") {
+            toast.classList.add("error");
+        }
+        
+        setTimeout(function() {
+            toast.classList.remove("show");
+            toast.classList.remove("success");
+            toast.classList.remove("error");
+        }, 3000);
+    }
+    document.getElementById("confirmBooking").addEventListener("click", processBooking);
+    document.getElementById("closeModal").addEventListener("click", function() {
+        document.getElementById("bookingModal").classList.remove("show");
+    });
+</script>
+<div id="bookingModal" class="modal">
+    <div class="modal-content">
+        <span id="closeModal" class="close">&times;</span>
+        <h2 data-i18n="modal_title">حیجزکردنی ژوور</h2>
+        <p id="modalHotelName"></p>
+
+        <input type="text" id="guestName" data-i18n-ph="modal_name" placeholder="ناوی تەواو">
+        <input type="tel" id="guestPhone" data-i18n-ph="modal_phone" placeholder="ژمارەی تەلەفۆن">
+        <label data-i18n="modal_checkin">بەرواری چوونەژوورەوە:</label>
+        <input type="date" id="checkInDate">
+        <input type="number" id="nights" data-i18n-ph="modal_nights" placeholder="ژمارەی شەوەکان" min="1">
+        <label data-i18n="modal_roomtype">جۆری ژوور:</label>
+        <select id="roomType">
+            <option value="" data-i18n="modal_select_room">-- جۆری ژوور هەڵبژێرە --</option>
+        </select>
+        <p id="roomPriceDisplay"></p>
+
+        <button id="confirmBooking" data-i18n="modal_confirm">پشتڕاستکردنەوەی حیجز</button>
+    </div>
+</div>
+<script type="module"></script> 
+<script src="data.js"></script>
+<script src="script.js" defer></script>
+</body>
+</html>

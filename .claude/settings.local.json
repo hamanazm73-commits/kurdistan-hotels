@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 8000 -State Listen -ErrorAction SilentlyContinue; if \\($c\\) { \"STILL IN USE by PID\\(s\\): \" + \\(\\($c.OwningProcess | Sort-Object -Unique\\) -join ', '\\) } else { \"Port 8000 is FREE\" })",
+      "PowerShell($job = Start-Job -ScriptBlock { powershell -NoProfile -ExecutionPolicy Bypass -File \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\\\\serve.ps1\" 8000 }; Start-Sleep -Seconds 2; try { $r = Invoke-WebRequest -Uri \"http://localhost:8000/login.html\" -UseBasicParsing -TimeoutSec 5; \"OK $\\($r.StatusCode\\) - serve.ps1 binds port 8000 cleanly\" } catch { \"ERR: $\\($_.Exception.Message\\)\" } finally { Stop-Job $job -ErrorAction SilentlyContinue; Remove-Job $job -Force -ErrorAction SilentlyContinue })",
+      "WebFetch(domain:github.com)",
+      "PowerShell($w = \\(Get-Command winget -ErrorAction SilentlyContinue\\); if \\($w\\) { \"winget: \" + $w.Source } else { \"no winget\" }; $n = \\(Get-Command node -ErrorAction SilentlyContinue\\); if \\($n\\) { \"node: \" + $n.Source } else { \"no node\" }; $npm = \\(Get-Command npm -ErrorAction SilentlyContinue\\); if \\($npm\\) { \"npm: \" + $npm.Source } else { \"no npm\" }; \"OS: \" + \\(Get-CimInstance Win32_OperatingSystem\\).Caption)",
+      "PowerShell(try { \"fresh-shell node: \" + \\(node --version\\) + \"  npm: \" + \\(npm --version\\) } catch { \"NOT on fresh PATH: \" + $_.Exception.Message })",
+      "PowerShell(try { \"fresh-shell node: \" + \\(node --version\\) + \"  npm: \" + \\(npm --version\\) + \"  npx: \" + \\(npx --version\\) } catch { \"STILL NOT on PATH: \" + $_.Exception.Message })",
+      "PowerShell($p = \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\\\\.env.local\"; if \\(Test-Path $p\\) { \"Found: $p\"; \"Size: \" + \\(Get-Item $p\\).Length + \" bytes\" } else { \"NOT FOUND\" })"
+    ]
+  }
+}
