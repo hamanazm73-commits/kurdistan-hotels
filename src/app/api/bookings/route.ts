@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { notifyBooking } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -48,6 +49,7 @@ export async function POST(req: Request) {
   // 3) persist via Admin SDK when configured (writes bypass client rules safely)
   const adminDb = getAdminDb();
   if (!adminDb) {
+    await notifyBooking(parsed.data);
     return NextResponse.json({ ok: true, persisted: false });
   }
 
@@ -81,6 +83,7 @@ export async function POST(req: Request) {
     if (outcome.soldOut) {
       return NextResponse.json({ error: "sold_out" }, { status: 409 });
     }
+    await notifyBooking(parsed.data);
     return NextResponse.json({
       ok: true,
       persisted: true,
