@@ -35,10 +35,16 @@ service cloud.firestore {
     match /hotels/{id} {
       allow read: if true;
       allow create, delete: if isAdmin();
-      // owner/admins edit any hotel; a hotel owner edits only their own
+      // owner/admins edit any hotel; a hotel owner edits only their own,
+      // and may NOT change featured / recommended / discount.
       allow update: if isAdmin() ||
         (hasRole() && myRole().enabled == true && myRole().role == 'hotel'
-          && myRole().hotelId == id);
+          && myRole().hotelId == id
+          && request.resource.data.featured == resource.data.featured
+          && request.resource.data.recommended == resource.data.recommended
+          && request.resource.data.discount.active == resource.data.discount.active
+          && request.resource.data.discount.oldPrice == resource.data.discount.oldPrice
+          && request.resource.data.discount.newPrice == resource.data.discount.newPrice);
     }
 
     // Bookings: created server-side via the API (Admin SDK). Owner/admins

@@ -228,9 +228,12 @@ export function HotelsPanel() {
 export function HotelFormDialog({
   hotel,
   trigger,
+  restricted,
 }: {
   hotel?: Hotel;
   trigger: React.ReactElement;
+  /** hotel owners can't touch featured / recommended / discount */
+  restricted?: boolean;
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -525,44 +528,48 @@ export function HotelFormDialog({
             </div>
           </Field>
 
-          <div className="grid grid-cols-2 gap-3">
-            <ToggleRow
-              label={t("admin_featured")}
-              checked={form.featured}
-              onChange={(v) => set("featured", v)}
-            />
-            <ToggleRow
-              label={t("admin_recommended")}
-              checked={form.recommended}
-              onChange={(v) => set("recommended", v)}
-            />
-          </div>
-
-          <div className="rounded-lg border p-3">
-            <ToggleRow
-              label={t("admin_discount_on")}
-              checked={form.discountActive}
-              onChange={(v) => set("discountActive", v)}
-            />
-            {form.discountActive && (
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <Field label={t("admin_old_price")}>
-                  <Input
-                    type="number"
-                    value={form.oldPrice}
-                    onChange={(e) => set("oldPrice", Number(e.target.value))}
-                  />
-                </Field>
-                <Field label={t("admin_new_price")}>
-                  <Input
-                    type="number"
-                    value={form.newPrice}
-                    onChange={(e) => set("newPrice", Number(e.target.value))}
-                  />
-                </Field>
+          {!restricted && (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                <ToggleRow
+                  label={t("admin_featured")}
+                  checked={form.featured}
+                  onChange={(v) => set("featured", v)}
+                />
+                <ToggleRow
+                  label={t("admin_recommended")}
+                  checked={form.recommended}
+                  onChange={(v) => set("recommended", v)}
+                />
               </div>
-            )}
-          </div>
+
+              <div className="rounded-lg border p-3">
+                <ToggleRow
+                  label={t("admin_discount_on")}
+                  checked={form.discountActive}
+                  onChange={(v) => set("discountActive", v)}
+                />
+                {form.discountActive && (
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <Field label={t("admin_old_price")}>
+                      <Input
+                        type="number"
+                        value={form.oldPrice}
+                        onChange={(e) => set("oldPrice", Number(e.target.value))}
+                      />
+                    </Field>
+                    <Field label={t("admin_new_price")}>
+                      <Input
+                        type="number"
+                        value={form.newPrice}
+                        onChange={(e) => set("newPrice", Number(e.target.value))}
+                      />
+                    </Field>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         <DialogFooter>

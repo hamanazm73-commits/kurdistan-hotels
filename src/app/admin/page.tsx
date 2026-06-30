@@ -83,6 +83,7 @@ export default function AdminPage() {
               {myHotel && (
                 <HotelFormDialog
                   hotel={myHotel}
+                  restricted
                   trigger={
                     <Button variant="secondary" size="sm" className="gap-1.5">
                       <Pencil className="size-4" />
