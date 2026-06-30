@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import {
   Plus,
@@ -244,50 +244,54 @@ export function HotelFormDialog({
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const buildForm = useCallback(
-    () =>
-      hotel
-        ? {
-            name: hotel.name,
-            city: hotel.city,
-            price: hotel.price,
-            rating: hotel.rating,
-            image: hotel.image,
-            images: hotel.images ?? [],
-            available: hotel.available,
-            features: hotel.features.join(", "),
-            description: hotel.description ?? "",
-            address: hotel.address ?? "",
-            phone: hotel.phone ?? "",
-            rooms: hotel.rooms?.length ? hotel.rooms : defaultRooms(),
-            featured: hotel.featured,
-            recommended: hotel.recommended,
-            discountActive: hotel.discount?.active ?? false,
-            oldPrice: hotel.discount?.oldPrice ?? 0,
-            newPrice: hotel.discount?.newPrice ?? 0,
-            nameCkb: hotel.nameI18n?.ckb ?? "",
-            nameKmr: hotel.nameI18n?.kmr ?? "",
-            nameEn: hotel.nameI18n?.en ?? "",
-            nameAr: hotel.nameI18n?.ar ?? "",
-            descCkb: hotel.descriptionI18n?.ckb ?? "",
-            descKmr: hotel.descriptionI18n?.kmr ?? "",
-            descEn: hotel.descriptionI18n?.en ?? "",
-            descAr: hotel.descriptionI18n?.ar ?? "",
-          }
-        : empty,
-    [hotel],
-  );
+  // Always holds the latest hotel prop without triggering re-renders.
+  const hotelRef = useRef(hotel);
+  hotelRef.current = hotel;
+
+  function buildForm() {
+    const h = hotelRef.current;
+    if (!h) return { ...empty };
+    return {
+      name: h.name,
+      city: h.city,
+      price: h.price,
+      rating: h.rating,
+      image: h.image,
+      images: h.images ?? [],
+      available: h.available,
+      features: h.features.join(", "),
+      description: h.description ?? "",
+      address: h.address ?? "",
+      phone: h.phone ?? "",
+      rooms: h.rooms?.length ? h.rooms : defaultRooms(),
+      featured: h.featured,
+      recommended: h.recommended,
+      discountActive: h.discount?.active ?? false,
+      oldPrice: h.discount?.oldPrice ?? 0,
+      newPrice: h.discount?.newPrice ?? 0,
+      nameCkb: h.nameI18n?.ckb ?? "",
+      nameKmr: h.nameI18n?.kmr ?? "",
+      nameEn: h.nameI18n?.en ?? "",
+      nameAr: h.nameI18n?.ar ?? "",
+      descCkb: h.descriptionI18n?.ckb ?? "",
+      descKmr: h.descriptionI18n?.kmr ?? "",
+      descEn: h.descriptionI18n?.en ?? "",
+      descAr: h.descriptionI18n?.ar ?? "",
+    };
+  }
 
   const [form, setForm] = useState(buildForm);
   const [showI18n, setShowI18n] = useState(false);
 
-  // Re-sync form with latest hotel data every time the dialog opens.
+  // Reset form with latest hotel data each time the dialog opens.
+  // Depends only on `open` so Firestore real-time updates can't
+  // interrupt the user while they're editing.
   useEffect(() => {
-    if (open) {
-      setForm(buildForm());
-      setShowI18n(false);
-    }
-  }, [open, buildForm]);
+    if (!open) return;
+    setForm(buildForm());
+    setShowI18n(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
