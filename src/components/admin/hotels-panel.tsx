@@ -113,6 +113,8 @@ export function HotelsPanel() {
   const { t, tCity, lang } = useI18n();
   const { hotels, usingSamples } = useHotels();
   const [seeding, setSeeding] = useState(false);
+  const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
+  const [priceInput, setPriceInput] = useState("");
 
   async function onSeed() {
     setSeeding(true);
@@ -123,6 +125,24 @@ export function HotelsPanel() {
       toast.error((e as Error).message);
     } finally {
       setSeeding(false);
+    }
+  }
+
+  function startPriceEdit(h: Hotel) {
+    setEditingPriceId(h.id);
+    setPriceInput(String(h.price));
+  }
+
+  async function commitPriceEdit(h: Hotel) {
+    const n = Number(priceInput);
+    setEditingPriceId(null);
+    if (!n || n === h.price) return;
+    try {
+      await updateHotel(h.id, { price: n });
+      toast.success(t("admin_saved"));
+    } catch (e) {
+      console.error("[price edit]", e);
+      toast.error(e instanceof Error ? e.message : String(e));
     }
   }
 
@@ -161,6 +181,7 @@ export function HotelsPanel() {
       <div className="grid gap-3">
         {hotels.map((h) => {
           const isSample = h.id.startsWith("sample-");
+          const isEditingPrice = editingPriceId === h.id;
           return (
             <Card key={h.id} className="flex flex-row items-center gap-4 p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -186,9 +207,38 @@ export function HotelsPanel() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {tCity(h.city)} · {formatPrice(effectivePrice(h), lang)} {t("per_night")}
-                </p>
+                <div className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground">
+                  <span>{tCity(h.city)} ·</span>
+                  {isEditingPrice ? (
+                    <span className="flex items-center gap-1">
+                      <Input
+                        type="number"
+                        value={priceInput}
+                        onChange={(e) => setPriceInput(e.target.value)}
+                        onBlur={() => commitPriceEdit(h)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") { e.preventDefault(); commitPriceEdit(h); }
+                          if (e.key === "Escape") setEditingPriceId(null);
+                        }}
+                        autoFocus
+                        className="h-6 w-28 px-1.5 text-xs"
+                      />
+                      <span className="text-xs">
+                        {lang === "en" || lang === "kmr" ? "IQD" : "دینار"}
+                      </span>
+                    </span>
+                  ) : (
+                    <button
+                      disabled={isSample}
+                      onClick={() => startPriceEdit(h)}
+                      className="rounded px-1 hover:bg-muted hover:text-foreground disabled:pointer-events-none"
+                      title={t("admin_edit")}
+                    >
+                      {formatPrice(effectivePrice(h), lang)}
+                    </button>
+                  )}
+                  <span>{t("per_night")}</span>
+                </div>
               </div>
               <div className="flex shrink-0 gap-1">
                 <HotelFormDialog
