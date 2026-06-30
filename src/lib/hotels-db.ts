@@ -9,11 +9,12 @@ import {
   setDoc,
   getDocs,
   query,
+  where,
   orderBy,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import { SAMPLE_HOTELS } from "./sample-data";
-import type { AdminRecord, Booking, Hotel, HotelInput } from "./types";
+import type { AdminRecord, Booking, Hotel, HotelInput, Role } from "./types";
 
 function requireDb() {
   if (!db) throw new Error("Firebase not configured");
@@ -55,15 +56,25 @@ export async function listAdmins(): Promise<AdminRecord[]> {
   return snap.docs.map((d) => d.data() as AdminRecord);
 }
 
-export async function addAdmin(email: string, addedBy: string) {
+export async function addAdmin(
+  email: string,
+  addedBy: string,
+  role: Role = "admin",
+  hotel?: { id: string; name: string },
+) {
   const e = email.trim().toLowerCase();
-  return setDoc(doc(requireDb(), "roles", e), {
+  const rec: AdminRecord = {
     email: e,
-    role: "admin",
+    role,
     enabled: true,
     addedBy,
     createdAt: Date.now(),
-  } satisfies AdminRecord);
+  };
+  if (role === "hotel" && hotel) {
+    rec.hotelId = hotel.id;
+    rec.hotelName = hotel.name;
+  }
+  return setDoc(doc(requireDb(), "roles", e), rec);
 }
 
 export async function setAdminEnabled(email: string, enabled: boolean) {
@@ -76,11 +87,17 @@ export async function removeAdmin(email: string) {
 
 /* ---------------- bookings (read for admin) ---------------- */
 
-export async function listBookings(): Promise<(Booking & { id: string })[]> {
-  const q = query(
-    collection(requireDb(), "bookings"),
-    orderBy("createdAt", "desc"),
-  );
+export async function listBookings(
+  hotelId?: string,
+): Promise<(Booking & { id: string })[]> {
+  const col = collection(requireDb(), "bookings");
+  // For a hotel owner, filter by hotelId (sorted client-side to avoid a
+  // composite index). Owners/admins get all, sorted by Firestore.
+  const q = hotelId
+    ? query(col, where("hotelId", "==", hotelId))
+    : query(col, orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Booking) }));
+  const rows = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Booking) }));
+  if (hotelId) rows.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+  return rows;
 }

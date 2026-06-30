@@ -20,6 +20,7 @@ import type { Role } from "./types";
 interface AuthValue {
   user: User | null;
   role: Role | null;
+  hotelId: string | null;
   loading: boolean;
   isOwner: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -31,6 +32,7 @@ const AuthContext = createContext<AuthValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<Role | null>(null);
+  const [hotelId, setHotelId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,7 +42,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      setRole(await resolveRole(u));
+      const r = await resolveRole(u);
+      setRole(r.role);
+      setHotelId(r.hotelId);
       setLoading(false);
     });
   }, []);
@@ -58,29 +62,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, role, loading, isOwner, login, logout }}
+      value={{ user, role, hotelId, loading, isOwner, login, logout }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
 
-async function resolveRole(u: User | null): Promise<Role | null> {
-  if (!u?.email) return null;
+async function resolveRole(
+  u: User | null,
+): Promise<{ role: Role | null; hotelId: string | null }> {
+  if (!u?.email) return { role: null, hotelId: null };
   const email = u.email.toLowerCase();
-  if (OWNER_EMAIL && email === OWNER_EMAIL) return "owner";
-  if (!db) return null;
+  if (OWNER_EMAIL && email === OWNER_EMAIL)
+    return { role: "owner", hotelId: null };
+  if (!db) return { role: null, hotelId: null };
   try {
     const snap = await getDoc(doc(db, "roles", email));
     if (snap.exists()) {
-      const data = snap.data() as { role?: Role; enabled?: boolean };
-      if (data.enabled && (data.role === "admin" || data.role === "owner"))
-        return data.role;
+      const data = snap.data() as {
+        role?: Role;
+        enabled?: boolean;
+        hotelId?: string;
+      };
+      if (
+        data.enabled &&
+        (data.role === "admin" || data.role === "owner" || data.role === "hotel")
+      )
+        return { role: data.role, hotelId: data.hotelId ?? null };
     }
   } catch {
     /* ignore — treated as no role */
   }
-  return null;
+  return { role: null, hotelId: null };
 }
 
 export function useAuth() {

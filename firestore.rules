@@ -1,14 +1,7 @@
 rules_version = '2';
 
-// ============================================================
-//  Kurdistan Hotels — Firestore security rules
-//
-//  Deploy:  copy into Firebase console > Firestore > Rules,
-//  OR run:  firebase deploy --only firestore:rules
-//
-//  IMPORTANT: set OWNER_EMAIL below to the SAME email you put in
-//  NEXT_PUBLIC_OWNER_EMAIL in .env.local (lowercase).
-// ============================================================
+// Deploy: Firebase console > Firestore > Rules > paste > Publish.
+// Set ownerEmail() to your login email (lowercase).
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -25,11 +18,17 @@ service cloud.firestore {
     function isOwner() {
       return isSignedIn() && emailLower() == ownerEmail();
     }
+    function hasRole() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/roles/$(emailLower()));
+    }
+    function myRole() {
+      return get(/databases/$(database)/documents/roles/$(emailLower())).data;
+    }
     function isAdmin() {
       return isOwner() ||
-        (isSignedIn()
-          && exists(/databases/$(database)/documents/roles/$(emailLower()))
-          && get(/databases/$(database)/documents/roles/$(emailLower())).data.enabled == true);
+        (hasRole() && myRole().enabled == true
+          && (myRole().role == 'admin' || myRole().role == 'owner'));
     }
 
     // Hotels: anyone can read; only owner/admins can change.
@@ -38,10 +37,12 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
-    // Bookings: created server-side via the rate-limited API (Admin SDK),
-    // so clients can't write directly. Only admins can read them.
+    // Bookings: created server-side via the API (Admin SDK). Owner/admins
+    // read all; a hotel owner reads only bookings for their own hotel.
     match /bookings/{id} {
-      allow read: if isAdmin();
+      allow read: if isAdmin() ||
+        (hasRole() && myRole().enabled == true && myRole().role == 'hotel'
+          && resource.data.hotelId == myRole().hotelId);
       allow write: if false;
     }
 

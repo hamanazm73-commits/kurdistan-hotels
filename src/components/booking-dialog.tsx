@@ -93,7 +93,7 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
       <DialogTrigger render={<Button className="shrink-0" />}>
         {t("book_now")}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("book_title")}</DialogTitle>
           <DialogDescription>{hotel.name}</DialogDescription>

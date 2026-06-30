@@ -17,7 +17,7 @@ import { AdminsPanel } from "@/components/admin/admins-panel";
 
 export default function AdminPage() {
   const { t } = useI18n();
-  const { user, role, isOwner, loading, logout } = useAuth();
+  const { user, role, hotelId, isOwner, loading, logout } = useAuth();
 
   if (loading) {
     return (
@@ -58,6 +58,34 @@ export default function AdminPage() {
             </Button>
           </div>
         </Card>
+      </div>
+    );
+  }
+
+  // Hotel owner: only their own hotel's bookings, no tabs.
+  if (role === "hotel") {
+    return (
+      <div className="min-h-dvh bg-muted/30">
+        <header className="border-b bg-background">
+          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
+            <div>
+              <h1 className="text-xl font-bold">{t("admin_bookings")}</h1>
+              {user?.email && (
+                <p className="text-sm text-muted-foreground">{user.email}</p>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              <LanguageSwitcher />
+              <ThemeToggle />
+              <Button variant="ghost" size="sm" onClick={() => logout()}>
+                {t("nav_logout")}
+              </Button>
+            </div>
+          </div>
+        </header>
+        <main className="mx-auto max-w-5xl px-6 py-8">
+          <BookingsPanel hotelId={hotelId ?? undefined} />
+        </main>
       </div>
     );
   }

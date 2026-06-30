@@ -1,6 +1,6 @@
 export type Lang = "ckb" | "en" | "ar";
 
-export type Role = "owner" | "admin";
+export type Role = "owner" | "admin" | "hotel";
 
 /** Optional per-language overrides for a text field. */
 export type LangMap = Partial<Record<Lang, string>>;
@@ -75,6 +75,9 @@ export interface AdminRecord {
   email: string;
   role: Role;
   enabled: boolean;
+  /** for role "hotel": the hotel this owner is scoped to */
+  hotelId?: string;
+  hotelName?: string;
   addedBy?: string;
   createdAt?: number;
 }

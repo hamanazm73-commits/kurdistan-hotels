@@ -125,6 +125,9 @@ const ckb: Dict = {
   admin_deleted: "سڕایەوە",
   role_owner: "خاوەن",
   role_admin: "بەڕێوەبەر",
+  role_hotel: "خاوەنی هۆتێل",
+  admin_role: "ڕۆڵ",
+  admin_select_hotel: "هۆتێل هەڵبژێرە",
 
   admin_description: "وەسف",
   admin_address: "ناونیشان",
@@ -256,6 +259,9 @@ const en: Dict = {
   admin_deleted: "Deleted",
   role_owner: "Owner",
   role_admin: "Admin",
+  role_hotel: "Hotel owner",
+  admin_role: "Role",
+  admin_select_hotel: "Choose a hotel",
 
   admin_description: "Description",
   admin_address: "Address",
@@ -387,6 +393,9 @@ const ar: Dict = {
   admin_deleted: "انحذف",
   role_owner: "المالك",
   role_admin: "مدير",
+  role_hotel: "صاحب فندق",
+  admin_role: "الدور",
+  admin_select_hotel: "اختر فندق",
 
   admin_description: "الوصف",
   admin_address: "العنوان",

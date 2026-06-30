@@ -15,17 +15,17 @@ import { useI18n } from "@/lib/i18n";
 import { listBookings } from "@/lib/hotels-db";
 import type { Booking } from "@/lib/types";
 
-export function BookingsPanel() {
+export function BookingsPanel({ hotelId }: { hotelId?: string }) {
   const { t } = useI18n();
   const [rows, setRows] = useState<(Booking & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    listBookings()
+    listBookings(hotelId)
       .then(setRows)
       .catch(() => setRows([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [hotelId]);
 
   if (loading)
     return (
