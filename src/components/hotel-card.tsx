@@ -6,7 +6,7 @@ import { MapPin, Star, BedDouble } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, pickLang, type Hotel } from "@/lib/types";
+import { effectivePrice, formatPrice, pickLang, type Hotel } from "@/lib/types";
 import { BookingDialog } from "./booking-dialog";
 
 export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }) {
@@ -88,11 +88,11 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               <div className="flex items-baseline gap-2">
                 {hasDiscount && (
                   <span className="text-sm text-muted-foreground line-through">
-                    ${hotel.discount.oldPrice}
+                    {formatPrice(hotel.discount.oldPrice, lang)}
                   </span>
                 )}
                 <span className="text-2xl font-extrabold text-primary">
-                  ${price}
+                  {formatPrice(price, lang)}
                 </span>
               </div>
               <span className="text-xs text-muted-foreground">

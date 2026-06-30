@@ -22,10 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
-import type { Hotel } from "@/lib/types";
+import { formatPrice, type Hotel } from "@/lib/types";
 
 export function BookingDialog({ hotel }: { hotel: Hotel }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -150,7 +150,7 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
               <SelectContent>
                 {hotel.rooms.map((r) => (
                   <SelectItem key={r.type} value={r.type}>
-                    {r.type} — ${r.price}
+                    {r.type} — {formatPrice(r.price, lang)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -160,7 +160,7 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
           {total > 0 && (
             <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3 text-sm font-medium">
               <span>{t("book_total")}</span>
-              <span className="text-lg font-bold text-primary">${total}</span>
+              <span className="text-lg font-bold text-primary">{formatPrice(total, lang)}</span>
             </div>
           )}
         </div>

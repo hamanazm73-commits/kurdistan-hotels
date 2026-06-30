@@ -17,13 +17,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
-import { effectivePrice } from "@/lib/types";
+import { effectivePrice, formatPrice } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type Sort = "recommended" | "price_low" | "price_high" | "rating";
 
 export function HotelsSection() {
-  const { t, tCity } = useI18n();
+  const { t, tCity, lang } = useI18n();
   const { hotels, loading } = useHotels();
 
   const [search, setSearch] = useState("");
@@ -112,7 +112,7 @@ export function HotelsSection() {
             <div className="hidden items-center gap-2 sm:flex">
               <SlidersHorizontal className="size-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
-                {t("max_price")}: ${maxPrice}
+                {t("max_price")}: {formatPrice(maxPrice, lang)}
               </span>
               <Slider
                 value={[maxPrice]}

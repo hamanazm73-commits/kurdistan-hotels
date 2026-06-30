@@ -1,4 +1,4 @@
-export type Lang = "ckb" | "en" | "ar";
+export type Lang = "ckb" | "kmr" | "en" | "ar";
 
 export type Role = "owner" | "admin" | "hotel";
 
@@ -85,4 +85,9 @@ export interface AdminRecord {
 /** the price a hotel is actually sold at right now */
 export function effectivePrice(h: Pick<Hotel, "price" | "discount">): number {
   return h.discount?.active ? h.discount.newPrice : h.price;
+}
+
+export function formatPrice(price: number, lang: Lang): string {
+  const n = price.toLocaleString("en-US");
+  return lang === "en" || lang === "kmr" ? `${n} IQD` : `${n} دینار`;
 }

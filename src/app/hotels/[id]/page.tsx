@@ -20,7 +20,7 @@ import { Card } from "@/components/ui/card";
 import { BookingDialog } from "@/components/booking-dialog";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, pickLang } from "@/lib/types";
+import { effectivePrice, formatPrice, pickLang } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export default function HotelDetailPage() {
@@ -175,7 +175,7 @@ export default function HotelDetailPage() {
                       {r.type}
                     </span>
                     <span className="font-bold text-primary">
-                      ${r.price}
+                      {formatPrice(r.price, lang)}
                       <span className="text-xs font-normal text-muted-foreground">
                         {" "}
                         {t("per_night")}
@@ -213,11 +213,11 @@ export default function HotelDetailPage() {
               <div className="flex items-baseline gap-2">
                 {hasDiscount && (
                   <span className="text-base text-muted-foreground line-through">
-                    ${hotel.discount.oldPrice}
+                    {formatPrice(hotel.discount.oldPrice, lang)}
                   </span>
                 )}
                 <span className="text-3xl font-extrabold text-primary">
-                  ${price}
+                  {formatPrice(price, lang)}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   {t("per_night")}

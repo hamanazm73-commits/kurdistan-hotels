@@ -45,7 +45,7 @@ import {
   deleteHotel,
   seedHotels,
 } from "@/lib/hotels-db";
-import { effectivePrice, type Hotel, type HotelInput } from "@/lib/types";
+import { effectivePrice, formatPrice, type Hotel, type HotelInput } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
 function defaultRooms() {
@@ -56,10 +56,11 @@ function defaultRooms() {
   ];
 }
 
-/** Build a {ckb,en,ar} map, skipping empty values (Firestore-safe). */
-function i18nObj(ckb: string, en: string, ar: string) {
-  const o: { ckb?: string; en?: string; ar?: string } = {};
+/** Build a {ckb,kmr,en,ar} map, skipping empty values (Firestore-safe). */
+function i18nObj(ckb: string, kmr: string, en: string, ar: string) {
+  const o: { ckb?: string; kmr?: string; en?: string; ar?: string } = {};
   if (ckb.trim()) o.ckb = ckb.trim();
+  if (kmr.trim()) o.kmr = kmr.trim();
   if (en.trim()) o.en = en.trim();
   if (ar.trim()) o.ar = ar.trim();
   return o;
@@ -67,12 +68,14 @@ function i18nObj(ckb: string, en: string, ar: string) {
 
 const NAME_FIELDS = [
   { lang: "ckb", key: "nameCkb" },
+  { lang: "kmr", key: "nameKmr" },
   { lang: "en", key: "nameEn" },
   { lang: "ar", key: "nameAr" },
 ] as const;
 
 const DESC_FIELDS = [
   { lang: "ckb", key: "descCkb" },
+  { lang: "kmr", key: "descKmr" },
   { lang: "en", key: "descEn" },
   { lang: "ar", key: "descAr" },
 ] as const;
@@ -97,15 +100,17 @@ const empty = {
   oldPrice: 0,
   newPrice: 0,
   nameCkb: "",
+  nameKmr: "",
   nameEn: "",
   nameAr: "",
   descCkb: "",
+  descKmr: "",
   descEn: "",
   descAr: "",
 };
 
 export function HotelsPanel() {
-  const { t, tCity } = useI18n();
+  const { t, tCity, lang } = useI18n();
   const { hotels, usingSamples } = useHotels();
   const [seeding, setSeeding] = useState(false);
 
@@ -182,7 +187,7 @@ export function HotelsPanel() {
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {tCity(h.city)} · ${effectivePrice(h)} {t("per_night")}
+                  {tCity(h.city)} · {formatPrice(effectivePrice(h), lang)} {t("per_night")}
                 </p>
               </div>
               <div className="flex shrink-0 gap-1">
@@ -259,9 +264,11 @@ export function HotelFormDialog({
           oldPrice: hotel.discount?.oldPrice ?? 0,
           newPrice: hotel.discount?.newPrice ?? 0,
           nameCkb: hotel.nameI18n?.ckb ?? "",
+          nameKmr: hotel.nameI18n?.kmr ?? "",
           nameEn: hotel.nameI18n?.en ?? "",
           nameAr: hotel.nameI18n?.ar ?? "",
           descCkb: hotel.descriptionI18n?.ckb ?? "",
+          descKmr: hotel.descriptionI18n?.kmr ?? "",
           descEn: hotel.descriptionI18n?.en ?? "",
           descAr: hotel.descriptionI18n?.ar ?? "",
         }
@@ -280,7 +287,7 @@ export function HotelFormDialog({
     }
     const data: HotelInput = {
       name: form.name.trim(),
-      nameI18n: i18nObj(form.nameCkb, form.nameEn, form.nameAr),
+      nameI18n: i18nObj(form.nameCkb, form.nameKmr, form.nameEn, form.nameAr),
       city: form.city,
       price: Number(form.price),
       rating: Number(form.rating),
@@ -292,7 +299,7 @@ export function HotelFormDialog({
         .map((s) => s.trim())
         .filter(Boolean),
       description: form.description.trim(),
-      descriptionI18n: i18nObj(form.descCkb, form.descEn, form.descAr),
+      descriptionI18n: i18nObj(form.descCkb, form.descKmr, form.descEn, form.descAr),
       address: form.address.trim(),
       phone: form.phone.trim(),
       rooms: form.rooms
