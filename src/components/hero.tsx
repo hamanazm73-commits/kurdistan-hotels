@@ -95,30 +95,6 @@ export function Hero() {
               {t("hero_cta2")}
             </Button>
           </motion.div>
-
-          <motion.dl
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={4}
-            className="mx-auto mt-14 grid max-w-lg grid-cols-3 gap-4"
-          >
-            {[
-              { n: "200+", k: "stat_hotels" },
-              { n: "6", k: "stat_cities" },
-              { n: "10k+", k: "stat_guests" },
-            ].map((s) => (
-              <div
-                key={s.k}
-                className="rounded-2xl border bg-card/60 p-4 backdrop-blur"
-              >
-                <dt className="text-2xl font-bold text-gradient-gold">{s.n}</dt>
-                <dd className="mt-1 text-xs text-muted-foreground">
-                  {t(s.k)}
-                </dd>
-              </div>
-            ))}
-          </motion.dl>
         </div>
       </div>
     </section>
