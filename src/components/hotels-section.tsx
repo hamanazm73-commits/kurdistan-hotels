@@ -29,7 +29,7 @@ export function HotelsSection() {
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(300);
+  const [maxPrice, setMaxPrice] = useState(500_000);
   const [sort, setSort] = useState<Sort>("recommended");
 
   const filtered = useMemo(() => {
@@ -119,9 +119,9 @@ export function HotelsSection() {
                 onValueChange={(v) =>
                   setMaxPrice(Array.isArray(v) ? v[0] : v)
                 }
-                min={50}
-                max={300}
-                step={10}
+                min={10_000}
+                max={500_000}
+                step={5_000}
                 className="w-36"
               />
             </div>
