@@ -332,19 +332,80 @@ export function HotelFormDialog({
 
   const [form, setForm] = useState(buildForm);
   const [showI18n, setShowI18n] = useState(false);
+  const formRef = useRef(form);
+  formRef.current = form;
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
-  // Reset form with latest hotel data each time the dialog opens.
-  // Depends only on `open` so Firestore real-time updates can't
-  // interrupt the user while they're editing.
+  function buildData(f: typeof form): HotelInput {
+    return {
+      name: f.name.trim(),
+      nameI18n: i18nObj(f.nameCkb, f.nameKmr, f.nameEn, f.nameAr),
+      city: f.city,
+      price: Number(f.price),
+      rating: Number(f.rating),
+      image: f.image.trim(),
+      images: f.images.filter(Boolean),
+      available: Number(f.available),
+      features: f.features.split(",").map((s) => s.trim()).filter(Boolean),
+      description: f.description.trim(),
+      descriptionI18n: i18nObj(f.descCkb, f.descKmr, f.descEn, f.descAr),
+      address: f.address.trim(),
+      phone: f.phone.trim(),
+      rooms: f.rooms.map((r) => ({ type: r.type.trim(), price: Number(r.price) })).filter((r) => r.type),
+      featured: f.featured,
+      recommended: f.recommended,
+      discount: {
+        active: f.discountActive,
+        oldPrice: Number(f.oldPrice),
+        newPrice: Number(f.newPrice),
+      },
+    };
+  }
+
+  async function doAutoSave() {
+    const h = hotelRef.current;
+    if (!h) return;
+    const f = formRef.current;
+    if (!f.name.trim()) return;
+    setAutoSaveStatus("saving");
+    try {
+      await updateHotel(h.id, buildData(f));
+      setAutoSaveStatus("saved");
+    } catch (e) {
+      console.error("[auto-save]", e);
+      toast.error(e instanceof Error ? e.message : String(e));
+      setAutoSaveStatus("idle");
+    }
+  }
+
+  function scheduleAutoSave() {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    setAutoSaveStatus("idle");
+    debounceTimerRef.current = setTimeout(doAutoSave, 1000);
+  }
+
+  // Reset form when dialog opens; flush pending save when it closes.
   useEffect(() => {
-    if (!open) return;
-    setForm(buildForm());
-    setShowI18n(false);
+    if (open) {
+      setForm(buildForm());
+      setShowI18n(false);
+      setAutoSaveStatus("idle");
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+    } else if (hotelRef.current && debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+      void doAutoSave();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
+    if (hotelRef.current) scheduleAutoSave();
   }
 
   async function save() {
@@ -352,38 +413,9 @@ export function HotelFormDialog({
       toast.error(t("book_required"));
       return;
     }
-    const data: HotelInput = {
-      name: form.name.trim(),
-      nameI18n: i18nObj(form.nameCkb, form.nameKmr, form.nameEn, form.nameAr),
-      city: form.city,
-      price: Number(form.price),
-      rating: Number(form.rating),
-      image: form.image.trim(),
-      images: form.images.filter(Boolean),
-      available: Number(form.available),
-      features: form.features
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      description: form.description.trim(),
-      descriptionI18n: i18nObj(form.descCkb, form.descKmr, form.descEn, form.descAr),
-      address: form.address.trim(),
-      phone: form.phone.trim(),
-      rooms: form.rooms
-        .map((r) => ({ type: r.type.trim(), price: Number(r.price) }))
-        .filter((r) => r.type),
-      featured: form.featured,
-      recommended: form.recommended,
-      discount: {
-        active: form.discountActive,
-        oldPrice: Number(form.oldPrice),
-        newPrice: Number(form.newPrice),
-      },
-    };
     setSaving(true);
     try {
-      if (hotel) await updateHotel(hotel.id, data);
-      else await addHotel(data);
+      await addHotel(buildData(form));
       toast.success(t("admin_saved"));
       setOpen(false);
     } catch (e) {
@@ -648,13 +680,29 @@ export function HotelFormDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setOpen(false)}>
-            {t("admin_cancel")}
-          </Button>
-          <Button onClick={save} disabled={saving}>
-            {saving && <Loader2 className="size-4 animate-spin" />}
-            {t("admin_save")}
-          </Button>
+          {hotel ? (
+            <>
+              <span className="me-auto flex items-center gap-1.5 text-sm text-muted-foreground">
+                {autoSaveStatus === "saving" && (
+                  <><Loader2 className="size-3.5 animate-spin" />{t("admin_saving")}</>
+                )}
+                {autoSaveStatus === "saved" && t("admin_saved")}
+              </span>
+              <Button onClick={() => setOpen(false)}>
+                {t("admin_close")}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                {t("admin_cancel")}
+              </Button>
+              <Button onClick={save} disabled={saving}>
+                {saving && <Loader2 className="size-4 animate-spin" />}
+                {t("admin_save")}
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
