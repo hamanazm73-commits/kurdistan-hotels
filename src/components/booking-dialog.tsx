@@ -117,7 +117,7 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
             <div className="grid gap-2">
               <Label htmlFor="bk-date">{t("book_checkin")}</Label>
               <Input
