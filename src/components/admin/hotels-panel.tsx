@@ -50,9 +50,9 @@ import { CITIES } from "@/lib/sample-data";
 
 function defaultRooms() {
   return [
-    { type: "Single", price: 75 },
-    { type: "Double", price: 105 },
-    { type: "Suite", price: 170 },
+    { type: "Single", price: 75_000 },
+    { type: "Double", price: 105_000 },
+    { type: "Suite", price: 170_000 },
   ];
 }
 
@@ -83,7 +83,7 @@ const DESC_FIELDS = [
 const empty = {
   name: "",
   city: CITIES[0] as string,
-  price: 90,
+  price: 90_000,
   rating: 4.5,
   image:
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
