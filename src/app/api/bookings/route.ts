@@ -12,7 +12,7 @@ const BookingSchema = z.object({
   name: z.string().min(2).max(100),
   phone: z.string().min(5).max(30),
   roomType: z.string().min(1).max(60),
-  roomPrice: z.number().nonnegative().max(100000),
+  roomPrice: z.number().nonnegative().max(10_000_000),
   checkIn: z.string().min(4).max(40),
   nights: z.number().int().min(1).max(60),
 });
