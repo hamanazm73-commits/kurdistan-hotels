@@ -225,7 +225,7 @@ export function HotelsPanel() {
   );
 }
 
-function HotelFormDialog({
+export function HotelFormDialog({
   hotel,
   trigger,
 }: {

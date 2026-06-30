@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Crown, Lock, Loader2, ArrowLeft } from "lucide-react";
+import { Crown, Lock, Loader2, ArrowLeft, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,13 +11,15 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
-import { HotelsPanel } from "@/components/admin/hotels-panel";
+import { useHotels } from "@/lib/use-hotels";
+import { HotelsPanel, HotelFormDialog } from "@/components/admin/hotels-panel";
 import { BookingsPanel } from "@/components/admin/bookings-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 
 export default function AdminPage() {
   const { t } = useI18n();
   const { user, role, hotelId, isOwner, loading, logout } = useAuth();
+  const { hotels } = useHotels();
 
   if (loading) {
     return (
@@ -64,17 +66,31 @@ export default function AdminPage() {
 
   // Hotel owner: only their own hotel's bookings, no tabs.
   if (role === "hotel") {
+    const myHotel = hotels.find((h) => h.id === hotelId);
     return (
       <div className="min-h-dvh bg-muted/30">
         <header className="border-b bg-background">
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
             <div>
-              <h1 className="text-xl font-bold">{t("admin_bookings")}</h1>
+              <h1 className="text-xl font-bold">
+                {myHotel?.name ?? t("admin_bookings")}
+              </h1>
               {user?.email && (
                 <p className="text-sm text-muted-foreground">{user.email}</p>
               )}
             </div>
             <div className="flex items-center gap-1">
+              {myHotel && (
+                <HotelFormDialog
+                  hotel={myHotel}
+                  trigger={
+                    <Button variant="secondary" size="sm" className="gap-1.5">
+                      <Pencil className="size-4" />
+                      {t("admin_edit_my_hotel")}
+                    </Button>
+                  }
+                />
+              )}
               <LanguageSwitcher />
               <ThemeToggle />
               <Button variant="ghost" size="sm" onClick={() => logout()}>
