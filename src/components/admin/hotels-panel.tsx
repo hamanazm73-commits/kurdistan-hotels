@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Plus,
@@ -243,38 +243,51 @@ export function HotelFormDialog({
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState(
-    hotel
-      ? {
-          name: hotel.name,
-          city: hotel.city,
-          price: hotel.price,
-          rating: hotel.rating,
-          image: hotel.image,
-          images: hotel.images ?? [],
-          available: hotel.available,
-          features: hotel.features.join(", "),
-          description: hotel.description ?? "",
-          address: hotel.address ?? "",
-          phone: hotel.phone ?? "",
-          rooms: hotel.rooms?.length ? hotel.rooms : defaultRooms(),
-          featured: hotel.featured,
-          recommended: hotel.recommended,
-          discountActive: hotel.discount?.active ?? false,
-          oldPrice: hotel.discount?.oldPrice ?? 0,
-          newPrice: hotel.discount?.newPrice ?? 0,
-          nameCkb: hotel.nameI18n?.ckb ?? "",
-          nameKmr: hotel.nameI18n?.kmr ?? "",
-          nameEn: hotel.nameI18n?.en ?? "",
-          nameAr: hotel.nameI18n?.ar ?? "",
-          descCkb: hotel.descriptionI18n?.ckb ?? "",
-          descKmr: hotel.descriptionI18n?.kmr ?? "",
-          descEn: hotel.descriptionI18n?.en ?? "",
-          descAr: hotel.descriptionI18n?.ar ?? "",
-        }
-      : empty,
+
+  const buildForm = useCallback(
+    () =>
+      hotel
+        ? {
+            name: hotel.name,
+            city: hotel.city,
+            price: hotel.price,
+            rating: hotel.rating,
+            image: hotel.image,
+            images: hotel.images ?? [],
+            available: hotel.available,
+            features: hotel.features.join(", "),
+            description: hotel.description ?? "",
+            address: hotel.address ?? "",
+            phone: hotel.phone ?? "",
+            rooms: hotel.rooms?.length ? hotel.rooms : defaultRooms(),
+            featured: hotel.featured,
+            recommended: hotel.recommended,
+            discountActive: hotel.discount?.active ?? false,
+            oldPrice: hotel.discount?.oldPrice ?? 0,
+            newPrice: hotel.discount?.newPrice ?? 0,
+            nameCkb: hotel.nameI18n?.ckb ?? "",
+            nameKmr: hotel.nameI18n?.kmr ?? "",
+            nameEn: hotel.nameI18n?.en ?? "",
+            nameAr: hotel.nameI18n?.ar ?? "",
+            descCkb: hotel.descriptionI18n?.ckb ?? "",
+            descKmr: hotel.descriptionI18n?.kmr ?? "",
+            descEn: hotel.descriptionI18n?.en ?? "",
+            descAr: hotel.descriptionI18n?.ar ?? "",
+          }
+        : empty,
+    [hotel],
   );
+
+  const [form, setForm] = useState(buildForm);
   const [showI18n, setShowI18n] = useState(false);
+
+  // Re-sync form with latest hotel data every time the dialog opens.
+  useEffect(() => {
+    if (open) {
+      setForm(buildForm());
+      setShowI18n(false);
+    }
+  }, [open, buildForm]);
 
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -320,7 +333,8 @@ export function HotelFormDialog({
       toast.success(t("admin_saved"));
       setOpen(false);
     } catch (e) {
-      toast.error((e as Error).message);
+      console.error("[save hotel]", e);
+      toast.error(e instanceof Error ? e.message : String(e));
     } finally {
       setSaving(false);
     }
