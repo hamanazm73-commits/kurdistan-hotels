@@ -367,7 +367,8 @@ export function HotelFormDialog({
     const h = hotelRef.current;
     if (!h) return;
     const f = formRef.current;
-    if (!f.name.trim()) return;
+    // don't auto-save while a required number is empty (mid-edit)
+    if (!f.name.trim() || Number(f.price) <= 0) return;
     setAutoSaveStatus("saving");
     try {
       await updateHotel(h.id, buildData(f));
@@ -409,7 +410,7 @@ export function HotelFormDialog({
   }
 
   async function save() {
-    if (!form.name.trim()) {
+    if (!form.name.trim() || Number(form.price) <= 0) {
       toast.error(t("book_required"));
       return;
     }
@@ -509,7 +510,7 @@ export function HotelFormDialog({
                 step="0.1"
                 min={0}
                 max={5}
-                value={form.rating}
+                value={form.rating || ""}
                 onChange={(e) => set("rating", Number(e.target.value))}
               />
             </Field>
@@ -519,14 +520,15 @@ export function HotelFormDialog({
             <Field label={t("admin_price")}>
               <Input
                 type="number"
-                value={form.price}
+                inputMode="numeric"
+                value={form.price || ""}
                 onChange={(e) => set("price", Number(e.target.value))}
               />
             </Field>
             <Field label={t("admin_available")}>
               <Input
                 type="number"
-                value={form.available}
+                value={form.available || ""}
                 onChange={(e) => set("available", Number(e.target.value))}
               />
             </Field>
@@ -595,7 +597,7 @@ export function HotelFormDialog({
                     type="number"
                     className="w-28"
                     placeholder={t("admin_room_price")}
-                    value={r.price}
+                    value={r.price || ""}
                     onChange={(e) =>
                       set(
                         "rooms",
@@ -661,14 +663,14 @@ export function HotelFormDialog({
                     <Field label={t("admin_old_price")}>
                       <Input
                         type="number"
-                        value={form.oldPrice}
+                        value={form.oldPrice || ""}
                         onChange={(e) => set("oldPrice", Number(e.target.value))}
                       />
                     </Field>
                     <Field label={t("admin_new_price")}>
                       <Input
                         type="number"
-                        value={form.newPrice}
+                        value={form.newPrice || ""}
                         onChange={(e) => set("newPrice", Number(e.target.value))}
                       />
                     </Field>

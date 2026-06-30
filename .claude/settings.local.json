@@ -8,7 +8,18 @@
       "PowerShell($w = \\(Get-Command winget -ErrorAction SilentlyContinue\\); if \\($w\\) { \"winget: \" + $w.Source } else { \"no winget\" }; $n = \\(Get-Command node -ErrorAction SilentlyContinue\\); if \\($n\\) { \"node: \" + $n.Source } else { \"no node\" }; $npm = \\(Get-Command npm -ErrorAction SilentlyContinue\\); if \\($npm\\) { \"npm: \" + $npm.Source } else { \"no npm\" }; \"OS: \" + \\(Get-CimInstance Win32_OperatingSystem\\).Caption)",
       "PowerShell(try { \"fresh-shell node: \" + \\(node --version\\) + \"  npm: \" + \\(npm --version\\) } catch { \"NOT on fresh PATH: \" + $_.Exception.Message })",
       "PowerShell(try { \"fresh-shell node: \" + \\(node --version\\) + \"  npm: \" + \\(npm --version\\) + \"  npx: \" + \\(npx --version\\) } catch { \"STILL NOT on PATH: \" + $_.Exception.Message })",
-      "PowerShell($p = \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\\\\.env.local\"; if \\(Test-Path $p\\) { \"Found: $p\"; \"Size: \" + \\(Get-Item $p\\).Length + \" bytes\" } else { \"NOT FOUND\" })"
+      "PowerShell($p = \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\\\\.env.local\"; if \\(Test-Path $p\\) { \"Found: $p\"; \"Size: \" + \\(Get-Item $p\\).Length + \" bytes\" } else { \"NOT FOUND\" })",
+      "PowerShell($env:Path = \"C:\\\\Users\\\\pc\\\\AppData\\\\Local\\\\nodejs\\\\node-v24.18.0-win-x64;$env:Path\"; cd \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\"; npm run build 2>&1 | Select-Object -Last 40)",
+      "PowerShell($env:Path = \"C:\\\\Users\\\\pc\\\\AppData\\\\Local\\\\nodejs\\\\node-v24.18.0-win-x64;$env:Path\"; cd \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\"; npm run build 2>&1 | Select-Object -Last 20)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "PowerShell($env:Path = \"C:\\\\Users\\\\pc\\\\AppData\\\\Local\\\\nodejs\\\\node-v24.18.0-win-x64;$env:Path\"; cd \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\"; node scripts/add-kmr-names.mjs)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "PowerShell($env:PATH = \"C:\\\\Users\\\\pc\\\\AppData\\\\Local\\\\nodejs\\\\node-v24.18.0-win-x64;\" + $env:PATH; cd \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\"; npx tsc --noEmit 2>&1 | Select-Object -First 30)",
+      "PowerShell($env:PATH = \"C:\\\\Users\\\\pc\\\\AppData\\\\Local\\\\nodejs\\\\node-v24.18.0-win-x64;\" + $env:PATH; cd \"D:\\\\OneDrive\\\\Desktop\\\\hotel dukan 2\"; npx tsc --noEmit 2>&1 | Select-Object -First 20)",
+      "Bash(node scripts/migrate-prices-to-iqd.mjs)"
     ]
   }
 }
