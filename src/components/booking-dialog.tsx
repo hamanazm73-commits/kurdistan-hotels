@@ -147,12 +147,12 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
               <SelectTrigger>
                 <SelectValue placeholder={t("book_select_room")} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="w-[min(92vw,22rem)]">
                 {hotel.rooms.map((r) => (
                   <SelectItem key={r.type} value={r.type}>
-                    <span className="flex w-full items-center justify-between gap-6">
-                      <span>{r.type}</span>
-                      <span className="text-muted-foreground">
+                    <span className="flex w-full items-center justify-between gap-6 pe-4">
+                      <span className="font-medium">{r.type}</span>
+                      <span className="whitespace-nowrap text-muted-foreground">
                         {formatPrice(r.price, lang)}
                       </span>
                     </span>
