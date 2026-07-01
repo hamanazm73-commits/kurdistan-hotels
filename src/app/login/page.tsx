@@ -29,7 +29,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/admin");
+      router.push("/hq");
     } catch {
       setError(t("login_error"));
     } finally {

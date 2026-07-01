@@ -46,26 +46,26 @@
 
 /* ===== Kurdistan Hotels palette — navy + gold ===== */
 :root {
-  --background: oklch(0.985 0.006 85);
-  --foreground: oklch(0.22 0.03 262);
+  --background: oklch(0.988 0.008 78);
+  --foreground: oklch(0.20 0.03 258);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 262);
+  --card-foreground: oklch(0.20 0.03 258);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.03 262);
-  --primary: oklch(0.34 0.07 262);
+  --popover-foreground: oklch(0.20 0.03 258);
+  --primary: oklch(0.32 0.08 252);
   --primary-foreground: oklch(0.98 0.01 85);
   --secondary: oklch(0.95 0.01 262);
   --secondary-foreground: oklch(0.30 0.05 262);
   --muted: oklch(0.96 0.008 262);
   --muted-foreground: oklch(0.52 0.02 262);
-  --accent: oklch(0.92 0.06 85);
-  --accent-foreground: oklch(0.30 0.05 262);
+  --accent: oklch(0.94 0.07 78);
+  --accent-foreground: oklch(0.28 0.05 258);
   --destructive: oklch(0.58 0.21 25);
   --border: oklch(0.90 0.012 262);
   --input: oklch(0.90 0.012 262);
-  --ring: oklch(0.72 0.12 85);
-  --gold: oklch(0.78 0.13 85);
-  --gold-foreground: oklch(0.26 0.04 262);
+  --ring: oklch(0.72 0.14 78);
+  --gold: oklch(0.75 0.16 68);
+  --gold-foreground: oklch(0.24 0.04 258);
   --radius: 0.85rem;
   --sidebar: oklch(0.985 0.006 85);
   --sidebar-foreground: oklch(0.22 0.03 262);

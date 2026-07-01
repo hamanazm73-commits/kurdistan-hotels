@@ -39,7 +39,7 @@ export function SiteHeader() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-bold">
-          <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow-md">
+          <span className="grid size-9 place-items-center rounded-xl bg-gold text-gold-foreground shadow-md">
             <Building2 className="size-5" />
           </span>
           <span className="text-lg tracking-tight">{t("brand")}</span>
@@ -70,7 +70,7 @@ export function SiteHeader() {
                   size="sm"
                   className="gap-1.5"
                   nativeButton={false}
-                  render={<Link href="/admin" />}
+                  render={<Link href="/hq" />}
                 >
                   <LayoutDashboard className="size-4" />
                   {t("nav_admin")}
@@ -132,7 +132,7 @@ export function SiteHeader() {
                       variant="secondary"
                       className="justify-start"
                       nativeButton={false}
-                      render={<Link href="/admin" />}
+                      render={<Link href="/hq" />}
                     >
                       {t("nav_admin")}
                     </Button>

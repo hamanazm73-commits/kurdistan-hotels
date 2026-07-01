@@ -25,8 +25,8 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.4) }}
     >
-      <Card className="group h-full overflow-hidden p-0 transition-shadow hover:shadow-xl">
-        <div className="relative aspect-[16/10] overflow-hidden">
+      <Card className="group h-full overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
+        <div className="relative aspect-[3/2] overflow-hidden">
           <Link href={`/hotels/${hotel.id}`} className="block size-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -53,8 +53,8 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             )}
           </div>
 
-          <div className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-background/90 px-2.5 py-1 text-sm font-semibold shadow">
-            <Star className="size-3.5 fill-gold text-gold" />
+          <div className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-sm font-bold shadow-lg text-gold-foreground">
+            <Star className="size-3.5 fill-gold-foreground text-gold-foreground" />
             {hotel.rating.toFixed(1)}
           </div>
         </div>
@@ -91,7 +91,7 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                     {formatPrice(hotel.discount.oldPrice, lang)}
                   </span>
                 )}
-                <span className="text-2xl font-extrabold text-primary">
+                <span className="text-2xl font-extrabold text-gold">
                   {formatPrice(price, lang)}
                 </span>
               </div>
