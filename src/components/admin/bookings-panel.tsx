@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Loader2, Inbox, Phone } from "lucide-react";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -58,8 +58,64 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     );
 
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="overflow-x-auto">
+    <div className="space-y-3">
+      {/* ── Mobile: one card per booking ── */}
+      <div className="grid gap-3 md:hidden">
+        {rows.map((b) => (
+          <Card key={b.id} className="p-4">
+            {/* header: name + total */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate font-bold">{b.name}</p>
+                <p className="truncate text-sm text-muted-foreground">{b.hotel}</p>
+              </div>
+              <span className="shrink-0 text-base font-extrabold text-gold">
+                {formatPrice(b.roomPrice * b.nights, lang)}
+              </span>
+            </div>
+
+            {/* details grid */}
+            <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+              <span className="text-muted-foreground">{t("book_roomtype")}</span>
+              <span className="flex items-center gap-1 font-medium">
+                <BedDouble className="size-3.5 shrink-0 text-muted-foreground" />
+                {b.roomType}
+              </span>
+              <span className="text-muted-foreground">{t("book_checkin")}</span>
+              <span dir="ltr" className="flex items-center gap-1 font-medium">
+                <CalendarDays className="size-3.5 shrink-0 text-muted-foreground" />
+                {b.checkIn}
+              </span>
+              <span className="text-muted-foreground">{t("book_nights")}</span>
+              <span className="font-medium">{b.nights} {t("per_night").replace("/", "").trim()}</span>
+            </div>
+
+            {/* phone + whatsapp */}
+            <div className="mt-3 flex items-center gap-2 border-t pt-3">
+              <a
+                href={`tel:${b.phone}`}
+                dir="ltr"
+                className="flex flex-1 items-center gap-2 rounded-lg border bg-muted/40 px-3 py-2 text-sm font-medium text-primary active:bg-muted"
+              >
+                <Phone className="size-4 shrink-0" />
+                {b.phone}
+              </a>
+              <a
+                href={buildWhatsApp(b.phone, b.name)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="WhatsApp"
+                className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#25D366] text-white transition-colors hover:bg-[#1ebe5d] active:scale-95"
+              >
+                <WhatsAppIcon className="size-5" />
+              </a>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* ── Desktop: table ── */}
+      <Card className="hidden overflow-hidden p-0 md:block">
         <Table className="[&_tbody_tr:nth-child(even)]:bg-muted/30">
           <TableHeader>
             <TableRow>
@@ -92,7 +148,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       title="WhatsApp"
-                      className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white hover:bg-[#1ebe5d] transition-colors"
+                      className="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-[#25D366] text-white transition-colors hover:bg-[#1ebe5d]"
                     >
                       <WhatsAppIcon className="size-3" />
                     </a>
@@ -110,7 +166,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
             ))}
           </TableBody>
         </Table>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
