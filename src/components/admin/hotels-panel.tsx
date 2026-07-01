@@ -114,7 +114,7 @@ export function HotelsPanel() {
   const { hotels, usingSamples } = useHotels();
   const [seeding, setSeeding] = useState(false);
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
-  const [priceInput, setPriceInput] = useState("");
+  const [priceInput, setPriceInput] = useState(0);
 
   async function onSeed() {
     setSeeding(true);
@@ -130,11 +130,11 @@ export function HotelsPanel() {
 
   function startPriceEdit(h: Hotel) {
     setEditingPriceId(h.id);
-    setPriceInput(String(h.price));
+    setPriceInput(h.price);
   }
 
   async function commitPriceEdit(h: Hotel) {
-    const n = Number(priceInput);
+    const n = priceInput;
     setEditingPriceId(null);
     if (!n || n === h.price) return;
     try {
@@ -211,10 +211,9 @@ export function HotelsPanel() {
                   <span>{tCity(h.city)} ·</span>
                   {isEditingPrice ? (
                     <span className="flex items-center gap-1">
-                      <Input
-                        type="number"
+                      <MoneyInput
                         value={priceInput}
-                        onChange={(e) => setPriceInput(e.target.value)}
+                        onChange={setPriceInput}
                         onBlur={() => commitPriceEdit(h)}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") { e.preventDefault(); commitPriceEdit(h); }
@@ -518,12 +517,7 @@ export function HotelFormDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label={t("admin_price")}>
-              <Input
-                type="number"
-                inputMode="numeric"
-                value={form.price || ""}
-                onChange={(e) => set("price", Number(e.target.value))}
-              />
+              <MoneyInput value={form.price} onChange={(n) => set("price", n)} />
             </Field>
             <Field label={t("admin_available")}>
               <Input
@@ -593,16 +587,15 @@ export function HotelFormDialog({
                       )
                     }
                   />
-                  <Input
-                    type="number"
+                  <MoneyInput
                     className="w-28"
                     placeholder={t("admin_room_price")}
-                    value={r.price || ""}
-                    onChange={(e) =>
+                    value={r.price}
+                    onChange={(n) =>
                       set(
                         "rooms",
                         form.rooms.map((x, j) =>
-                          j === i ? { ...x, price: Number(e.target.value) } : x,
+                          j === i ? { ...x, price: n } : x,
                         ),
                       )
                     }
@@ -661,17 +654,15 @@ export function HotelFormDialog({
                 {form.discountActive && (
                   <div className="mt-3 grid grid-cols-2 gap-3">
                     <Field label={t("admin_old_price")}>
-                      <Input
-                        type="number"
-                        value={form.oldPrice || ""}
-                        onChange={(e) => set("oldPrice", Number(e.target.value))}
+                      <MoneyInput
+                        value={form.oldPrice}
+                        onChange={(n) => set("oldPrice", n)}
                       />
                     </Field>
                     <Field label={t("admin_new_price")}>
-                      <Input
-                        type="number"
-                        value={form.newPrice || ""}
-                        onChange={(e) => set("newPrice", Number(e.target.value))}
+                      <MoneyInput
+                        value={form.newPrice}
+                        onChange={(n) => set("newPrice", n)}
                       />
                     </Field>
                   </div>
@@ -740,5 +731,26 @@ function ToggleRow({
       {label}
       <Switch checked={checked} onCheckedChange={onChange} />
     </label>
+  );
+}
+
+/** Number input that shows thousands separators as you type (50000 -> 50,000)
+    and shows blank (not 0) when cleared. */
+function MoneyInput({
+  value,
+  onChange,
+  ...rest
+}: {
+  value: number;
+  onChange: (n: number) => void;
+} & Omit<React.ComponentProps<typeof Input>, "value" | "onChange" | "type">) {
+  return (
+    <Input
+      type="text"
+      inputMode="numeric"
+      value={value ? value.toLocaleString("en-US") : ""}
+      onChange={(e) => onChange(Number(e.target.value.replace(/\D/g, "")) || 0)}
+      {...rest}
+    />
   );
 }
