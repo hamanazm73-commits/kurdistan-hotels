@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { SiteProtection } from "@/components/site-protection";
 
 const sans = Plus_Jakarta_Sans({
   variable: "--font-sans",
@@ -51,6 +52,7 @@ export default function RootLayout({
       <body
         className={`${sans.variable} ${arabic.variable} min-h-dvh antialiased`}
       >
+        <SiteProtection />
         <Providers>{children}</Providers>
       </body>
     </html>
