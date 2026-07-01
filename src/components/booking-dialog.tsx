@@ -150,7 +150,12 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
               <SelectContent>
                 {hotel.rooms.map((r) => (
                   <SelectItem key={r.type} value={r.type}>
-                    {r.type} — {formatPrice(r.price, lang)}
+                    <span className="flex w-full items-center justify-between gap-6">
+                      <span>{r.type}</span>
+                      <span className="text-muted-foreground">
+                        {formatPrice(r.price, lang)}
+                      </span>
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
