@@ -15,7 +15,7 @@ import {
 import { HotelCard } from "./hotel-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHotels } from "@/lib/use-hotels";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, CITY_KEYS } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
 import { effectivePrice, formatPrice } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -37,9 +37,12 @@ export function HotelsSection() {
       const q = search.trim().toLowerCase();
       const matchesSearch =
         !q ||
-        h.name.toLowerCase().includes(q) ||
-        h.city.toLowerCase().includes(q) ||
-        tCity(h.city).toLowerCase().includes(q);
+        [
+          h.name,
+          ...(h.nameI18n ? Object.values(h.nameI18n) : []),
+          h.city,
+          ...(CITY_KEYS[h.city] ? Object.values(CITY_KEYS[h.city]) : []),
+        ].some((v) => v?.toLowerCase().includes(q));
       const matchesCity = city === "all" || h.city === city;
       const matchesFeatured = !featuredOnly || h.featured;
       const matchesPrice = effectivePrice(h) <= maxPrice;
@@ -62,7 +65,7 @@ export function HotelsSection() {
       }
     });
     return list;
-  }, [hotels, search, city, featuredOnly, maxPrice, sort, tCity]);
+  }, [hotels, search, city, featuredOnly, maxPrice, sort]);
 
   return (
     <section id="hotels" className="mx-auto max-w-7xl scroll-mt-20 px-6 py-16">

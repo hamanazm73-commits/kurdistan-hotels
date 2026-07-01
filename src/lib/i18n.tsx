@@ -581,7 +581,7 @@ const kmr: Dict = {
 const DICTS: Record<Lang, Dict> = { ckb, kmr, en, ar };
 
 /** English city name -> translation key */
-const CITY_KEYS: Record<string, Dict> = {
+export const CITY_KEYS: Record<string, Dict> = {
   Dukan: { ckb: "دووکان", kmr: "Dûkan", en: "Dukan", ar: "دوكان" },
   Erbil: { ckb: "هەولێر", kmr: "Hewlêr", en: "Erbil", ar: "أربيل" },
   Sulaymaniyah: { ckb: "سلێمانی", kmr: "Silêmanî", en: "Sulaymaniyah", ar: "السليمانية" },
