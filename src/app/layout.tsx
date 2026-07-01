@@ -18,6 +18,29 @@ export const metadata: Metadata = {
   title: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
   description:
     "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
+  openGraph: {
+    title: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
+    description:
+      "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
+    type: "website",
+    url: "https://kurdistan-hotels.vercel.app",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=630&fit=crop&q=85",
+        width: 1200,
+        height: 630,
+        alt: "Kurdistan Hotels — Beautiful mountain landscape",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
+    description: "Discover and book the finest hotels across Kurdistan.",
+    images: [
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=630&fit=crop&q=85",
+    ],
+  },
 };
 
 export default function RootLayout({
