@@ -33,6 +33,11 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               src={hotel.image}
               alt={hotel.name}
               className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+              onError={(e) => {
+                const img = e.currentTarget;
+                img.onerror = null;
+                img.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
+              }}
             />
           </Link>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
