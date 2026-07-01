@@ -130,15 +130,19 @@ export function HotelsPanel() {
 
   function startPriceEdit(h: Hotel) {
     setEditingPriceId(h.id);
-    setPriceInput(h.price);
+    setPriceInput(effectivePrice(h));
   }
 
   async function commitPriceEdit(h: Hotel) {
     const n = priceInput;
     setEditingPriceId(null);
-    if (!n || n === h.price) return;
+    if (!n || n === effectivePrice(h)) return;
     try {
-      await updateHotel(h.id, { price: n });
+      // if the hotel is discounted, the shown price is the discount price
+      const data = h.discount?.active
+        ? { discount: { ...h.discount, newPrice: n } }
+        : { price: n };
+      await updateHotel(h.id, data);
       toast.success(t("admin_saved"));
     } catch (e) {
       console.error("[price edit]", e);
