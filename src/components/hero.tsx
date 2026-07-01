@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
+import { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform, useInView, type Variants } from "motion/react";
 import { MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
@@ -15,6 +16,60 @@ const fadeUp: Variants = {
   }),
 };
 
+const ORBS = [
+  { cls: "size-80 top-1/4 -right-10", color: "oklch(0.78 0.15 68 / 0.14)", dur: 9, delay: 0 },
+  { cls: "size-56 top-1/2 -left-10", color: "oklch(0.78 0.15 68 / 0.09)", dur: 12, delay: 3 },
+  { cls: "size-40 bottom-1/3 right-1/3", color: "oklch(0.85 0.12 68 / 0.11)", dur: 10, delay: 1.5 },
+] as const;
+
+function AnimatedStat({
+  value,
+  label,
+  hasBorderEnd,
+}: {
+  value: string;
+  label: string;
+  hasBorderEnd?: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+  const [display, setDisplay] = useState("0");
+
+  useEffect(() => {
+    if (!inView) return;
+    const match = value.match(/^([\d,]+)(\+?)$/);
+    if (!match) { setDisplay(value); return; }
+
+    const num = parseInt(match[1].replace(/,/g, ""), 10);
+    const suffix = match[2] ?? "";
+    const duration = 1800;
+    let t0: number | null = null;
+
+    const tick = (ts: number) => {
+      if (t0 === null) t0 = ts;
+      const p = Math.min((ts - t0) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const cur = Math.floor(eased * num);
+      setDisplay((cur >= 1000 ? cur.toLocaleString() : String(cur)) + suffix);
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [inView, value]);
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex flex-col items-center gap-1 py-6",
+        hasBorderEnd && "border-e border-white/20",
+      )}
+    >
+      <span className="text-3xl font-extrabold text-gold sm:text-4xl">{display}</span>
+      <span className="text-xs text-white/70">{label}</span>
+    </div>
+  );
+}
+
 const STATS = [
   { labelKey: "stat_hotels", value: "12+" },
   { labelKey: "stat_cities", value: "6" },
@@ -23,28 +78,46 @@ const STATS = [
 
 export function Hero() {
   const { t } = useI18n();
+  const { scrollY } = useScroll();
+  const bgY = useTransform(scrollY, [0, 700], [0, -90]);
+  const contentOpacity = useTransform(scrollY, [0, 450], [1, 0.55]);
 
   return (
     <section className="relative flex min-h-[90vh] flex-col justify-center overflow-hidden">
-      {/* Background photo */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=90"
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 size-full object-cover"
-        fetchPriority="high"
-      />
+      {/* Parallax background */}
+      <motion.div style={{ y: bgY }} className="absolute inset-0 scale-[1.22] origin-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=90"
+          alt=""
+          aria-hidden="true"
+          className="size-full object-cover"
+          fetchPriority="high"
+        />
+      </motion.div>
 
-      {/* Layered overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/30 to-black/80" />
+      {/* Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/85" />
       <div className="absolute inset-0 [background:radial-gradient(ellipse_120%_80%_at_50%_0%,transparent_45%,rgba(0,0,0,0.4)_100%)]" />
 
-      {/* Content */}
-      <div className="relative mx-auto w-full max-w-7xl px-6 pb-28 pt-36 text-white">
-        <div className="mx-auto max-w-3xl text-center">
+      {/* Floating glow orbs */}
+      {ORBS.map((orb, i) => (
+        <motion.div
+          key={i}
+          animate={{ y: [0, -24, 0], scale: [1, 1.12, 1], opacity: [0.6, 1, 0.6] }}
+          transition={{ duration: orb.dur, repeat: Infinity, ease: "easeInOut", delay: orb.delay }}
+          style={{ background: orb.color }}
+          className={cn("pointer-events-none absolute rounded-full blur-3xl", orb.cls)}
+        />
+      ))}
 
-          {/* Pill badge */}
+      {/* Content */}
+      <motion.div
+        style={{ opacity: contentOpacity }}
+        className="relative mx-auto w-full max-w-7xl px-6 pb-28 pt-36 text-white"
+      >
+        <div className="mx-auto max-w-3xl text-center">
+          {/* Badge */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -66,13 +139,13 @@ export function Hero() {
           >
             {t("hero_title")}
           </motion.h1>
-          {/* Gold accent line */}
+
+          {/* Animated gold accent line */}
           <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={2}
-            className="mx-auto mt-4 h-1 w-20 rounded-full bg-gold opacity-80"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 0.85 }}
+            transition={{ delay: 0.9, duration: 0.7, ease: [0.25, 0.4, 0.25, 1] }}
+            className="mx-auto mt-4 h-1 w-24 rounded-full bg-gold origin-center"
           />
 
           {/* Subtitle */}
@@ -86,7 +159,7 @@ export function Hero() {
             {t("hero_sub")}
           </motion.p>
 
-          {/* CTA buttons */}
+          {/* CTAs */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -96,7 +169,7 @@ export function Hero() {
           >
             <Button
               size="lg"
-              className="h-12 gap-2 bg-gold px-8 text-base font-semibold text-gold-foreground shadow-xl shadow-black/40 hover:bg-gold/90"
+              className="h-12 gap-2 bg-gold px-8 text-base font-semibold text-gold-foreground shadow-xl shadow-black/40 hover:bg-gold/90 active:scale-95 transition-transform"
               nativeButton={false}
               render={<a href="#hotels" />}
             >
@@ -116,7 +189,7 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Stats row */}
+        {/* Stats with count-up */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -126,24 +199,18 @@ export function Hero() {
         >
           <div className="grid grid-cols-3">
             {STATS.map(({ labelKey, value }, i) => (
-              <div
+              <AnimatedStat
                 key={labelKey}
-                className={cn(
-                  "flex flex-col items-center gap-1 py-6",
-                  i < STATS.length - 1 && "border-e border-white/20",
-                )}
-              >
-                <span className="text-3xl font-extrabold text-gold sm:text-4xl">
-                  {value}
-                </span>
-                <span className="text-xs text-white/70">{t(labelKey)}</span>
-              </div>
+                value={value}
+                label={t(labelKey)}
+                hasBorderEnd={i < STATS.length - 1}
+              />
             ))}
           </div>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* Fade into page background */}
+      {/* Bottom fade */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
