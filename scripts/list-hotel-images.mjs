@@ -1,6 +1,6 @@
 /**
- * Fix: give Plaza Hotel a unique image (was duplicate of Sulaymaniyah Palace).
- * Run:  node scripts/fix-plaza-image.mjs
+ * Diagnostic: list all hotel names + image URLs so we can spot broken ones.
+ * Run:  node scripts/list-hotel-images.mjs
  */
 
 import { readFileSync } from "fs";
@@ -22,18 +22,10 @@ const db = getFirestore();
 
 async function run() {
   const snap = await db.collection("hotels").get();
-
   for (const doc of snap.docs) {
-    const { name } = doc.data();
-    if (typeof name === "string" && name.toLowerCase().includes("plaza")) {
-      const newUrl =
-        "https://images.unsplash.com/photo-1455587734955-081b22074882?w=800&q=80";
-      await doc.ref.update({ image: newUrl });
-      console.log(`✅ updated "${name}" → ${newUrl}`);
-    }
+    const { name, image } = doc.data();
+    console.log(`"${name}"\n  ${image || "(empty)"}\n`);
   }
-
-  console.log("Done.");
 }
 
 run().catch((e) => { console.error(e); process.exit(1); });
