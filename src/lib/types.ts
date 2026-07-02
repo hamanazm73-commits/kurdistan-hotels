@@ -68,6 +68,8 @@ export type HotelInput = Omit<Hotel, "id">;
 
 export interface Booking {
   hotel: string;
+  /** id of the booked hotel (used to look up its city) */
+  hotelId?: string | null;
   name: string;
   phone: string;
   roomType: string;

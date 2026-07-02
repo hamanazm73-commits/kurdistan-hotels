@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble, X } from "lucide-react";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,13 +13,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
+import { useHotels } from "@/lib/use-hotels";
 import { listBookings } from "@/lib/hotels-db";
 import { formatPrice, type Booking } from "@/lib/types";
 
 type Range = "week" | "month" | "all";
 const DAY_MS = 86_400_000;
+
+/** Stable grouping key for a booking's hotel: its id, else its name. */
+function hotelKeyOf(b: Booking): string {
+  return b.hotelId || b.hotel;
+}
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -37,11 +50,13 @@ function buildWhatsApp(phone: string, customerName: string): string {
 }
 
 export function BookingsPanel({ hotelId }: { hotelId?: string }) {
-  const { t, lang } = useI18n();
+  const { t, tCity, lang } = useI18n();
+  const { hotels } = useHotels();
   const [rows, setRows] = useState<(Booking & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
-  const [range, setRange] = useState<Range>("week");
+  const [range, setRange] = useState<Range>("all");
   const [fromDate, setFromDate] = useState("");
+  const [hotelKey, setHotelKey] = useState("all");
   // "now" captured when data loads, so render stays pure (no Date.now() in render)
   const [now, setNow] = useState(0);
 
@@ -55,18 +70,39 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
       .finally(() => setLoading(false));
   }, [hotelId]);
 
-  // Filter by when the booking was made. A picked date shows everything from
-  // that day onward (to reach old bookings); otherwise the quick range applies.
+  // A stable key + city for each booking's hotel (by id, else by name).
+  const cityByHotel = useMemo(() => {
+    const byId = new Map(hotels.map((h) => [h.id, h] as const));
+    const byName = new Map(hotels.map((h) => [h.name, h] as const));
+    return (b: Booking) => {
+      const h = (b.hotelId && byId.get(b.hotelId)) || byName.get(b.hotel);
+      return h?.city ?? null;
+    };
+  }, [hotels]);
+
+  // Distinct hotels present in the bookings, for the hotel filter dropdown.
+  const bookingHotels = useMemo(() => {
+    const seen = new Map<string, { key: string; name: string; city: string | null }>();
+    for (const b of rows) {
+      const key = hotelKeyOf(b);
+      if (!seen.has(key)) seen.set(key, { key, name: b.hotel, city: cityByHotel(b) });
+    }
+    return [...seen.values()];
+  }, [rows, cityByHotel]);
+
+  // Filter by hotel + by when the booking was made. A picked date shows
+  // everything from that day onward (to reach old bookings).
   const filtered = useMemo(() => {
     const fromTs = fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : null;
     const windowMs = range === "week" ? 7 * DAY_MS : range === "month" ? 30 * DAY_MS : Infinity;
     return rows.filter((b) => {
+      if (hotelKey !== "all" && hotelKeyOf(b) !== hotelKey) return false;
       const c = b.createdAt;
       if (c == null) return true; // never hide undated bookings
       if (fromTs !== null) return c >= fromTs;
       return windowMs === Infinity || now - c <= windowMs;
     });
-  }, [rows, range, fromDate, now]);
+  }, [rows, range, fromDate, now, hotelKey]);
 
   if (loading)
     return (
@@ -77,6 +113,22 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
 
   const filterBar = (
     <div className="flex flex-wrap items-center gap-2">
+      {!hotelId && bookingHotels.length > 1 && (
+        <Select value={hotelKey} onValueChange={(v) => setHotelKey(v ?? "all")}>
+          <SelectTrigger className="h-9 w-full sm:w-56">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("bookings_all_hotels")}</SelectItem>
+            {bookingHotels.map((bh) => (
+              <SelectItem key={bh.key} value={bh.key}>
+                {bh.name}
+                {bh.city ? ` — ${tCity(bh.city)}` : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       {(["week", "month", "all"] as const).map((r) => (
         <Button
           key={r}
@@ -149,7 +201,13 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="truncate font-bold">{b.name}</p>
-                <p className="truncate text-sm text-muted-foreground">{b.hotel}</p>
+                <p className="truncate text-sm font-medium">{b.hotel}</p>
+                {cityByHotel(b) && (
+                  <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <MapPin className="size-3 shrink-0" />
+                    {tCity(cityByHotel(b)!)}
+                  </p>
+                )}
               </div>
               <span className="shrink-0 text-base font-extrabold text-gold">
                 {formatPrice(b.roomPrice * b.nights, lang)}
@@ -213,7 +271,15 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
           <TableBody>
             {filtered.map((b) => (
               <TableRow key={b.id}>
-                <TableCell className="font-medium">{b.hotel}</TableCell>
+                <TableCell className="font-medium">
+                  {b.hotel}
+                  {cityByHotel(b) && (
+                    <span className="mt-0.5 flex items-center gap-1 text-xs font-normal text-muted-foreground">
+                      <MapPin className="size-3 shrink-0" />
+                      {tCity(cityByHotel(b)!)}
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>{b.name}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
