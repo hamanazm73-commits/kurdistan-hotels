@@ -44,6 +44,7 @@ import {
   updateHotel,
   deleteHotel,
   seedHotels,
+  getHotelMedia,
 } from "@/lib/hotels-db";
 import { effectivePrice, formatPrice, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
@@ -398,6 +399,9 @@ export function HotelFormDialog({
   formRef.current = form;
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  // Gallery/video load async from the media doc; block auto-save until they're
+  // in so a quick edit can't overwrite them with empty values.
+  const mediaReadyRef = useRef(false);
 
   function buildData(f: typeof form): HotelInput {
     const rooms: RoomType[] = f.rooms
@@ -442,6 +446,11 @@ export function HotelFormDialog({
   async function doAutoSave() {
     const h = hotelRef.current;
     if (!h) return;
+    // media not loaded yet — wait, so we don't clobber the gallery/video
+    if (!mediaReadyRef.current) {
+      scheduleAutoSave();
+      return;
+    }
     const f = formRef.current;
     // don't auto-save while a required number is empty (mid-edit)
     if (!f.name.trim() || Number(f.price) <= 0) return;
@@ -471,6 +480,22 @@ export function HotelFormDialog({
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
         debounceTimerRef.current = null;
+      }
+      // Load gallery/video from the media doc (falls back to inline for
+      // un-migrated hotels). New hotels have nothing to load.
+      const h = hotelRef.current;
+      mediaReadyRef.current = !h;
+      if (h) {
+        getHotelMedia(h.id).then((m) => {
+          if (m) {
+            setForm((f) => ({
+              ...f,
+              images: m.images ?? f.images,
+              video: m.video ?? f.video,
+            }));
+          }
+          mediaReadyRef.current = true;
+        });
       }
     } else if (hotelRef.current && debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);

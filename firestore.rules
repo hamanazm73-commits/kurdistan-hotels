@@ -47,6 +47,16 @@ service cloud.firestore {
           && request.resource.data.discount.newPrice == resource.data.discount.newPrice);
     }
 
+    // Hotel gallery + inline video, split off the hotel doc to keep the public
+    // hotel list light. Anyone can read; owner/admins write any, a hotel owner
+    // writes only their own hotel's media.
+    match /hotelMedia/{id} {
+      allow read: if true;
+      allow write: if isAdmin() ||
+        (hasRole() && myRole().enabled == true && myRole().role == 'hotel'
+          && myRole().hotelId == id);
+    }
+
     // Bookings: created server-side via the API (Admin SDK). Owner/admins
     // read all; a hotel owner reads only bookings for their own hotel.
     match /bookings/{id} {

@@ -23,6 +23,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
 import { useHotels } from "@/lib/use-hotels";
+import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
 import { useI18n } from "@/lib/i18n";
 import { effectivePrice, pickLang, mapsUrl } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
@@ -61,6 +62,19 @@ export default function HotelDetailPage() {
   const hotel = hotels.find((h) => h.id === id);
   const [active, setActive] = useState(0);
   const [lightbox, setLightbox] = useState<number | null>(null);
+  // Gallery + video live in a separate doc; load them on demand (fall back to
+  // any legacy inline media still on the hotel doc for un-migrated hotels).
+  const [media, setMedia] = useState<HotelMedia | null>(null);
+  useEffect(() => {
+    if (!id) return;
+    let alive = true;
+    getHotelMedia(id).then((m) => {
+      if (alive) setMedia(m);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [id]);
 
   if (loading && !hotel) {
     return (
@@ -104,7 +118,9 @@ export default function HotelDetailPage() {
 
   const price = effectivePrice(hotel);
   const hasDiscount = hotel.discount?.active;
-  const gallery = [hotel.image, ...(hotel.images ?? [])].filter(Boolean);
+  const galleryImages = media?.images ?? hotel.images ?? [];
+  const video = media?.video ?? hotel.video ?? "";
+  const gallery = [hotel.image, ...galleryImages].filter(Boolean);
   const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const description = pickLang(hotel.description, hotel.descriptionI18n, lang);
 
@@ -225,13 +241,13 @@ export default function HotelDetailPage() {
               </section>
             )}
 
-            {hotel.video && (
+            {video && (
               <section className="mt-7">
                 <h2 className="mb-3 text-lg font-bold">{t("detail_video")}</h2>
-                {youtubeId(hotel.video) ? (
+                {youtubeId(video) ? (
                   <div className="aspect-video overflow-hidden rounded-xl border">
                     <iframe
-                      src={`https://www.youtube.com/embed/${youtubeId(hotel.video)}`}
+                      src={`https://www.youtube.com/embed/${youtubeId(video)}`}
                       title={t("detail_video")}
                       className="size-full"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -240,7 +256,7 @@ export default function HotelDetailPage() {
                   </div>
                 ) : (
                   <video
-                    src={hotel.video}
+                    src={video}
                     controls
                     playsInline
                     className="aspect-video w-full rounded-xl border bg-black"
