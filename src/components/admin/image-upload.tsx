@@ -1,27 +1,86 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
 import { Upload, Loader2, X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { storage } from "@/lib/firebase";
 import { useI18n } from "@/lib/i18n";
 
-function safeName(name: string) {
-  return name.replace(/[^\w.\-]/g, "_");
+/**
+ * Image handling WITHOUT Firebase Storage.
+ *
+ * The picked file is downscaled + JPEG-compressed in the browser and stored
+ * inline as a data URL on the hotel document in Firestore. That keeps the app
+ * working with zero backend setup (no Storage bucket / Blaze plan needed).
+ *
+ * A Firestore document is capped at ~1 MB, so we keep each image well under
+ * that: the cover ≲ 220 KB and each gallery image ≲ 130 KB, and the gallery
+ * refuses new images once its total nears the safe budget below.
+ */
+const COVER_MAX_CHARS = 220_000;
+const GALLERY_ITEM_MAX_CHARS = 130_000;
+const GALLERY_TOTAL_BUDGET = 720_000; // leaves room for the cover + text fields
+
+function readFileAsDataURL(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result as string);
+    fr.onerror = () => reject(new Error("read-failed"));
+    fr.readAsDataURL(file);
+  });
 }
 
-async function uploadFile(file: File, folder: string) {
-  if (!storage) throw new Error("Firebase Storage is not enabled");
-  const path = `hotels/${folder}/${Date.now()}-${safeName(file.name)}`;
-  const r = ref(storage, path);
-  await uploadBytes(r, file);
-  return getDownloadURL(r);
+function loadImage(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("decode-failed"));
+    img.src = src;
+  });
 }
 
-/** Single cover image: upload, preview, remove, or paste a URL. */
+/**
+ * Downscale + JPEG-compress `file` in the browser, returning a data URL whose
+ * length is ≤ `maxChars`. Lowers quality first, then shrinks dimensions, so
+ * even a huge phone photo ends up small enough to store inline.
+ */
+async function compressImage(
+  file: File,
+  { maxDim = 1600, maxChars = COVER_MAX_CHARS } = {},
+): Promise<string> {
+  const src = await readFileAsDataURL(file);
+  const img = await loadImage(src);
+
+  let dim = maxDim;
+  let last = "";
+  for (let attempt = 0; attempt < 6; attempt++) {
+    let width = img.width || dim;
+    let height = img.height || dim;
+    const longest = Math.max(width, height);
+    if (longest > dim) {
+      const scale = dim / longest;
+      width = Math.max(1, Math.round(width * scale));
+      height = Math.max(1, Math.round(height * scale));
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("canvas-unavailable");
+    ctx.drawImage(img, 0, 0, width, height);
+
+    for (let q = 0.8; q >= 0.4; q -= 0.1) {
+      last = canvas.toDataURL("image/jpeg", q);
+      if (last.length <= maxChars) return last;
+    }
+    dim = Math.round(dim * 0.8); // still too big — shrink and retry
+  }
+  return last; // smallest we could manage
+}
+
+/** Single cover image: upload (compressed inline), preview, remove, or paste a URL. */
 export function ImageUpload({
   value,
   onChange,
@@ -36,9 +95,9 @@ export function ImageUpload({
   async function handleFile(file: File) {
     setUploading(true);
     try {
-      onChange(await uploadFile(file, "cover"));
-    } catch (e) {
-      toast.error((e as Error).message);
+      onChange(await compressImage(file, { maxDim: 1600, maxChars: COVER_MAX_CHARS }));
+    } catch {
+      toast.error(t("admin_upload_failed"));
     } finally {
       setUploading(false);
     }
@@ -96,7 +155,7 @@ export function ImageUpload({
   );
 }
 
-/** Gallery: multiple images with add/remove. */
+/** Gallery: multiple images (compressed inline) with add/remove. */
 export function GalleryUpload({
   value,
   onChange,
@@ -104,19 +163,32 @@ export function GalleryUpload({
   value: string[];
   onChange: (urls: string[]) => void;
 }) {
+  const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
   async function handleFiles(files: FileList) {
     setUploading(true);
     try {
-      const urls: string[] = [];
+      const next = [...value];
+      let total = next.reduce((sum, url) => sum + url.length, 0);
+      let hitLimit = false;
       for (const file of Array.from(files)) {
-        urls.push(await uploadFile(file, "gallery"));
+        const url = await compressImage(file, {
+          maxDim: 1280,
+          maxChars: GALLERY_ITEM_MAX_CHARS,
+        });
+        if (total + url.length > GALLERY_TOTAL_BUDGET) {
+          hitLimit = true;
+          break;
+        }
+        next.push(url);
+        total += url.length;
       }
-      onChange([...value, ...urls]);
-    } catch (e) {
-      toast.error((e as Error).message);
+      onChange(next);
+      if (hitLimit) toast.error(t("admin_gallery_full"));
+    } catch {
+      toast.error(t("admin_upload_failed"));
     } finally {
       setUploading(false);
     }
