@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Crown, Lock, Loader2, ArrowLeft, Pencil } from "lucide-react";
+import { Crown, Lock, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +12,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { useHotels } from "@/lib/use-hotels";
-import { HotelsPanel, HotelFormDialog } from "@/components/admin/hotels-panel";
+import { HotelsPanel } from "@/components/admin/hotels-panel";
 import { BookingsPanel } from "@/components/admin/bookings-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 
@@ -68,7 +68,7 @@ export default function AdminPage() {
     );
   }
 
-  // Hotel owner: only their own hotel's bookings, no tabs.
+  // Hotel owner: same layout as the site owner, but scoped to their one hotel.
   if (role === "hotel") {
     const myHotel = hotels.find((h) => h.id === hotelId);
     return (
@@ -77,25 +77,13 @@ export default function AdminPage() {
           <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
             <div>
               <h1 className="text-xl font-bold">
-                {myHotel?.name ?? t("admin_bookings")}
+                {myHotel?.name ?? t("admin_my_hotel")}
               </h1>
               {user?.email && (
                 <p className="text-sm text-muted-foreground">{user.email}</p>
               )}
             </div>
             <div className="flex items-center gap-1">
-              {myHotel && (
-                <HotelFormDialog
-                  hotel={myHotel}
-                  restricted
-                  trigger={
-                    <Button variant="secondary" size="sm" className="gap-1.5">
-                      <Pencil className="size-4" />
-                      {t("admin_edit_my_hotel")}
-                    </Button>
-                  }
-                />
-              )}
               <LanguageSwitcher />
               <ThemeToggle />
               <Button variant="ghost" size="sm" onClick={handleLogout}>
@@ -105,7 +93,18 @@ export default function AdminPage() {
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-6 py-8">
-          <BookingsPanel hotelId={hotelId ?? undefined} />
+          <Tabs defaultValue="hotel">
+            <TabsList>
+              <TabsTrigger value="hotel">{t("admin_my_hotel")}</TabsTrigger>
+              <TabsTrigger value="bookings">{t("admin_bookings")}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="hotel" className="mt-6">
+              <HotelsPanel ownerHotelId={hotelId ?? undefined} />
+            </TabsContent>
+            <TabsContent value="bookings" className="mt-6">
+              <BookingsPanel hotelId={hotelId ?? undefined} />
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     );

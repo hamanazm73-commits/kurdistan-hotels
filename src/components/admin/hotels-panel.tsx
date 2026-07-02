@@ -50,25 +50,6 @@ import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
 
-/** Machine-translate `q` into `to` via our /api/translate route; "" on failure. */
-async function translateText(
-  q: string,
-  to: "ckb" | "kmr" | "en" | "ar",
-): Promise<string> {
-  try {
-    const res = await fetch("/api/translate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ q, to }),
-    });
-    if (!res.ok) return "";
-    const data = (await res.json()) as { text?: string };
-    return (data.text ?? "").trim();
-  } catch {
-    return "";
-  }
-}
-
 function defaultRooms(): FormRoom[] {
   return [
     { type: "Single", price: 75_000, available: 5 },
@@ -132,12 +113,21 @@ const empty = {
   descAr: "",
 };
 
-export function HotelsPanel() {
+export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
   const { t, tCity, lang } = useI18n();
   const { hotels, usingSamples } = useHotels();
   const [seeding, setSeeding] = useState(false);
   const [editingPriceId, setEditingPriceId] = useState<string | null>(null);
   const [priceInput, setPriceInput] = useState(0);
+  const [cityFilter, setCityFilter] = useState<string>("all");
+
+  const owner = Boolean(ownerHotelId);
+
+  const visibleHotels = hotels.filter((h) =>
+    owner ? h.id === ownerHotelId : cityFilter === "all" || h.city === cityFilter,
+  );
+  // only offer cities that actually have hotels
+  const cityOptions = CITIES.filter((c) => hotels.some((h) => h.city === c));
 
   async function onSeed() {
     setSeeding(true);
@@ -176,37 +166,63 @@ export function HotelsPanel() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold">{t("admin_hotels")}</h2>
-        <div className="flex gap-2">
-          {usingSamples && (
-            <Button variant="outline" onClick={onSeed} disabled={seeding}>
-              {seeding ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Sparkles className="size-4" />
-              )}
-              {t("admin_seed")}
-            </Button>
-          )}
-          <HotelFormDialog
-            trigger={
-              <Button>
-                <Plus className="size-4" />
-                {t("admin_add_hotel")}
+        <h2 className="text-lg font-semibold">
+          {owner ? t("admin_my_hotel") : t("admin_hotels")}
+        </h2>
+        {!owner && (
+          <div className="flex flex-wrap items-center gap-2">
+            {/* city filter */}
+            {cityOptions.length > 1 && (
+              <Select value={cityFilter} onValueChange={(v) => setCityFilter(v ?? "all")}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("filter_all")}</SelectItem>
+                  {cityOptions.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {tCity(c)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {usingSamples && (
+              <Button variant="outline" onClick={onSeed} disabled={seeding}>
+                {seeding ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Sparkles className="size-4" />
+                )}
+                {t("admin_seed")}
               </Button>
-            }
-          />
-        </div>
+            )}
+            <HotelFormDialog
+              trigger={
+                <Button>
+                  <Plus className="size-4" />
+                  {t("admin_add_hotel")}
+                </Button>
+              }
+            />
+          </div>
+        )}
       </div>
 
-      {usingSamples && (
+      {!owner && usingSamples && (
         <p className="rounded-lg border border-dashed bg-muted/40 px-4 py-3 text-sm text-muted-foreground">
           {t("admin_seed")} → {t("footer_about")}
         </p>
       )}
 
+      {visibleHotels.length === 0 && (
+        <p className="rounded-lg border border-dashed bg-muted/40 px-4 py-8 text-center text-sm text-muted-foreground">
+          {t("no_results")}
+        </p>
+      )}
+
       <div className="grid gap-3">
-        {hotels.map((h) => {
+        {visibleHotels.map((h) => {
           const isSample = h.id.startsWith("sample-");
           const isEditingPrice = editingPriceId === h.id;
           return (
@@ -269,6 +285,7 @@ export function HotelsPanel() {
               <div className="flex shrink-0 gap-1">
                 <HotelFormDialog
                   hotel={h}
+                  restricted={owner}
                   trigger={
                     <Button
                       variant="ghost"
@@ -280,23 +297,25 @@ export function HotelsPanel() {
                     </Button>
                   }
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled={isSample}
-                  title={t("admin_delete")}
-                  onClick={async () => {
-                    if (!confirm(t("admin_confirm_delete"))) return;
-                    try {
-                      await deleteHotel(h.id);
-                      toast.success(t("admin_deleted"));
-                    } catch (e) {
-                      toast.error((e as Error).message);
-                    }
-                  }}
-                >
-                  <Trash2 className="size-4 text-destructive" />
-                </Button>
+                {!owner && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={isSample}
+                    title={t("admin_delete")}
+                    onClick={async () => {
+                      if (!confirm(t("admin_confirm_delete"))) return;
+                      try {
+                        await deleteHotel(h.id);
+                        toast.success(t("admin_deleted"));
+                      } catch (e) {
+                        toast.error((e as Error).message);
+                      }
+                    }}
+                  >
+                    <Trash2 className="size-4 text-destructive" />
+                  </Button>
+                )}
               </div>
             </Card>
           );
@@ -366,7 +385,6 @@ export function HotelFormDialog({
 
   const [form, setForm] = useState(buildForm);
   const [showI18n, setShowI18n] = useState(false);
-  const [translating, setTranslating] = useState(false);
   const formRef = useRef(form);
   formRef.current = form;
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -476,63 +494,6 @@ export function HotelFormDialog({
     }
   }
 
-  /** Fill every per-language name & description by machine-translating the base ones. */
-  async function translateAll() {
-    const f = formRef.current;
-    const nameSrc = (
-      f.name || f.nameCkb || f.nameEn || f.nameAr || f.nameKmr
-    ).trim();
-    const descSrc = (
-      f.description || f.descCkb || f.descEn || f.descAr || f.descKmr
-    ).trim();
-    if (!nameSrc && !descSrc) {
-      toast.error(t("admin_translate_empty"));
-      return;
-    }
-    setTranslating(true);
-    setShowI18n(true);
-    try {
-      const langs = ["ckb", "kmr", "en", "ar"] as const;
-      const results = await Promise.all(
-        langs.map(async (l) => ({
-          l,
-          nm: nameSrc ? await translateText(nameSrc, l) : "",
-          ds: descSrc ? await translateText(descSrc, l) : "",
-        })),
-      );
-      if (!results.some((r) => r.nm || r.ds)) {
-        toast.error(t("admin_translate_failed"));
-        return;
-      }
-      const nameKey = {
-        ckb: "nameCkb",
-        kmr: "nameKmr",
-        en: "nameEn",
-        ar: "nameAr",
-      } as const;
-      const descKey = {
-        ckb: "descCkb",
-        kmr: "descKmr",
-        en: "descEn",
-        ar: "descAr",
-      } as const;
-      setForm((prev) => {
-        const next = { ...prev };
-        for (const { l, nm, ds } of results) {
-          if (nm) next[nameKey[l]] = nm;
-          if (ds) next[descKey[l]] = ds;
-        }
-        return next;
-      });
-      if (hotelRef.current) scheduleAutoSave();
-      toast.success(t("admin_translate_done"));
-    } catch {
-      toast.error(t("admin_translate_failed"));
-    } finally {
-      setTranslating(false);
-    }
-  }
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={trigger} />
@@ -563,21 +524,6 @@ export function HotelFormDialog({
                 className={cn("size-4 transition", showI18n && "rotate-180")}
               />
             </button>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={translateAll}
-              disabled={translating}
-              className="mt-3 w-full gap-1.5"
-            >
-              {translating ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                <Sparkles className="size-4" />
-              )}
-              {translating ? t("admin_translating") : t("admin_autotranslate")}
-            </Button>
             {showI18n && (
               <div className="mt-3 space-y-3">
                 {NAME_FIELDS.map(({ lang, key }) => (

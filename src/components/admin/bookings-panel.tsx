@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -11,9 +13,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { listBookings } from "@/lib/hotels-db";
 import { formatPrice, type Booking } from "@/lib/types";
+
+type Range = "week" | "month" | "all";
+const DAY_MS = 86_400_000;
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -34,13 +40,33 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
   const { t, lang } = useI18n();
   const [rows, setRows] = useState<(Booking & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState<Range>("week");
+  const [fromDate, setFromDate] = useState("");
+  // "now" captured when data loads, so render stays pure (no Date.now() in render)
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
     listBookings(hotelId)
-      .then(setRows)
+      .then((r) => {
+        setRows(r);
+        setNow(Date.now());
+      })
       .catch(() => setRows([]))
       .finally(() => setLoading(false));
   }, [hotelId]);
+
+  // Filter by when the booking was made. A picked date shows everything from
+  // that day onward (to reach old bookings); otherwise the quick range applies.
+  const filtered = useMemo(() => {
+    const fromTs = fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : null;
+    const windowMs = range === "week" ? 7 * DAY_MS : range === "month" ? 30 * DAY_MS : Infinity;
+    return rows.filter((b) => {
+      const c = b.createdAt;
+      if (c == null) return true; // never hide undated bookings
+      if (fromTs !== null) return c >= fromTs;
+      return windowMs === Infinity || now - c <= windowMs;
+    });
+  }, [rows, range, fromDate, now]);
 
   if (loading)
     return (
@@ -49,19 +75,75 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
       </div>
     );
 
+  const filterBar = (
+    <div className="flex flex-wrap items-center gap-2">
+      {(["week", "month", "all"] as const).map((r) => (
+        <Button
+          key={r}
+          type="button"
+          size="sm"
+          variant={!fromDate && range === r ? "default" : "outline"}
+          className="rounded-full"
+          onClick={() => {
+            setRange(r);
+            setFromDate("");
+          }}
+        >
+          {t(r === "week" ? "filter_week" : r === "month" ? "filter_month" : "filter_all")}
+        </Button>
+      ))}
+      <div className="ms-auto flex items-center gap-2">
+        <span className="text-sm text-muted-foreground">{t("bookings_date")}</span>
+        <Input
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+          className={cn("h-9 w-40", fromDate && "border-primary")}
+        />
+        {fromDate && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-9 shrink-0"
+            onClick={() => setFromDate("")}
+            title={t("filter_all")}
+          >
+            <X className="size-4" />
+          </Button>
+        )}
+      </div>
+      <span className="w-full text-sm font-medium text-muted-foreground sm:w-auto">
+        {t("bookings_count", { n: filtered.length })}
+      </span>
+    </div>
+  );
+
   if (rows.length === 0)
     return (
-      <Card className="grid place-items-center gap-2 py-16 text-muted-foreground">
-        <Inbox className="size-8" />
-        <p>{t("admin_bookings")} — 0</p>
-      </Card>
+      <div className="space-y-3">
+        {filterBar}
+        <Card className="grid place-items-center gap-2 py-16 text-muted-foreground">
+          <Inbox className="size-8" />
+          <p>{t("admin_bookings")} — 0</p>
+        </Card>
+      </div>
     );
 
   return (
     <div className="space-y-3">
+      {filterBar}
+
+      {filtered.length === 0 ? (
+        <Card className="grid place-items-center gap-2 py-16 text-muted-foreground">
+          <Inbox className="size-8" />
+          <p>{t("bookings_none_range")}</p>
+        </Card>
+      ) : (
+        <>
       {/* ── Mobile: one card per booking ── */}
       <div className="grid gap-3 md:hidden">
-        {rows.map((b) => (
+        {filtered.map((b) => (
           <Card key={b.id} className="p-4">
             {/* header: name + total */}
             <div className="flex items-start justify-between gap-2">
@@ -129,7 +211,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((b) => (
+            {filtered.map((b) => (
               <TableRow key={b.id}>
                 <TableCell className="font-medium">{b.hotel}</TableCell>
                 <TableCell>{b.name}</TableCell>
@@ -167,6 +249,8 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
           </TableBody>
         </Table>
       </Card>
+        </>
+      )}
     </div>
   );
 }
