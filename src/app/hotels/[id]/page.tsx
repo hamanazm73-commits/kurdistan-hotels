@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "motion/react";
@@ -11,6 +11,10 @@ import {
   Phone,
   BedDouble,
   Check,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -46,6 +50,7 @@ export default function HotelDetailPage() {
   const { hotels, loading } = useHotels();
   const hotel = hotels.find((h) => h.id === id);
   const [active, setActive] = useState(0);
+  const [lightbox, setLightbox] = useState<number | null>(null);
 
   if (loading && !hotel) {
     return (
@@ -111,23 +116,31 @@ export default function HotelDetailPage() {
         </Link>
 
         {/* gallery */}
-        <div className="overflow-hidden rounded-2xl border">
+        <button
+          type="button"
+          onClick={() => gallery.length > 0 && setLightbox(active)}
+          className="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl border"
+          aria-label={t("gallery_zoom")}
+        >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={gallery[active]}
             alt={name}
-            className="aspect-[21/9] w-full object-cover"
+            className="aspect-[21/9] w-full object-cover transition group-hover:brightness-95"
             onError={(e) => { const i = e.currentTarget; i.onerror = null; i.src = FALLBACK_IMG; }}
           />
-        </div>
+          <span className="pointer-events-none absolute end-3 top-3 grid size-9 place-items-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
+            <Maximize2 className="size-4" />
+          </span>
+        </button>
         {gallery.length > 1 && (
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
             {gallery.map((src, i) => (
               <button
                 key={i}
-                onClick={() => setActive(i)}
+                onClick={() => { setActive(i); setLightbox(i); }}
                 className={cn(
-                  "size-20 shrink-0 overflow-hidden rounded-lg border-2 transition",
+                  "size-20 shrink-0 cursor-zoom-in overflow-hidden rounded-lg border-2 transition",
                   i === active ? "border-primary" : "border-transparent",
                 )}
               >
@@ -279,7 +292,120 @@ export default function HotelDetailPage() {
           </div>
         </div>
       </motion.main>
+      {lightbox !== null && gallery.length > 0 && (
+        <Lightbox
+          images={gallery}
+          start={lightbox}
+          alt={name}
+          onClose={() => setLightbox(null)}
+        />
+      )}
       <SiteFooter />
     </>
+  );
+}
+
+/** Fullscreen image viewer with prev/next, keyboard, swipe, and tap-to-close. */
+function Lightbox({
+  images,
+  start,
+  alt,
+  onClose,
+}: {
+  images: string[];
+  start: number;
+  alt: string;
+  onClose: () => void;
+}) {
+  const [i, setI] = useState(start);
+  const prev = useCallback(
+    () => setI((v) => (v - 1 + images.length) % images.length),
+    [images.length],
+  );
+  const next = useCallback(
+    () => setI((v) => (v + 1) % images.length),
+    [images.length],
+  );
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "ArrowRight") next();
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [prev, next, onClose]);
+
+  // simple horizontal swipe on touch devices
+  const [touchX, setTouchX] = useState<number | null>(null);
+  function onTouchEnd(endX: number) {
+    if (touchX === null) return;
+    const dx = endX - touchX;
+    if (Math.abs(dx) > 50) (dx > 0 ? prev : next)();
+    setTouchX(null);
+  }
+
+  const multiple = images.length > 1;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+      onClick={onClose}
+      onTouchStart={(e) => setTouchX(e.touches[0].clientX)}
+      onTouchEnd={(e) => onTouchEnd(e.changedTouches[0].clientX)}
+    >
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute end-4 top-4 z-10 grid size-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+        aria-label="Close"
+      >
+        <X className="size-5" />
+      </button>
+
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={images[i]}
+        alt={alt}
+        onClick={(e) => e.stopPropagation()}
+        className="max-h-[88dvh] max-w-full rounded-lg object-contain shadow-2xl"
+        onError={(e) => { const el = e.currentTarget; el.onerror = null; el.src = FALLBACK_IMG; }}
+      />
+
+      {multiple && (
+        <>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); prev(); }}
+            className="absolute start-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            aria-label="Previous"
+          >
+            <ChevronLeft className="size-6 rtl:rotate-180" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); next(); }}
+            className="absolute end-4 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            aria-label="Next"
+          >
+            <ChevronRight className="size-6 rtl:rotate-180" />
+          </button>
+          <div
+            dir="ltr"
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white"
+          >
+            {i + 1} / {images.length}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
