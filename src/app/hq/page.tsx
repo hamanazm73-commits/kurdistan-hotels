@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Crown, Lock, Loader2, ArrowLeft } from "lucide-react";
+import { Crown, Lock, Loader2, ArrowLeft, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -81,6 +81,16 @@ export default function AdminPage() {
               )}
             </div>
             <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                nativeButton={false}
+                render={<Link href="/" />}
+              >
+                <Home className="size-4" />
+                <span className="hidden sm:inline">{t("nav_home")}</span>
+              </Button>
               <LanguageSwitcher />
               <ThemeToggle />
               <LogoutButton
@@ -133,10 +143,12 @@ export default function AdminPage() {
             <Button
               variant="outline"
               size="sm"
+              className="gap-1.5"
               nativeButton={false}
               render={<Link href="/" />}
             >
-              {t("login_back")}
+              <Home className="size-4" />
+              <span className="hidden sm:inline">{t("nav_home")}</span>
             </Button>
             <LogoutButton
               trigger={

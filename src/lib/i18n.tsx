@@ -153,8 +153,17 @@ const ckb: Dict = {
   admin_room_price: "نرخ (IQD)",
   admin_room_available: "بەردەست",
   admin_add_room: "زیادکردنی ژوور",
-  admin_video: "ڤیدیۆ (بەستەر)",
-  admin_video_ph: "بەستەری YouTube یان MP4",
+  admin_video: "ڤیدیۆ",
+  admin_video_ph: "بەستەری YouTube یان MP4 بلکێنە",
+  admin_video_upload: "ڤیدیۆ لە مۆبایل هەڵبژێرە",
+  admin_video_added: "ڤیدیۆکە زیادکرا",
+  admin_video_youtube_linked: "بەستەری YouTube دانرا",
+  admin_video_too_large:
+    "ئەم ڤیدیۆیە زۆر گەورەیە ({size} مێگابایت). زۆرترین قەبارەی بارکردنی ڕاستەوخۆ 0.5 مێگابایتە. بۆ ڤیدیۆی درێژتر، بیخە سەر YouTube (بەخۆڕاییە) و بەستەرەکەی لێرە بلکێنە.",
+  admin_video_hint:
+    "ڤیدیۆی کورت (کەمتر لە 0.5 مێگابایت) ڕاستەوخۆ باردەکرێت و لە لاپەڕەی هۆتێلەکەدا دەردەکەوێت. بۆ ڤیدیۆی گەورەتر/درێژتر، بیخە سەر YouTube و بەستەرەکەی بلکێنە.",
+  admin_too_large_save:
+    "زانیارییەکان زۆر گەورەن بۆ پاشەکەوتکردن. ڤیدیۆکە یان وێنەکان قەبارەیان زۆرە — بۆ ڤیدیۆ بەستەری YouTube بەکاربهێنە لە جیاتی بارکردن، یان هەندێک وێنە لە گالێری بسڕەوە.",
   admin_location: "شوێن (Google Maps)",
   admin_location_ph: "بەستەری Google Maps بلکێنە",
   detail_video: "ڤیدیۆ",
@@ -318,8 +327,17 @@ const en: Dict = {
   admin_room_price: "Price (IQD)",
   admin_room_available: "Left",
   admin_add_room: "Add room",
-  admin_video: "Video (link)",
-  admin_video_ph: "YouTube or MP4 link",
+  admin_video: "Video",
+  admin_video_ph: "Paste a YouTube or MP4 link",
+  admin_video_upload: "Pick a video from your phone",
+  admin_video_added: "Video added",
+  admin_video_youtube_linked: "YouTube link added",
+  admin_video_too_large:
+    "This video is too large ({size} MB). The maximum for direct upload is 0.5 MB. For a longer video, upload it to YouTube (free) and paste the link here.",
+  admin_video_hint:
+    "Short clips (under 0.5 MB) upload directly and show on the hotel page. For a bigger/longer video, put it on YouTube and paste the link.",
+  admin_too_large_save:
+    "The data is too large to save. The video or images are too big — use a YouTube link for the video instead of uploading, or remove some gallery images.",
   admin_location: "Location (Google Maps)",
   admin_location_ph: "Paste a Google Maps link",
   detail_video: "Video",
@@ -483,8 +501,17 @@ const ar: Dict = {
   admin_room_price: "السعر (IQD)",
   admin_room_available: "المتوفر",
   admin_add_room: "إضافة غرفة",
-  admin_video: "فيديو (رابط)",
-  admin_video_ph: "رابط YouTube أو MP4",
+  admin_video: "فيديو",
+  admin_video_ph: "الصق رابط YouTube أو MP4",
+  admin_video_upload: "اختر فيديو من هاتفك",
+  admin_video_added: "تمت إضافة الفيديو",
+  admin_video_youtube_linked: "تمت إضافة رابط YouTube",
+  admin_video_too_large:
+    "هذا الفيديو كبير جداً ({size} ميغابايت). الحد الأقصى للرفع المباشر هو 0.5 ميغابايت. لفيديو أطول، ارفعه على YouTube (مجاناً) والصق الرابط هنا.",
+  admin_video_hint:
+    "المقاطع القصيرة (أقل من 0.5 ميغابايت) تُرفع مباشرة وتظهر في صفحة الفندق. للفيديو الأكبر/الأطول، ضعه على YouTube والصق الرابط.",
+  admin_too_large_save:
+    "البيانات كبيرة جداً للحفظ. الفيديو أو الصور كبيرة الحجم — استخدم رابط YouTube للفيديو بدلاً من الرفع، أو احذف بعض صور المعرض.",
   admin_location: "الموقع (خرائط Google)",
   admin_location_ph: "الصق رابط خرائط Google",
   detail_video: "فيديو",
@@ -648,8 +675,17 @@ const kmr: Dict = {
   admin_room_price: "Biha (IQD)",
   admin_room_available: "Berdest",
   admin_add_room: "Odeyeke zêde bike",
-  admin_video: "Vîdyo (girêdan)",
-  admin_video_ph: "Girêdana YouTube an MP4",
+  admin_video: "Vîdyo",
+  admin_video_ph: "Girêdana YouTube an MP4 pêve bike",
+  admin_video_upload: "Ji telefonê vîdyoyekê hilbijêre",
+  admin_video_added: "Vîdyo hate zêdekirin",
+  admin_video_youtube_linked: "Girêdana YouTube hate zêdekirin",
+  admin_video_too_large:
+    "Ev vîdyo pir mezin e ({size} MB). Sînorê barkirina rasterast 0.5 MB e. Ji bo vîdyoyeke dirêjtir, wê bixe YouTube (belaş) û girêdanê li vir pêve bike.",
+  admin_video_hint:
+    "Vîdyoyên kurt (di bin 0.5 MB) rasterast bar dibin û li rûpela otêlê xuya dibin. Ji bo vîdyoyeke mezintir/dirêjtir, wê bixe YouTube û girêdanê pêve bike.",
+  admin_too_large_save:
+    "Dane pir mezin in ji bo tomarkirinê. Vîdyo an wêne pir mezin in — ji bo vîdyoyê girêdana YouTube bi kar bîne li şûna barkirinê, an hin wêneyên galeriyê rake.",
   admin_location: "Cih (Google Maps)",
   admin_location_ph: "Girêdana Google Maps deyne",
   detail_video: "Vîdyo",

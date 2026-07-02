@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Upload, Loader2, X, Plus } from "lucide-react";
+import { Upload, Loader2, X, Plus, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
@@ -235,6 +235,110 @@ export function GalleryUpload({
           e.target.value = "";
         }}
       />
+    </div>
+  );
+}
+
+/**
+ * Video: pick from the phone gallery (stored inline as a data URL) OR paste a
+ * link. Firestore docs are capped at ~1 MB and there is no Storage bucket, so
+ * a real (multi-MB) video can't be stored inline — for those we tell the owner
+ * exactly why and to use a YouTube link instead.
+ */
+const MAX_VIDEO_BYTES = 480 * 1024; // ~0.5 MB — must fit the Firestore document
+
+function isYouTube(url: string) {
+  return /youtu\.?be/i.test(url);
+}
+
+export function VideoUpload({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (url: string) => void;
+}) {
+  const { t } = useI18n();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFile(file: File) {
+    if (file.size > MAX_VIDEO_BYTES) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      toast.error(t("admin_video_too_large", { size: mb }), { duration: 10000 });
+      return;
+    }
+    setUploading(true);
+    try {
+      onChange(await readFileAsDataURL(file));
+      toast.success(t("admin_video_added"));
+    } catch {
+      toast.error(t("admin_upload_failed"));
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  const yt = value && isYouTube(value);
+
+  return (
+    <div className="space-y-2">
+      {value && (
+        <div className="relative overflow-hidden rounded-lg border">
+          {yt ? (
+            <div className="flex items-center gap-2 p-3 text-sm">
+              <Film className="size-5 shrink-0 text-red-600" />
+              {t("admin_video_youtube_linked")}
+            </div>
+          ) : (
+            // eslint-disable-next-line jsx-a11y/media-has-caption
+            <video src={value} controls className="max-h-44 w-full bg-black" />
+          )}
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon-sm"
+            className="absolute end-2 top-2"
+            onClick={() => onChange("")}
+          >
+            <X className="size-4" />
+          </Button>
+        </div>
+      )}
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => inputRef.current?.click()}
+        disabled={uploading}
+        className="w-full gap-2"
+      >
+        {uploading ? (
+          <Loader2 className="size-4 animate-spin" />
+        ) : (
+          <Film className="size-4" />
+        )}
+        {uploading ? t("admin_uploading") : t("admin_video_upload")}
+      </Button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="video/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) handleFile(f);
+          e.target.value = "";
+        }}
+      />
+      <Input
+        dir="ltr"
+        placeholder={t("admin_video_ph")}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {t("admin_video_hint")}
+      </p>
     </div>
   );
 }

@@ -35,7 +35,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ImageUpload, GalleryUpload } from "./image-upload";
+import { ImageUpload, GalleryUpload, VideoUpload } from "./image-upload";
 import { useI18n, LANGS } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { useHotels } from "@/lib/use-hotels";
@@ -49,6 +49,15 @@ import { effectivePrice, formatPrice, type Hotel, type HotelInput, type RoomType
 import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
+
+/** Turn a raw Firestore error into a clear message. A too-big document (usually
+    an uploaded video + images exceeding the ~1 MB limit) gets its own guidance. */
+function saveErrorMessage(e: unknown, t: (k: string) => string): string {
+  const msg = e instanceof Error ? e.message : String(e);
+  if (/exceeds|maximum|1048|longer than|too large|invalid-argument/i.test(msg))
+    return t("admin_too_large_save");
+  return msg;
+}
 
 function defaultRooms(): FormRoom[] {
   return [
@@ -159,7 +168,7 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
       toast.success(t("admin_saved"));
     } catch (e) {
       console.error("[price edit]", e);
-      toast.error(e instanceof Error ? e.message : String(e));
+      toast.error(saveErrorMessage(e, t));
     }
   }
 
@@ -442,7 +451,7 @@ export function HotelFormDialog({
       setAutoSaveStatus("saved");
     } catch (e) {
       console.error("[auto-save]", e);
-      toast.error(e instanceof Error ? e.message : String(e));
+      toast.error(saveErrorMessage(e, t), { duration: 8000 });
       setAutoSaveStatus("idle");
     }
   }
@@ -488,7 +497,7 @@ export function HotelFormDialog({
       setOpen(false);
     } catch (e) {
       console.error("[save hotel]", e);
-      toast.error(e instanceof Error ? e.message : String(e));
+      toast.error(saveErrorMessage(e, t), { duration: 8000 });
     } finally {
       setSaving(false);
     }
@@ -641,12 +650,7 @@ export function HotelFormDialog({
           </Field>
 
           <Field label={t("admin_video")}>
-            <Input
-              dir="ltr"
-              placeholder={t("admin_video_ph")}
-              value={form.video}
-              onChange={(e) => set("video", e.target.value)}
-            />
+            <VideoUpload value={form.video} onChange={(url) => set("video", url)} />
           </Field>
 
           <Field label={t("admin_features")}>
