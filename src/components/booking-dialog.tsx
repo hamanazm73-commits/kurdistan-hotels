@@ -153,16 +153,17 @@ export function BookingDialog({
             />
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
-            <div className="grid gap-2">
+            <div className="grid min-w-0 gap-2">
               <Label htmlFor="bk-date">{t("book_checkin")}</Label>
               <Input
                 id="bk-date"
                 type="date"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
+                className="w-full min-w-0 [&::-webkit-date-and-time-value]:text-start"
               />
             </div>
-            <div className="grid gap-2">
+            <div className="grid min-w-0 gap-2">
               <Label htmlFor="bk-nights">{t("book_nights")}</Label>
               <Input
                 id="bk-nights"
