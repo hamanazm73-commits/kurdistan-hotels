@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
+import { CurrencySwitcher } from "./currency-switcher";
 import { LogoutButton } from "./logout-button";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
@@ -60,6 +61,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-1">
+          <CurrencySwitcher />
           <LanguageSwitcher />
           <ThemeToggle />
 

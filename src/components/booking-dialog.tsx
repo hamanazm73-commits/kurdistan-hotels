@@ -22,11 +22,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
-import { formatPrice, type Hotel } from "@/lib/types";
+import { useCurrency } from "@/lib/currency";
+import { type Hotel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 export function BookingDialog({ hotel }: { hotel: Hotel }) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
+  const { format } = useCurrency();
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -180,7 +182,7 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
                         )}
                       </span>
                       <span className="whitespace-nowrap text-muted-foreground">
-                        {formatPrice(r.price, lang)}
+                        {format(r.price)}
                       </span>
                     </span>
                   </SelectItem>
@@ -192,7 +194,7 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
           {total > 0 && (
             <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3 text-sm font-medium">
               <span>{t("book_total")}</span>
-              <span className="text-lg font-bold text-primary">{formatPrice(total, lang)}</span>
+              <span className="text-lg font-bold text-primary">{format(total)}</span>
             </div>
           )}
         </div>

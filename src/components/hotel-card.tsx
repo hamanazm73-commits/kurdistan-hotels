@@ -16,12 +16,12 @@ import { Card } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n";
 import {
   effectivePrice,
-  formatPrice,
   pickLang,
   mapsUrl,
   totalAvailable,
   type Hotel,
 } from "@/lib/types";
+import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { BookingDialog } from "./booking-dialog";
 
@@ -46,6 +46,7 @@ function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string
 
 export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }) {
   const { t, tCity, tFeature, lang } = useI18n();
+  const { format } = useCurrency();
   const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const price = effectivePrice(hotel);
   const hasDiscount = hotel.discount?.active;
@@ -174,11 +175,11 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               <div className="flex items-baseline gap-2">
                 {hasDiscount && (
                   <span className="text-sm text-muted-foreground line-through">
-                    {formatPrice(hotel.discount.oldPrice, lang)}
+                    {format(hotel.discount.oldPrice)}
                   </span>
                 )}
                 <span className="text-2xl font-extrabold text-gold">
-                  {formatPrice(price, lang)}
+                  {format(price)}
                 </span>
               </div>
               <span className="text-xs text-muted-foreground">

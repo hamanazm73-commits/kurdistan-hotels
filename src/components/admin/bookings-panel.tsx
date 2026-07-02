@@ -58,6 +58,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
   const [fromDate, setFromDate] = useState("");
   const [cityFilter, setCityFilter] = useState("all");
   const [hotelKey, setHotelKey] = useState("all");
+  const [roomFilter, setRoomFilter] = useState("all");
   // "now" captured when data loads, so render stays pure (no Date.now() in render)
   const [now, setNow] = useState(0);
 
@@ -101,6 +102,13 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     return [...set];
   }, [rows, cityByHotel]);
 
+  // Distinct room types present in the bookings, for the room filter dropdown.
+  const bookingRoomTypes = useMemo(() => {
+    const set = new Set<string>();
+    for (const b of rows) if (b.roomType) set.add(b.roomType);
+    return [...set];
+  }, [rows]);
+
   // Hotels shown in the hotel dropdown, narrowed to the chosen city.
   const hotelOptions =
     cityFilter === "all"
@@ -115,12 +123,13 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     return rows.filter((b) => {
       if (cityFilter !== "all" && cityByHotel(b) !== cityFilter) return false;
       if (hotelKey !== "all" && hotelKeyOf(b) !== hotelKey) return false;
+      if (roomFilter !== "all" && b.roomType !== roomFilter) return false;
       const c = b.createdAt;
       if (c == null) return true; // never hide undated bookings
       if (fromTs !== null) return c >= fromTs;
       return windowMs === Infinity || now - c <= windowMs;
     });
-  }, [rows, range, fromDate, now, cityFilter, hotelKey, cityByHotel]);
+  }, [rows, range, fromDate, now, cityFilter, hotelKey, roomFilter, cityByHotel]);
 
   if (loading)
     return (
@@ -131,12 +140,13 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
 
   const showCity = !hotelId && bookingCities.length > 1;
   const showHotel = !hotelId && bookingHotels.length > 1;
+  const showRoom = bookingRoomTypes.length > 1;
 
   const filterBar = (
     <div className="space-y-3 rounded-xl border bg-card p-3">
-      {/* row 1 — hotel & city, each on its own control */}
-      {(showCity || showHotel) && (
-        <div className="grid gap-2 sm:grid-cols-2">
+      {/* row 1 — city, hotel & room type, each on its own control */}
+      {(showCity || showHotel || showRoom) && (
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {showCity && (
             <div className="grid gap-1">
               <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
@@ -179,6 +189,27 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                   {hotelOptions.map((bh) => (
                     <SelectItem key={bh.key} value={bh.key}>
                       {bh.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          {showRoom && (
+            <div className="grid gap-1">
+              <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <BedDouble className="size-3.5" />
+                {t("book_roomtype")}
+              </label>
+              <Select value={roomFilter} onValueChange={(v) => setRoomFilter(v ?? "all")}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("bookings_all_rooms")}</SelectItem>
+                  {bookingRoomTypes.map((rt) => (
+                    <SelectItem key={rt} value={rt}>
+                      {rt}
                     </SelectItem>
                   ))}
                 </SelectContent>

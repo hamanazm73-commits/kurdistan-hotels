@@ -24,7 +24,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, formatPrice, pickLang, mapsUrl } from "@/lib/types";
+import { effectivePrice, pickLang, mapsUrl } from "@/lib/types";
+import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 /** Extract a YouTube video id from common URL shapes, else null. */
@@ -55,6 +56,7 @@ const FALLBACK_IMG = "https://images.unsplash.com/photo-1566073771259-6a85060999
 export default function HotelDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t, tCity, tFeature, lang } = useI18n();
+  const { format } = useCurrency();
   const { hotels, loading } = useHotels();
   const hotel = hotels.find((h) => h.id === id);
   const [active, setActive] = useState(0);
@@ -276,7 +278,7 @@ export default function HotelDetailPage() {
                       )}
                     </span>
                     <span className="shrink-0 font-bold text-primary">
-                      {formatPrice(r.price, lang)}
+                      {format(r.price)}
                       <span className="text-xs font-normal text-muted-foreground">
                         {" "}
                         {t("per_night")}
@@ -323,11 +325,11 @@ export default function HotelDetailPage() {
               <div className="flex items-baseline gap-2">
                 {hasDiscount && (
                   <span className="text-base text-muted-foreground line-through">
-                    {formatPrice(hotel.discount.oldPrice, lang)}
+                    {format(hotel.discount.oldPrice)}
                   </span>
                 )}
                 <span className="text-3xl font-extrabold text-primary">
-                  {formatPrice(price, lang)}
+                  {format(price)}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   {t("per_night")}
