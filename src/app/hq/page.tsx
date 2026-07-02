@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { LogoutButton } from "@/components/logout-button";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { useHotels } from "@/lib/use-hotels";
@@ -18,12 +19,8 @@ import { AdminsPanel } from "@/components/admin/admins-panel";
 
 export default function AdminPage() {
   const { t } = useI18n();
-  const { user, role, hotelId, isOwner, loading, logout } = useAuth();
+  const { user, role, hotelId, isOwner, loading } = useAuth();
   const { hotels } = useHotels();
-
-  function handleLogout() {
-    if (window.confirm(t("logout_confirm"))) logout();
-  }
 
   if (loading) {
     return (
@@ -49,9 +46,9 @@ export default function AdminPage() {
               {t("nav_login")}
             </Button>
             {user && (
-              <Button variant="ghost" onClick={handleLogout}>
-                {t("nav_logout")}
-              </Button>
+              <LogoutButton
+                trigger={<Button variant="ghost">{t("nav_logout")}</Button>}
+              />
             )}
             <Button
               variant="ghost"
@@ -86,9 +83,13 @@ export default function AdminPage() {
             <div className="flex items-center gap-1">
               <LanguageSwitcher />
               <ThemeToggle />
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                {t("nav_logout")}
-              </Button>
+              <LogoutButton
+                trigger={
+                  <Button variant="ghost" size="sm">
+                    {t("nav_logout")}
+                  </Button>
+                }
+              />
             </div>
           </div>
         </header>
@@ -137,9 +138,13 @@ export default function AdminPage() {
             >
               {t("login_back")}
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              {t("nav_logout")}
-            </Button>
+            <LogoutButton
+              trigger={
+                <Button variant="ghost" size="sm">
+                  {t("nav_logout")}
+                </Button>
+              }
+            />
           </div>
         </div>
       </header>

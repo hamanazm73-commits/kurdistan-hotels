@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, X } from "lucide-react";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -56,6 +56,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<Range>("all");
   const [fromDate, setFromDate] = useState("");
+  const [cityFilter, setCityFilter] = useState("all");
   const [hotelKey, setHotelKey] = useState("all");
   // "now" captured when data loads, so render stays pure (no Date.now() in render)
   const [now, setNow] = useState(0);
@@ -90,19 +91,36 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     return [...seen.values()];
   }, [rows, cityByHotel]);
 
-  // Filter by hotel + by when the booking was made. A picked date shows
+  // Distinct cities present in the bookings, for the city filter dropdown.
+  const bookingCities = useMemo(() => {
+    const set = new Set<string>();
+    for (const b of rows) {
+      const c = cityByHotel(b);
+      if (c) set.add(c);
+    }
+    return [...set];
+  }, [rows, cityByHotel]);
+
+  // Hotels shown in the hotel dropdown, narrowed to the chosen city.
+  const hotelOptions =
+    cityFilter === "all"
+      ? bookingHotels
+      : bookingHotels.filter((h) => h.city === cityFilter);
+
+  // Filter by city + hotel + when the booking was made. A picked date shows
   // everything from that day onward (to reach old bookings).
   const filtered = useMemo(() => {
     const fromTs = fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : null;
     const windowMs = range === "week" ? 7 * DAY_MS : range === "month" ? 30 * DAY_MS : Infinity;
     return rows.filter((b) => {
+      if (cityFilter !== "all" && cityByHotel(b) !== cityFilter) return false;
       if (hotelKey !== "all" && hotelKeyOf(b) !== hotelKey) return false;
       const c = b.createdAt;
       if (c == null) return true; // never hide undated bookings
       if (fromTs !== null) return c >= fromTs;
       return windowMs === Infinity || now - c <= windowMs;
     });
-  }, [rows, range, fromDate, now, hotelKey]);
+  }, [rows, range, fromDate, now, cityFilter, hotelKey, cityByHotel]);
 
   if (loading)
     return (
@@ -111,63 +129,107 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
       </div>
     );
 
+  const showCity = !hotelId && bookingCities.length > 1;
+  const showHotel = !hotelId && bookingHotels.length > 1;
+
   const filterBar = (
-    <div className="flex flex-wrap items-center gap-2">
-      {!hotelId && bookingHotels.length > 1 && (
-        <Select value={hotelKey} onValueChange={(v) => setHotelKey(v ?? "all")}>
-          <SelectTrigger className="h-9 w-full sm:w-56">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("bookings_all_hotels")}</SelectItem>
-            {bookingHotels.map((bh) => (
-              <SelectItem key={bh.key} value={bh.key}>
-                {bh.name}
-                {bh.city ? ` — ${tCity(bh.city)}` : ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="space-y-3 rounded-xl border bg-card p-3">
+      {/* row 1 — hotel & city, each on its own control */}
+      {(showCity || showHotel) && (
+        <div className="grid gap-2 sm:grid-cols-2">
+          {showCity && (
+            <div className="grid gap-1">
+              <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <MapPin className="size-3.5" />
+                {t("book_city")}
+              </label>
+              <Select
+                value={cityFilter}
+                onValueChange={(v) => {
+                  setCityFilter(v ?? "all");
+                  setHotelKey("all");
+                }}
+              >
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("bookings_all_cities")}</SelectItem>
+                  {bookingCities.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {tCity(c)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          {showHotel && (
+            <div className="grid gap-1">
+              <label className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <Building2 className="size-3.5" />
+                {t("book_hotel")}
+              </label>
+              <Select value={hotelKey} onValueChange={(v) => setHotelKey(v ?? "all")}>
+                <SelectTrigger className="h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("bookings_all_hotels")}</SelectItem>
+                  {hotelOptions.map((bh) => (
+                    <SelectItem key={bh.key} value={bh.key}>
+                      {bh.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
       )}
-      {(["week", "month", "all"] as const).map((r) => (
-        <Button
-          key={r}
-          type="button"
-          size="sm"
-          variant={!fromDate && range === r ? "default" : "outline"}
-          className="rounded-full"
-          onClick={() => {
-            setRange(r);
-            setFromDate("");
-          }}
-        >
-          {t(r === "week" ? "filter_week" : r === "month" ? "filter_month" : "filter_all")}
-        </Button>
-      ))}
-      <div className="ms-auto flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">{t("bookings_date")}</span>
-        <Input
-          type="date"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-          className={cn("h-9 w-40", fromDate && "border-primary")}
-        />
-        {fromDate && (
+
+      {/* row 2 — date range + count */}
+      <div className="flex flex-wrap items-center gap-2">
+        {(["week", "month", "all"] as const).map((r) => (
           <Button
+            key={r}
             type="button"
-            variant="ghost"
-            size="icon"
-            className="size-9 shrink-0"
-            onClick={() => setFromDate("")}
-            title={t("filter_all")}
+            size="sm"
+            variant={!fromDate && range === r ? "default" : "outline"}
+            className="rounded-full"
+            onClick={() => {
+              setRange(r);
+              setFromDate("");
+            }}
           >
-            <X className="size-4" />
+            {t(r === "week" ? "filter_week" : r === "month" ? "filter_month" : "filter_all")}
           </Button>
-        )}
+        ))}
+        <div className="ms-auto flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">{t("bookings_date")}</span>
+          <Input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className={cn("h-9 w-40", fromDate && "border-primary")}
+          />
+          {fromDate && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-9 shrink-0"
+              onClick={() => setFromDate("")}
+              title={t("filter_all")}
+            >
+              <X className="size-4" />
+            </Button>
+          )}
+        </div>
+        <span className="w-full text-sm font-medium text-muted-foreground sm:w-auto">
+          {t("bookings_count", { n: filtered.length })}
+        </span>
       </div>
-      <span className="w-full text-sm font-medium text-muted-foreground sm:w-auto">
-        {t("bookings_count", { n: filtered.length })}
-      </span>
     </div>
   );
 
