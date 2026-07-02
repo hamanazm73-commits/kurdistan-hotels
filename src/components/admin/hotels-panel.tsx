@@ -50,6 +50,25 @@ import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
 
+/** Machine-translate `q` into `to` via our /api/translate route; "" on failure. */
+async function translateText(
+  q: string,
+  to: "ckb" | "kmr" | "en" | "ar",
+): Promise<string> {
+  try {
+    const res = await fetch("/api/translate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ q, to }),
+    });
+    if (!res.ok) return "";
+    const data = (await res.json()) as { text?: string };
+    return (data.text ?? "").trim();
+  } catch {
+    return "";
+  }
+}
+
 function defaultRooms(): FormRoom[] {
   return [
     { type: "Single", price: 75_000, available: 5 },
@@ -347,6 +366,7 @@ export function HotelFormDialog({
 
   const [form, setForm] = useState(buildForm);
   const [showI18n, setShowI18n] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const formRef = useRef(form);
   formRef.current = form;
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -456,6 +476,63 @@ export function HotelFormDialog({
     }
   }
 
+  /** Fill every per-language name & description by machine-translating the base ones. */
+  async function translateAll() {
+    const f = formRef.current;
+    const nameSrc = (
+      f.name || f.nameCkb || f.nameEn || f.nameAr || f.nameKmr
+    ).trim();
+    const descSrc = (
+      f.description || f.descCkb || f.descEn || f.descAr || f.descKmr
+    ).trim();
+    if (!nameSrc && !descSrc) {
+      toast.error(t("admin_translate_empty"));
+      return;
+    }
+    setTranslating(true);
+    setShowI18n(true);
+    try {
+      const langs = ["ckb", "kmr", "en", "ar"] as const;
+      const results = await Promise.all(
+        langs.map(async (l) => ({
+          l,
+          nm: nameSrc ? await translateText(nameSrc, l) : "",
+          ds: descSrc ? await translateText(descSrc, l) : "",
+        })),
+      );
+      if (!results.some((r) => r.nm || r.ds)) {
+        toast.error(t("admin_translate_failed"));
+        return;
+      }
+      const nameKey = {
+        ckb: "nameCkb",
+        kmr: "nameKmr",
+        en: "nameEn",
+        ar: "nameAr",
+      } as const;
+      const descKey = {
+        ckb: "descCkb",
+        kmr: "descKmr",
+        en: "descEn",
+        ar: "descAr",
+      } as const;
+      setForm((prev) => {
+        const next = { ...prev };
+        for (const { l, nm, ds } of results) {
+          if (nm) next[nameKey[l]] = nm;
+          if (ds) next[descKey[l]] = ds;
+        }
+        return next;
+      });
+      if (hotelRef.current) scheduleAutoSave();
+      toast.success(t("admin_translate_done"));
+    } catch {
+      toast.error(t("admin_translate_failed"));
+    } finally {
+      setTranslating(false);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={trigger} />
@@ -486,6 +563,21 @@ export function HotelFormDialog({
                 className={cn("size-4 transition", showI18n && "rotate-180")}
               />
             </button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={translateAll}
+              disabled={translating}
+              className="mt-3 w-full gap-1.5"
+            >
+              {translating ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Sparkles className="size-4" />
+              )}
+              {translating ? t("admin_translating") : t("admin_autotranslate")}
+            </Button>
             {showI18n && (
               <div className="mt-3 space-y-3">
                 {NAME_FIELDS.map(({ lang, key }) => (

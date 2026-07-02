@@ -28,6 +28,15 @@ import { BookingDialog } from "./booking-dialog";
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
 
+/** Colour classes for an availability chip: green plenty, amber low, red none. */
+function availTone(n: number): string {
+  return n <= 0
+    ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+    : n <= 3
+      ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300";
+}
+
 function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string {
   let digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) digits = "964" + digits.slice(1);
@@ -44,8 +53,9 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
     ? Math.round((1 - hotel.discount.newPrice / hotel.discount.oldPrice) * 100)
     : 0;
   const rooms = totalAvailable(hotel);
-  const roomTone =
-    rooms <= 0 ? "bg-red-500" : rooms <= 3 ? "bg-amber-500" : "bg-emerald-500";
+  const trackedRooms = (hotel.rooms ?? []).filter(
+    (r) => typeof r.available === "number",
+  );
 
   return (
     <motion.div
@@ -76,17 +86,6 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             />
           </Link>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-
-          {/* prominent rooms-available pill */}
-          <div
-            className={cn(
-              "absolute bottom-3 start-3 flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold text-white shadow-lg",
-              roomTone,
-            )}
-          >
-            <BedDouble className="size-4" />
-            {rooms <= 0 ? t("room_full") : t("rooms_available", { n: rooms })}
-          </div>
 
           <div className="absolute start-3 top-3 flex flex-wrap gap-1.5">
             {hotel.featured && (
@@ -140,6 +139,35 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               </span>
             ))}
           </div>
+
+          {/* rooms available — per type when tracked, else the total */}
+          {trackedRooms.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {trackedRooms.map((r) => (
+                <span
+                  key={r.type}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold",
+                    availTone(r.available ?? 0),
+                  )}
+                >
+                  <BedDouble className="size-3" />
+                  {r.type} ·{" "}
+                  {(r.available ?? 0) <= 0 ? t("room_full") : r.available}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 self-start rounded-md px-2.5 py-1 text-xs font-semibold",
+                availTone(rooms),
+              )}
+            >
+              <BedDouble className="size-3.5" />
+              {rooms <= 0 ? t("room_full") : t("rooms_available", { n: rooms })}
+            </span>
+          )}
 
           <div className="mt-auto flex items-end justify-between gap-2 pt-2">
             <div>
