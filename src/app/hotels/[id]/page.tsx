@@ -24,8 +24,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, formatPrice, pickLang } from "@/lib/types";
+import { effectivePrice, formatPrice, pickLang, mapsUrl } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+/** Extract a YouTube video id from common URL shapes, else null. */
+function youtubeId(url: string): string | null {
+  const m = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/)|youtu\.be\/)([\w-]{11})/,
+  );
+  return m ? m[1] : null;
+}
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -171,10 +179,16 @@ export default function HotelDetailPage() {
 
             <h1 className="mt-3 text-3xl font-extrabold">{name}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
+              <a
+                href={mapsUrl(hotel)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={t("view_on_map")}
+                className="flex items-center gap-1 transition-colors hover:text-primary hover:underline"
+              >
                 <MapPin className="size-4" />
                 {tCity(hotel.city)}
-              </span>
+              </a>
               <span className="flex items-center gap-1">
                 <Star className="size-4 fill-gold text-gold" />
                 {hotel.rating.toFixed(1)}
@@ -209,19 +223,59 @@ export default function HotelDetailPage() {
               </section>
             )}
 
+            {hotel.video && (
+              <section className="mt-7">
+                <h2 className="mb-3 text-lg font-bold">{t("detail_video")}</h2>
+                {youtubeId(hotel.video) ? (
+                  <div className="aspect-video overflow-hidden rounded-xl border">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${youtubeId(hotel.video)}`}
+                      title={t("detail_video")}
+                      className="size-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                ) : (
+                  <video
+                    src={hotel.video}
+                    controls
+                    playsInline
+                    className="aspect-video w-full rounded-xl border bg-black"
+                  />
+                )}
+              </section>
+            )}
+
             <section className="mt-7">
               <h2 className="mb-3 text-lg font-bold">{t("detail_rooms")}</h2>
               <div className="grid gap-2">
                 {hotel.rooms.map((r) => (
                   <div
                     key={r.type}
-                    className="flex items-center justify-between rounded-lg border bg-card px-4 py-3"
+                    className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
                   >
-                    <span className="flex items-center gap-2 font-medium">
-                      <BedDouble className="size-4 text-muted-foreground" />
+                    <span className="flex min-w-0 flex-wrap items-center gap-2 font-medium">
+                      <BedDouble className="size-4 shrink-0 text-muted-foreground" />
                       {r.type}
+                      {typeof r.available === "number" && (
+                        <span
+                          className={cn(
+                            "rounded-full px-2 py-0.5 text-xs font-semibold",
+                            r.available <= 0
+                              ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+                              : r.available <= 3
+                                ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"
+                                : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+                          )}
+                        >
+                          {r.available <= 0
+                            ? t("room_full")
+                            : t("rooms_available", { n: r.available })}
+                        </span>
+                      )}
                     </span>
-                    <span className="font-bold text-primary">
+                    <span className="shrink-0 font-bold text-primary">
                       {formatPrice(r.price, lang)}
                       <span className="text-xs font-normal text-muted-foreground">
                         {" "}
@@ -249,6 +303,15 @@ export default function HotelDetailPage() {
                       <span dir="ltr">{hotel.phone}</span>
                     </p>
                   )}
+                  <a
+                    href={mapsUrl(hotel)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 font-medium text-primary hover:underline"
+                  >
+                    <MapPin className="size-4" />
+                    {t("view_on_map")}
+                  </a>
                 </div>
               </section>
             )}

@@ -18,6 +18,8 @@ export function pickLang(
 export interface RoomType {
   type: string;
   price: number;
+  /** how many rooms of this type are still free (optional; undefined = untracked) */
+  available?: number;
 }
 
 export interface Discount {
@@ -55,6 +57,10 @@ export interface Hotel {
   address?: string;
   /** contact phone */
   phone?: string;
+  /** optional promo video (YouTube link or direct mp4 URL) */
+  video?: string;
+  /** Google Maps link / place URL for the hotel */
+  mapUrl?: string;
   createdAt?: number;
 }
 
@@ -90,4 +96,23 @@ export function effectivePrice(h: Pick<Hotel, "price" | "discount">): number {
 export function formatPrice(price: number, lang: Lang): string {
   const n = price.toLocaleString("en-US");
   return lang === "en" || lang === "kmr" ? `${n} IQD` : `${n} دینار`;
+}
+
+/** Best Google Maps URL for a hotel: its explicit link, else a name+city search. */
+export function mapsUrl(
+  h: Pick<Hotel, "mapUrl" | "name" | "city" | "address">,
+): string {
+  if (h.mapUrl && h.mapUrl.trim()) return h.mapUrl.trim();
+  const q = encodeURIComponent(
+    [h.name, h.address, h.city].filter(Boolean).join(", "),
+  );
+  return `https://www.google.com/maps/search/?api=1&query=${q}`;
+}
+
+/** Total free rooms: sum of per-room availability when tracked, else the hotel field. */
+export function totalAvailable(h: Pick<Hotel, "available" | "rooms">): number {
+  const tracked = h.rooms?.filter((r) => typeof r.available === "number") ?? [];
+  if (tracked.length > 0)
+    return tracked.reduce((s, r) => s + Math.max(0, r.available ?? 0), 0);
+  return h.available ?? 0;
 }

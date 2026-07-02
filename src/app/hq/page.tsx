@@ -21,6 +21,10 @@ export default function AdminPage() {
   const { user, role, hotelId, isOwner, loading, logout } = useAuth();
   const { hotels } = useHotels();
 
+  function handleLogout() {
+    if (window.confirm(t("logout_confirm"))) logout();
+  }
+
   if (loading) {
     return (
       <div className="grid min-h-dvh place-items-center">
@@ -45,7 +49,7 @@ export default function AdminPage() {
               {t("nav_login")}
             </Button>
             {user && (
-              <Button variant="ghost" onClick={() => logout()}>
+              <Button variant="ghost" onClick={handleLogout}>
                 {t("nav_logout")}
               </Button>
             )}
@@ -94,7 +98,7 @@ export default function AdminPage() {
               )}
               <LanguageSwitcher />
               <ThemeToggle />
-              <Button variant="ghost" size="sm" onClick={() => logout()}>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
                 {t("nav_logout")}
               </Button>
             </div>
@@ -134,7 +138,7 @@ export default function AdminPage() {
             >
               {t("login_back")}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => logout()}>
+            <Button variant="ghost" size="sm" onClick={handleLogout}>
               {t("nav_logout")}
             </Button>
           </div>

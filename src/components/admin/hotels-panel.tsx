@@ -45,14 +45,16 @@ import {
   deleteHotel,
   seedHotels,
 } from "@/lib/hotels-db";
-import { effectivePrice, formatPrice, type Hotel, type HotelInput } from "@/lib/types";
+import { effectivePrice, formatPrice, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
-function defaultRooms() {
+type FormRoom = { type: string; price: number; available?: number };
+
+function defaultRooms(): FormRoom[] {
   return [
-    { type: "Single", price: 75_000 },
-    { type: "Double", price: 105_000 },
-    { type: "Suite", price: 170_000 },
+    { type: "Single", price: 75_000, available: 5 },
+    { type: "Double", price: 105_000, available: 5 },
+    { type: "Suite", price: 170_000, available: 3 },
   ];
 }
 
@@ -93,6 +95,8 @@ const empty = {
   description: "",
   address: "",
   phone: "",
+  video: "",
+  mapUrl: "",
   rooms: defaultRooms(),
   featured: false,
   recommended: false,
@@ -316,7 +320,15 @@ export function HotelFormDialog({
       description: h.description ?? "",
       address: h.address ?? "",
       phone: h.phone ?? "",
-      rooms: h.rooms?.length ? h.rooms : defaultRooms(),
+      video: h.video ?? "",
+      mapUrl: h.mapUrl ?? "",
+      rooms: h.rooms?.length
+        ? h.rooms.map((r) => ({
+            type: r.type,
+            price: r.price,
+            available: r.available,
+          }))
+        : defaultRooms(),
       featured: h.featured,
       recommended: h.recommended,
       discountActive: h.discount?.active ?? false,
@@ -341,6 +353,18 @@ export function HotelFormDialog({
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   function buildData(f: typeof form): HotelInput {
+    const rooms: RoomType[] = f.rooms
+      .map((r) => {
+        const room: RoomType = { type: r.type.trim(), price: Number(r.price) };
+        if (r.available !== undefined && !Number.isNaN(Number(r.available)))
+          room.available = Math.max(0, Number(r.available));
+        return room;
+      })
+      .filter((r) => r.type);
+    const tracked = rooms.filter((r) => typeof r.available === "number");
+    const available = tracked.length
+      ? tracked.reduce((s, r) => s + (r.available ?? 0), 0)
+      : Number(f.available);
     return {
       name: f.name.trim(),
       nameI18n: i18nObj(f.nameCkb, f.nameKmr, f.nameEn, f.nameAr),
@@ -349,13 +373,15 @@ export function HotelFormDialog({
       rating: Number(f.rating),
       image: f.image.trim(),
       images: f.images.filter(Boolean),
-      available: Number(f.available),
+      available,
       features: f.features.split(",").map((s) => s.trim()).filter(Boolean),
       description: f.description.trim(),
       descriptionI18n: i18nObj(f.descCkb, f.descKmr, f.descEn, f.descAr),
       address: f.address.trim(),
       phone: f.phone.trim(),
-      rooms: f.rooms.map((r) => ({ type: r.type.trim(), price: Number(r.price) })).filter((r) => r.type),
+      video: f.video.trim(),
+      mapUrl: f.mapUrl.trim(),
+      rooms,
       featured: f.featured,
       recommended: f.recommended,
       discount: {
@@ -567,6 +593,24 @@ export function HotelFormDialog({
             </Field>
           </div>
 
+          <Field label={t("admin_location")}>
+            <Input
+              dir="ltr"
+              placeholder={t("admin_location_ph")}
+              value={form.mapUrl}
+              onChange={(e) => set("mapUrl", e.target.value)}
+            />
+          </Field>
+
+          <Field label={t("admin_video")}>
+            <Input
+              dir="ltr"
+              placeholder={t("admin_video_ph")}
+              value={form.video}
+              onChange={(e) => set("video", e.target.value)}
+            />
+          </Field>
+
           <Field label={t("admin_features")}>
             <Input
               value={form.features}
@@ -580,6 +624,7 @@ export function HotelFormDialog({
               {form.rooms.map((r, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <Input
+                    className="min-w-0 flex-1"
                     placeholder={t("admin_room_type")}
                     value={r.type}
                     onChange={(e) =>
@@ -592,7 +637,7 @@ export function HotelFormDialog({
                     }
                   />
                   <MoneyInput
-                    className="w-28"
+                    className="w-24"
                     placeholder={t("admin_room_price")}
                     value={r.price}
                     onChange={(n) =>
@@ -604,10 +649,36 @@ export function HotelFormDialog({
                       )
                     }
                   />
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    title={t("admin_room_available")}
+                    placeholder={t("admin_room_available")}
+                    className="w-16 shrink-0"
+                    value={r.available ?? ""}
+                    onChange={(e) =>
+                      set(
+                        "rooms",
+                        form.rooms.map((x, j) =>
+                          j === i
+                            ? {
+                                ...x,
+                                available:
+                                  e.target.value === ""
+                                    ? undefined
+                                    : Math.max(0, Number(e.target.value)),
+                              }
+                            : x,
+                        ),
+                      )
+                    }
+                  />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
+                    className="shrink-0"
                     onClick={() =>
                       set(
                         "rooms",

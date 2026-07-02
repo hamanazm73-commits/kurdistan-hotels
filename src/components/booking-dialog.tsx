@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { formatPrice, type Hotel } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export function BookingDialog({ hotel }: { hotel: Hotel }) {
   const { t, lang } = useI18n();
@@ -44,6 +45,10 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
   async function submit() {
     if (!name.trim() || !phone.trim() || !checkIn || !roomType) {
       toast.error(t("book_required"));
+      return;
+    }
+    if (room && room.available === 0) {
+      toast.error(t("book_room_full"));
       return;
     }
     setSubmitting(true);
@@ -149,9 +154,31 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
               </SelectTrigger>
               <SelectContent className="w-[min(92vw,22rem)]">
                 {hotel.rooms.map((r) => (
-                  <SelectItem key={r.type} value={r.type}>
-                    <span className="flex w-full items-center justify-between gap-6 pe-4">
-                      <span className="font-medium">{r.type}</span>
+                  <SelectItem
+                    key={r.type}
+                    value={r.type}
+                    disabled={r.available === 0}
+                  >
+                    <span className="flex w-full items-center justify-between gap-4 pe-4">
+                      <span className="flex items-center gap-2 font-medium">
+                        {r.type}
+                        {typeof r.available === "number" && (
+                          <span
+                            className={cn(
+                              "text-xs font-semibold",
+                              r.available <= 0
+                                ? "text-red-600"
+                                : r.available <= 3
+                                  ? "text-amber-600"
+                                  : "text-emerald-600",
+                            )}
+                          >
+                            {r.available <= 0
+                              ? t("room_full")
+                              : t("rooms_available", { n: r.available })}
+                          </span>
+                        )}
+                      </span>
                       <span className="whitespace-nowrap text-muted-foreground">
                         {formatPrice(r.price, lang)}
                       </span>

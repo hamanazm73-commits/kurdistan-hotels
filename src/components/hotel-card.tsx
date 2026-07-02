@@ -14,8 +14,19 @@ function WhatsAppIcon({ className }: { className?: string }) {
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, formatPrice, pickLang, type Hotel } from "@/lib/types";
+import {
+  effectivePrice,
+  formatPrice,
+  pickLang,
+  mapsUrl,
+  totalAvailable,
+  type Hotel,
+} from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { BookingDialog } from "./booking-dialog";
+
+const FALLBACK_IMG =
+  "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
 
 function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string {
   let digits = phone.replace(/\D/g, "");
@@ -32,6 +43,9 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
   const pct = hasDiscount
     ? Math.round((1 - hotel.discount.newPrice / hotel.discount.oldPrice) * 100)
     : 0;
+  const rooms = totalAvailable(hotel);
+  const roomTone =
+    rooms <= 0 ? "bg-red-500" : rooms <= 3 ? "bg-amber-500" : "bg-emerald-500";
 
   return (
     <motion.div
@@ -41,21 +55,38 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
       transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.4) }}
     >
       <Card className="group h-full overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
-        <div className="relative aspect-[3/2] overflow-hidden">
-          <Link href={`/hotels/${hotel.id}`} className="block size-full">
+        <div className="relative aspect-[3/2] overflow-hidden bg-muted">
+          {/* blurred fill so any image shape shows whole & looks nice */}
+          <div
+            aria-hidden
+            className="absolute inset-0 scale-110 bg-cover bg-center opacity-55 blur-xl"
+            style={{ backgroundImage: `url("${hotel.image || FALLBACK_IMG}")` }}
+          />
+          <Link href={`/hotels/${hotel.id}`} className="relative block size-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={hotel.image}
+              src={hotel.image || FALLBACK_IMG}
               alt={hotel.name}
-              className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="size-full object-contain transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {
                 const img = e.currentTarget;
                 img.onerror = null;
-                img.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
+                img.src = FALLBACK_IMG;
               }}
             />
           </Link>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+
+          {/* prominent rooms-available pill */}
+          <div
+            className={cn(
+              "absolute bottom-3 start-3 flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold text-white shadow-lg",
+              roomTone,
+            )}
+          >
+            <BedDouble className="size-4" />
+            {rooms <= 0 ? t("room_full") : t("rooms_available", { n: rooms })}
+          </div>
 
           <div className="absolute start-3 top-3 flex flex-wrap gap-1.5">
             {hotel.featured && (
@@ -86,10 +117,17 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                 {name}
               </h3>
             </Link>
-            <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+            <a
+              href={mapsUrl(hotel)}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t("view_on_map")}
+              onClick={(e) => e.stopPropagation()}
+              className="mt-1 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary hover:underline"
+            >
               <MapPin className="size-3.5" />
               {tCity(hotel.city)}
-            </p>
+            </a>
           </div>
 
           <div className="flex flex-wrap gap-1.5">
@@ -116,11 +154,7 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                 </span>
               </div>
               <span className="text-xs text-muted-foreground">
-                {t("per_night")} ·{" "}
-                <span className="inline-flex items-center gap-1">
-                  <BedDouble className="size-3" />
-                  {t("rooms_left", { n: hotel.available })}
-                </span>
+                {t("per_night")}
               </span>
             </div>
             <div className="flex items-center gap-2">

@@ -21,6 +21,10 @@ export function SiteHeader() {
   const { user, role, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
+  function handleLogout() {
+    if (window.confirm(t("logout_confirm"))) logout();
+  }
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
@@ -78,7 +82,7 @@ export function SiteHeader() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => logout()}
+                  onClick={handleLogout}
                   className="gap-1.5"
                 >
                   <LogOut className="size-4" />
@@ -139,7 +143,7 @@ export function SiteHeader() {
                     <Button
                       variant="ghost"
                       className="justify-start"
-                      onClick={() => logout()}
+                      onClick={handleLogout}
                     >
                       {t("nav_logout")}
                     </Button>
