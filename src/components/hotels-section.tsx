@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, ArrowDownUp } from "lucide-react";
+import { Search, ArrowDownUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -18,7 +17,6 @@ import { useHotels } from "@/lib/use-hotels";
 import { useI18n, CITY_KEYS } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
 import { effectivePrice } from "@/lib/types";
-import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 type Sort = "recommended" | "price_low" | "price_high" | "rating";
@@ -32,13 +30,11 @@ const SORT_LABEL: Record<Sort, string> = {
 
 export function HotelsSection() {
   const { t, tCity } = useI18n();
-  const { format } = useCurrency();
   const { hotels, loading } = useHotels();
 
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
-  const [maxPrice, setMaxPrice] = useState(500_000);
   const [sort, setSort] = useState<Sort>("recommended");
 
   const filtered = useMemo(() => {
@@ -54,8 +50,7 @@ export function HotelsSection() {
         ].some((v) => v?.toLowerCase().includes(q));
       const matchesCity = city === "all" || h.city === city;
       const matchesFeatured = !featuredOnly || h.featured;
-      const matchesPrice = effectivePrice(h) <= maxPrice;
-      return matchesSearch && matchesCity && matchesFeatured && matchesPrice;
+      return matchesSearch && matchesCity && matchesFeatured;
     });
 
     list = [...list].sort((a, b) => {
@@ -74,7 +69,7 @@ export function HotelsSection() {
       }
     });
     return list;
-  }, [hotels, search, city, featuredOnly, maxPrice, sort]);
+  }, [hotels, search, city, featuredOnly, sort]);
 
   return (
     <section id="hotels" className="mx-auto max-w-7xl scroll-mt-20 px-6 py-16">
@@ -121,22 +116,6 @@ export function HotelsSection() {
           ))}
 
           <div className="ms-auto flex items-center gap-3">
-            <div className="hidden items-center gap-2 sm:flex">
-              <SlidersHorizontal className="size-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {t("max_price")}: {format(maxPrice)}
-              </span>
-              <Slider
-                value={[maxPrice]}
-                onValueChange={(v) =>
-                  setMaxPrice(Array.isArray(v) ? v[0] : v)
-                }
-                min={10_000}
-                max={500_000}
-                step={5_000}
-                className="w-36"
-              />
-            </div>
             <Select
               value={sort}
               onValueChange={(v) => v && setSort(v as Sort)}
