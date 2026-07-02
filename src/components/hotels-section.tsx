@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, ArrowDownUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -22,6 +22,13 @@ import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
 type Sort = "recommended" | "price_low" | "price_high" | "rating";
+
+const SORT_LABEL: Record<Sort, string> = {
+  recommended: "sort_recommended",
+  price_low: "sort_price_low",
+  price_high: "sort_price_high",
+  rating: "sort_rating",
+};
 
 export function HotelsSection() {
   const { t, tCity } = useI18n();
@@ -134,8 +141,13 @@ export function HotelsSection() {
               value={sort}
               onValueChange={(v) => v && setSort(v as Sort)}
             >
-              <SelectTrigger className="w-44">
-                <SelectValue />
+              <SelectTrigger className="max-w-[52vw] sm:max-w-none">
+                <ArrowDownUp className="size-4 shrink-0 text-muted-foreground" />
+                <SelectValue>
+                  {(value: Sort | null) =>
+                    t(SORT_LABEL[value ?? "recommended"])
+                  }
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="recommended">
