@@ -104,8 +104,8 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             )}
           </div>
 
-          <div className="gold-glow absolute end-3 top-3 flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-sm font-bold text-gold-foreground">
-            <Star className="star-shine size-3.5 fill-gold-foreground text-gold-foreground" />
+          <div className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-sm font-bold text-white shadow-lg backdrop-blur-sm">
+            <Star className="star-shine size-3.5 fill-gold text-gold" />
             {hotel.rating.toFixed(1)}
           </div>
         </div>
