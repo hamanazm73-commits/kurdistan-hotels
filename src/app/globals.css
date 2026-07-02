@@ -204,11 +204,32 @@
   animation: shimmer 2.5s infinite;
 }
 
+/* gently glowing rating star */
+@keyframes star-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 50%, transparent));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px color-mix(in oklch, var(--gold) 95%, transparent));
+  }
+}
+.star-shine {
+  animation: star-glow 2.4s ease-in-out infinite;
+}
+/* soft golden halo for the rating badge */
+.gold-glow {
+  box-shadow:
+    0 4px 10px -2px rgb(0 0 0 / 0.15),
+    0 0 14px color-mix(in oklch, var(--gold) 60%, transparent);
+}
+
 /* respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
   .aurora-blob,
   .text-gradient-gold,
+  .star-shine,
   .shimmer::after {
     animation: none;
   }

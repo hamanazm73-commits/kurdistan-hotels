@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,17 +26,43 @@ import { useCurrency } from "@/lib/currency";
 import { type Hotel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export function BookingDialog({ hotel }: { hotel: Hotel }) {
+export function BookingDialog({
+  hotel,
+  open: openProp,
+  onOpenChange,
+  initialRoomType,
+  trigger = true,
+}: {
+  hotel: Hotel;
+  /** control the dialog from outside (e.g. open it from a room row) */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** room type to preselect when the dialog opens */
+  initialRoomType?: string;
+  /** render the built-in "Book now" trigger button (default true) */
+  trigger?: boolean;
+}) {
   const { t } = useI18n();
   const { format } = useCurrency();
-  const [open, setOpen] = useState(false);
+  const controlled = openProp !== undefined;
+  const [openState, setOpenState] = useState(false);
+  const open = controlled ? openProp : openState;
+  const setOpen = (o: boolean) => {
+    if (!controlled) setOpenState(o);
+    onOpenChange?.(o);
+  };
   const [submitting, setSubmitting] = useState(false);
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [checkIn, setCheckIn] = useState("");
   const [nights, setNights] = useState("1");
-  const [roomType, setRoomType] = useState("");
+  const [roomType, setRoomType] = useState(initialRoomType ?? "");
+
+  // preselect the tapped room each time the dialog opens
+  useEffect(() => {
+    if (open && initialRoomType) setRoomType(initialRoomType);
+  }, [open, initialRoomType]);
 
   const room = hotel.rooms.find((r) => r.type === roomType);
   const total = useMemo(
@@ -97,9 +123,11 @@ export function BookingDialog({ hotel }: { hotel: Hotel }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button className="shrink-0" />}>
-        {t("book_now")}
-      </DialogTrigger>
+      {trigger && (
+        <DialogTrigger render={<Button className="shrink-0" />}>
+          {t("book_now")}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{t("book_title")}</DialogTitle>

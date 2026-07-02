@@ -75,6 +75,9 @@ export default function HotelDetailPage() {
       alive = false;
     };
   }, [id]);
+  // Booking dialog opened by tapping a room row (preselects that room).
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [bookingRoom, setBookingRoom] = useState("");
 
   if (loading && !hotel) {
     return (
@@ -207,8 +210,8 @@ export default function HotelDetailPage() {
                 <MapPin className="size-4" />
                 {tCity(hotel.city)}
               </a>
-              <span className="flex items-center gap-1">
-                <Star className="size-4 fill-gold text-gold" />
+              <span className="flex items-center gap-1 font-semibold">
+                <Star className="star-shine size-5 fill-gold text-gold" />
                 {hotel.rating.toFixed(1)}
               </span>
             </div>
@@ -266,15 +269,24 @@ export default function HotelDetailPage() {
             )}
 
             <section className="mt-7">
-              <h2 className="mb-3 text-lg font-bold">{t("detail_rooms")}</h2>
+              <h2 className="mb-1 text-lg font-bold">{t("detail_rooms")}</h2>
+              <p className="mb-3 text-sm text-muted-foreground">
+                {t("detail_pick_room")}
+              </p>
               <div className="grid gap-2">
                 {hotel.rooms.map((r) => (
-                  <div
+                  <button
+                    type="button"
                     key={r.type}
-                    className="flex items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3"
+                    disabled={r.available === 0}
+                    onClick={() => {
+                      setBookingRoom(r.type);
+                      setBookingOpen(true);
+                    }}
+                    className="group flex w-full items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3 text-start transition hover:border-primary hover:bg-accent/40 hover:shadow-sm active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60"
                   >
                     <span className="flex min-w-0 flex-wrap items-center gap-2 font-medium">
-                      <BedDouble className="size-4 shrink-0 text-muted-foreground" />
+                      <BedDouble className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
                       {r.type}
                       {typeof r.available === "number" && (
                         <span
@@ -293,17 +305,28 @@ export default function HotelDetailPage() {
                         </span>
                       )}
                     </span>
-                    <span className="shrink-0 font-bold text-primary">
-                      {format(r.price)}
-                      <span className="text-xs font-normal text-muted-foreground">
-                        {" "}
-                        {t("per_night")}
+                    <span className="flex shrink-0 items-center gap-1.5 font-bold text-primary">
+                      <span>
+                        {format(r.price)}
+                        <span className="text-xs font-normal text-muted-foreground">
+                          {" "}
+                          {t("per_night")}
+                        </span>
                       </span>
+                      <ChevronLeft className="size-4 shrink-0 opacity-40 transition group-hover:opacity-100 ltr:rotate-180" />
                     </span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </section>
+
+            <BookingDialog
+              hotel={hotel}
+              open={bookingOpen}
+              onOpenChange={setBookingOpen}
+              initialRoomType={bookingRoom}
+              trigger={false}
+            />
 
             {(hotel.address || hotel.phone) && (
               <section className="mt-7">
