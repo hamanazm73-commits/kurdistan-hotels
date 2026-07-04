@@ -12,6 +12,8 @@ import {
   Loader2,
   X,
   ChevronDown,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -173,6 +175,16 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
     }
   }
 
+  async function toggleHidden(h: Hotel) {
+    try {
+      await updateHotel(h.id, { hidden: !h.hidden });
+      toast.success(h.hidden ? t("admin_shown") : t("admin_hidden_done"));
+    } catch (e) {
+      console.error("[toggle hidden]", e);
+      toast.error(saveErrorMessage(e, t));
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -236,7 +248,13 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
           const isSample = h.id.startsWith("sample-");
           const isEditingPrice = editingPriceId === h.id;
           return (
-            <Card key={h.id} className="flex flex-row items-center gap-4 p-3">
+            <Card
+              key={h.id}
+              className={cn(
+                "flex flex-row items-center gap-4 p-3",
+                h.hidden && "opacity-60",
+              )}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={h.image}
@@ -246,6 +264,11 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold">{h.name}</span>
+                  {h.hidden && (
+                    <Badge variant="outline" className="gap-1">
+                      <EyeOff className="size-3" /> {t("badge_hidden")}
+                    </Badge>
+                  )}
                   {h.featured && (
                     <Badge className="bg-gold text-gold-foreground hover:bg-gold">
                       <Star className="size-3" /> {t("badge_featured")}
@@ -307,6 +330,19 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
                     </Button>
                   }
                 />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isSample}
+                  title={h.hidden ? t("admin_show") : t("admin_hide")}
+                  onClick={() => toggleHidden(h)}
+                >
+                  {h.hidden ? (
+                    <Eye className="size-4" />
+                  ) : (
+                    <EyeOff className="size-4" />
+                  )}
+                </Button>
                 {!owner && (
                   <Button
                     variant="ghost"

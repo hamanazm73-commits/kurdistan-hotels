@@ -61,6 +61,8 @@ export interface Hotel {
   video?: string;
   /** Google Maps link / place URL for the hotel */
   mapUrl?: string;
+  /** when true, the hotel is hidden from the public site (still shown in admin) */
+  hidden?: boolean;
   createdAt?: number;
 }
 

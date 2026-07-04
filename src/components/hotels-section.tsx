@@ -39,6 +39,7 @@ export function HotelsSection() {
 
   const filtered = useMemo(() => {
     let list = hotels.filter((h) => {
+      if (h.hidden) return false;
       const q = search.trim().toLowerCase();
       const matchesSearch =
         !q ||
