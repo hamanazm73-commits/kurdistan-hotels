@@ -44,7 +44,7 @@ const ckb: Dict = {
   stat_hotels: "هۆتێل",
   stat_cities: "شار",
   stat_guests: "میوان",
-  stat_rating: "هەڵسەنگاندن",
+  stat_rooms: "ژوور",
 
   search_ph: "گەڕان بەدوای هۆتێل یان شار...",
   filter_all: "هەموو",
@@ -228,7 +228,7 @@ const en: Dict = {
   stat_hotels: "Hotels",
   stat_cities: "Cities",
   stat_guests: "Guests",
-  stat_rating: "Rating",
+  stat_rooms: "Rooms",
 
   search_ph: "Search hotels or city...",
   filter_all: "All",
@@ -412,7 +412,7 @@ const ar: Dict = {
   stat_hotels: "فندق",
   stat_cities: "مدينة",
   stat_guests: "ضيف",
-  stat_rating: "التقييم",
+  stat_rooms: "غرفة",
 
   search_ph: "دوّر على فندق أو مدينة...",
   filter_all: "الكل",
@@ -596,7 +596,7 @@ const kmr: Dict = {
   stat_hotels: "Otêl",
   stat_cities: "Bajar",
   stat_guests: "Mêvan",
-  stat_rating: "Nirxandin",
+  stat_rooms: "Ode",
 
   search_ph: "Li otêl an bajêr bigere...",
   filter_all: "Hemî",

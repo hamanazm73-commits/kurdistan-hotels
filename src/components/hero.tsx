@@ -34,10 +34,17 @@ function AnimatedStat({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
+  const [ready, setReady] = useState(false);
   const [display, setDisplay] = useState("0");
 
+  // fallback so the number never stays stuck at 0 if the observer never fires
   useEffect(() => {
-    if (!inView) return;
+    const id = setTimeout(() => setReady(true), 1200);
+    return () => clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    if (!inView && !ready) return;
     const match = value.match(/^([\d,]+)(\+?)$/);
     if (!match) { setDisplay(value); return; }
 
@@ -55,7 +62,7 @@ function AnimatedStat({
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [inView, value]);
+  }, [inView, ready, value]);
 
   return (
     <div
@@ -80,17 +87,24 @@ export function Hero() {
 
   // real figures, computed from the hotels shown on the site (excludes hidden)
   const visible = hotels.filter((h) => !h.hidden);
-  const rated = visible.filter((h) => typeof h.rating === "number");
-  const avgRating = rated.length
-    ? (rated.reduce((s, h) => s + h.rating, 0) / rated.length).toFixed(1)
-    : "0";
+  // total rooms on the site: sum tracked room counts per hotel, and when a
+  // hotel hasn't set counts, fall back to how many room types it lists
+  const roomsTotal = visible.reduce((sum, h) => {
+    const tracked = (h.rooms ?? []).filter(
+      (r) => typeof r.available === "number",
+    );
+    const n = tracked.length
+      ? tracked.reduce((s, r) => s + Math.max(0, r.available ?? 0), 0)
+      : (h.rooms?.length ?? 0);
+    return sum + n;
+  }, 0);
   const stats = [
     { labelKey: "stat_hotels", value: String(visible.length) },
     {
       labelKey: "stat_cities",
       value: String(new Set(visible.map((h) => h.city)).size),
     },
-    { labelKey: "stat_rating", value: avgRating },
+    { labelKey: "stat_rooms", value: String(roomsTotal) },
   ];
 
   return (
