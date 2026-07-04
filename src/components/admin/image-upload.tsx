@@ -106,14 +106,24 @@ export function ImageUpload({
   return (
     <div className="space-y-2">
       {value && (
-        <div className="relative overflow-hidden rounded-lg border">
+        <div className="relative overflow-hidden rounded-lg border bg-muted">
+          {/* blurred fill so the whole image shows undistorted, like the card */}
+          <div
+            aria-hidden
+            className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-xl"
+            style={{ backgroundImage: `url("${value}")` }}
+          />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="" className="h-32 w-full object-cover" />
+          <img
+            src={value}
+            alt=""
+            className="relative mx-auto h-40 w-full object-contain"
+          />
           <Button
             type="button"
             variant="secondary"
             size="icon-sm"
-            className="absolute end-2 top-2"
+            className="absolute end-2 top-2 z-10"
             onClick={() => onChange("")}
           >
             <X className="size-4" />
@@ -199,10 +209,10 @@ export function GalleryUpload({
       {value.map((url, i) => (
         <div
           key={i}
-          className="relative size-20 overflow-hidden rounded-lg border"
+          className="relative size-20 overflow-hidden rounded-lg border bg-muted"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt="" className="size-full object-cover" />
+          <img src={url} alt="" className="size-full object-contain" />
           <button
             type="button"
             onClick={() => onChange(value.filter((_, j) => j !== i))}
