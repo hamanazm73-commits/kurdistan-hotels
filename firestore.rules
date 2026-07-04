@@ -40,6 +40,10 @@ service cloud.firestore {
       allow update: if isAdmin() ||
         (hasRole() && myRole().enabled == true && myRole().role == 'hotel'
           && myRole().hotelId == id
+          // a hotel owner can't touch a hotel the admin has hidden,
+          // and can't change the hidden flag themselves
+          && resource.data.get('hidden', false) != true
+          && request.resource.data.get('hidden', false) == resource.data.get('hidden', false)
           && request.resource.data.featured == resource.data.featured
           && request.resource.data.recommended == resource.data.recommended
           && request.resource.data.discount.active == resource.data.discount.active

@@ -74,6 +74,8 @@ const ckb: Dict = {
   admin_show: "پیشاندان لە سایت",
   admin_hidden_done: "هۆتێلەکە شاردرایەوە",
   admin_shown: "هۆتێلەکە نیشان درا",
+  owner_hidden_notice:
+    "ئەم هۆتێلە لەلایەن بەڕێوەبەرایەتییەوە شاردراوەتەوە، بۆیە ناتوانیت دەستکاری بکەیت. بۆ چالاککردنەوە پەیوەندی بە بەڕێوەبەرایەتی بکە.",
   per_night: "/ شەو",
   rooms_left: "{n} ژوور ماوە",
   book_now: "حیجزکردن",
@@ -254,6 +256,8 @@ const en: Dict = {
   admin_show: "Show on site",
   admin_hidden_done: "Hotel hidden",
   admin_shown: "Hotel is now shown",
+  owner_hidden_notice:
+    "This hotel has been hidden by the administration, so you can't edit it. Contact the administration to restore it.",
   per_night: "/ night",
   rooms_left: "{n} rooms left",
   book_now: "Book now",
@@ -434,6 +438,8 @@ const ar: Dict = {
   admin_show: "إظهار في الموقع",
   admin_hidden_done: "تم إخفاء الفندق",
   admin_shown: "الفندق ظاهر الآن",
+  owner_hidden_notice:
+    "تم إخفاء هذا الفندق من قبل الإدارة، لذا لا يمكنك تعديله. تواصل مع الإدارة لإعادة إظهاره.",
   per_night: "/ ليلة",
   rooms_left: "باقي {n} غرف",
   book_now: "احجز",
@@ -614,6 +620,8 @@ const kmr: Dict = {
   admin_show: "Li malperê nîşan bide",
   admin_hidden_done: "Otêl hate veşartin",
   admin_shown: "Otêl niha tê nîşandan",
+  owner_hidden_notice:
+    "Ev otêl ji aliyê rêveberiyê ve hatiye veşartin, loma tu nikarî wê biguherînî. Ji bo vegerandinê bi rêveberiyê re têkilî deyne.",
   per_night: "/ şev",
   rooms_left: "{n} ode mane",
   book_now: "Rezervasyon bike",

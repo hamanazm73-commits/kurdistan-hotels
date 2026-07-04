@@ -243,6 +243,13 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
         </p>
       )}
 
+      {owner && visibleHotels.some((h) => h.hidden) && (
+        <div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+          <EyeOff className="mt-0.5 size-4 shrink-0" />
+          <span>{t("owner_hidden_notice")}</span>
+        </div>
+      )}
+
       <div className="grid gap-3">
         {visibleHotels.map((h) => {
           const isSample = h.id.startsWith("sample-");
@@ -316,33 +323,48 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
                 </div>
               </div>
               <div className="flex shrink-0 gap-1">
-                <HotelFormDialog
-                  hotel={h}
-                  restricted={owner}
-                  trigger={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={isSample}
-                      title={t("admin_edit")}
-                    >
-                      <Pencil className="size-4" />
-                    </Button>
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled={isSample}
-                  title={h.hidden ? t("admin_show") : t("admin_hide")}
-                  onClick={() => toggleHidden(h)}
-                >
-                  {h.hidden ? (
-                    <Eye className="size-4" />
-                  ) : (
-                    <EyeOff className="size-4" />
-                  )}
-                </Button>
+                {owner && h.hidden ? (
+                  // hotel owner can't edit a hotel the admin has hidden
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled
+                    title={t("owner_hidden_notice")}
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                ) : (
+                  <HotelFormDialog
+                    hotel={h}
+                    restricted={owner}
+                    trigger={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={isSample}
+                        title={t("admin_edit")}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    }
+                  />
+                )}
+                {/* only admins/owner control visibility */}
+                {!owner && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={isSample}
+                    title={h.hidden ? t("admin_show") : t("admin_hide")}
+                    onClick={() => toggleHidden(h)}
+                  >
+                    {h.hidden ? (
+                      <Eye className="size-4" />
+                    ) : (
+                      <EyeOff className="size-4" />
+                    )}
+                  </Button>
+                )}
                 {!owner && (
                   <Button
                     variant="ghost"
