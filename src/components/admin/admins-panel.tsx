@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
-import { Crown, UserPlus, Trash2, Loader2, Building2 } from "lucide-react";
+import { Crown, UserPlus, Trash2, Loader2, Building2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,7 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
 import { useHotels } from "@/lib/use-hotels";
+import { CITIES } from "@/lib/sample-data";
 import { OWNER_EMAIL } from "@/lib/firebase";
 import {
   listAdmins,
@@ -28,7 +29,7 @@ import {
 import type { AdminRecord } from "@/lib/types";
 
 export function AdminsPanel() {
-  const { t } = useI18n();
+  const { t, tCity } = useI18n();
   const { user } = useAuth();
   const { hotels } = useHotels();
   const [admins, setAdmins] = useState<AdminRecord[]>([]);
@@ -37,6 +38,22 @@ export function AdminsPanel() {
   const [newHotelId, setNewHotelId] = useState("");
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [cityFilter, setCityFilter] = useState<string>("all");
+
+  const hotelCity = (hotelId?: string) =>
+    hotelId ? hotels.find((h) => h.id === hotelId)?.city : undefined;
+
+  const otherAdmins = admins.filter((a) => a.email !== OWNER_EMAIL);
+  // cities that actually have a hotel owner, in the canonical order
+  const cityOptions = CITIES.filter((c) =>
+    otherAdmins.some((a) => a.role === "hotel" && hotelCity(a.hotelId) === c),
+  );
+  const visibleAdmins =
+    cityFilter === "all"
+      ? otherAdmins
+      : otherAdmins.filter(
+          (a) => a.role === "hotel" && hotelCity(a.hotelId) === cityFilter,
+        );
 
   const refresh = useCallback(() => {
     listAdmins()
@@ -151,7 +168,35 @@ export function AdminsPanel() {
       </Card>
 
       <div className="space-y-2">
-        {OWNER_EMAIL && (
+        {cityOptions.length > 0 && (
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <span className="text-sm text-muted-foreground">
+              {t("admin_filter_city")}
+            </span>
+            <Select
+              value={cityFilter}
+              onValueChange={(v) => setCityFilter(v ?? "all")}
+            >
+              <SelectTrigger className="w-44">
+                <SelectValue>
+                  {(v: string | null) =>
+                    v && v !== "all" ? tCity(v) : t("filter_all")
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t("filter_all")}</SelectItem>
+                {cityOptions.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {tCity(c)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {cityFilter === "all" && OWNER_EMAIL && (
           <Card className="flex items-center justify-between gap-3 p-4">
             <span dir="ltr" className="font-medium">
               {OWNER_EMAIL}
@@ -167,10 +212,14 @@ export function AdminsPanel() {
           <div className="grid place-items-center py-10">
             <Loader2 className="size-6 animate-spin text-muted-foreground" />
           </div>
+        ) : visibleAdmins.length === 0 ? (
+          <p className="rounded-lg border border-dashed bg-muted/40 px-4 py-8 text-center text-sm text-muted-foreground">
+            {t("no_results")}
+          </p>
         ) : (
-          admins
-            .filter((a) => a.email !== OWNER_EMAIL)
-            .map((a) => (
+          visibleAdmins.map((a) => {
+            const city = hotelCity(a.hotelId);
+            return (
               <Card
                 key={a.email}
                 className="flex flex-wrap items-center justify-between gap-3 p-4"
@@ -180,11 +229,19 @@ export function AdminsPanel() {
                     {a.email}
                   </span>
                   {a.role === "hotel" ? (
-                    <Badge variant="outline" className="gap-1">
-                      <Building2 className="size-3" />
-                      {t("role_hotel")}
-                      {a.hotelName ? ` · ${a.hotelName}` : ""}
-                    </Badge>
+                    <>
+                      <Badge variant="outline" className="gap-1">
+                        <Building2 className="size-3" />
+                        {t("role_hotel")}
+                        {a.hotelName ? ` · ${a.hotelName}` : ""}
+                      </Badge>
+                      {city && (
+                        <Badge variant="secondary" className="gap-1">
+                          <MapPin className="size-3" />
+                          {tCity(city)}
+                        </Badge>
+                      )}
+                    </>
                   ) : (
                     <Badge variant="secondary">{t("role_admin")}</Badge>
                   )}
@@ -221,7 +278,8 @@ export function AdminsPanel() {
                   </Button>
                 </div>
               </Card>
-            ))
+            );
+          })
         )}
       </div>
     </div>

@@ -74,6 +74,7 @@ const ckb: Dict = {
   admin_show: "پیشاندان لە سایت",
   admin_hidden_done: "هۆتێلەکە شاردرایەوە",
   admin_shown: "هۆتێلەکە نیشان درا",
+  admin_filter_city: "بەپێی شار",
   owner_hidden_notice:
     "ئەم هۆتێلە لەلایەن بەڕێوەبەرایەتییەوە شاردراوەتەوە، بۆیە ناتوانیت دەستکاری بکەیت. بۆ چالاککردنەوە پەیوەندی بە بەڕێوەبەرایەتی بکە.",
   per_night: "/ شەو",
@@ -256,6 +257,7 @@ const en: Dict = {
   admin_show: "Show on site",
   admin_hidden_done: "Hotel hidden",
   admin_shown: "Hotel is now shown",
+  admin_filter_city: "By city",
   owner_hidden_notice:
     "This hotel has been hidden by the administration, so you can't edit it. Contact the administration to restore it.",
   per_night: "/ night",
@@ -438,6 +440,7 @@ const ar: Dict = {
   admin_show: "إظهار في الموقع",
   admin_hidden_done: "تم إخفاء الفندق",
   admin_shown: "الفندق ظاهر الآن",
+  admin_filter_city: "حسب المدينة",
   owner_hidden_notice:
     "تم إخفاء هذا الفندق من قبل الإدارة، لذا لا يمكنك تعديله. تواصل مع الإدارة لإعادة إظهاره.",
   per_night: "/ ليلة",
@@ -620,6 +623,7 @@ const kmr: Dict = {
   admin_show: "Li malperê nîşan bide",
   admin_hidden_done: "Otêl hate veşartin",
   admin_shown: "Otêl niha tê nîşandan",
+  admin_filter_city: "Li gorî bajêr",
   owner_hidden_notice:
     "Ev otêl ji aliyê rêveberiyê ve hatiye veşartin, loma tu nikarî wê biguherînî. Ji bo vegerandinê bi rêveberiyê re têkilî deyne.",
   per_night: "/ şev",
