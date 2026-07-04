@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform, useInView, type Variants } from "motio
 import { MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { useHotels } from "@/lib/use-hotels";
 import { cn } from "@/lib/utils";
 
 const fadeUp: Variants = {
@@ -70,17 +71,27 @@ function AnimatedStat({
   );
 }
 
-const STATS = [
-  { labelKey: "stat_hotels", value: "12+" },
-  { labelKey: "stat_cities", value: "6" },
-  { labelKey: "stat_guests", value: "5,000+" },
-] as const;
-
 export function Hero() {
   const { t } = useI18n();
+  const { hotels } = useHotels();
   const { scrollY } = useScroll();
   const bgY = useTransform(scrollY, [0, 700], [0, -90]);
   const contentOpacity = useTransform(scrollY, [0, 450], [1, 0.55]);
+
+  // real figures, computed from the hotels shown on the site (excludes hidden)
+  const visible = hotels.filter((h) => !h.hidden);
+  const rated = visible.filter((h) => typeof h.rating === "number");
+  const avgRating = rated.length
+    ? (rated.reduce((s, h) => s + h.rating, 0) / rated.length).toFixed(1)
+    : "0";
+  const stats = [
+    { labelKey: "stat_hotels", value: String(visible.length) },
+    {
+      labelKey: "stat_cities",
+      value: String(new Set(visible.map((h) => h.city)).size),
+    },
+    { labelKey: "stat_rating", value: avgRating },
+  ];
 
   return (
     <section className="relative flex min-h-[90vh] flex-col justify-center overflow-hidden">
@@ -198,12 +209,12 @@ export function Hero() {
           className="mx-auto mt-20 max-w-md overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md"
         >
           <div className="grid grid-cols-3">
-            {STATS.map(({ labelKey, value }, i) => (
+            {stats.map(({ labelKey, value }, i) => (
               <AnimatedStat
                 key={labelKey}
                 value={value}
                 label={t(labelKey)}
-                hasBorderEnd={i < STATS.length - 1}
+                hasBorderEnd={i < stats.length - 1}
               />
             ))}
           </div>
