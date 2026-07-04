@@ -148,17 +148,23 @@ export default function HotelDetailPage() {
         <button
           type="button"
           onClick={() => gallery.length > 0 && setLightbox(active)}
-          className="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl border"
+          className="group relative block w-full cursor-zoom-in overflow-hidden rounded-2xl border bg-muted"
           aria-label={t("gallery_zoom")}
         >
+          {/* blurred fill so any image shape shows whole & undistorted */}
+          <div
+            aria-hidden
+            className="absolute inset-0 scale-110 bg-cover bg-center opacity-45 blur-2xl"
+            style={{ backgroundImage: `url("${gallery[active] || FALLBACK_IMG}")` }}
+          />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={gallery[active]}
             alt={name}
-            className="aspect-[21/9] w-full object-cover transition group-hover:brightness-95"
+            className="relative mx-auto aspect-[21/9] w-full object-contain transition group-hover:brightness-95"
             onError={(e) => { const i = e.currentTarget; i.onerror = null; i.src = FALLBACK_IMG; }}
           />
-          <span className="pointer-events-none absolute end-3 top-3 grid size-9 place-items-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
+          <span className="pointer-events-none absolute end-3 top-3 z-10 grid size-9 place-items-center rounded-full bg-black/50 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
             <Maximize2 className="size-4" />
           </span>
         </button>
@@ -169,12 +175,12 @@ export default function HotelDetailPage() {
                 key={i}
                 onClick={() => { setActive(i); setLightbox(i); }}
                 className={cn(
-                  "size-20 shrink-0 cursor-zoom-in overflow-hidden rounded-lg border-2 transition",
+                  "size-20 shrink-0 cursor-zoom-in overflow-hidden rounded-lg border-2 bg-muted transition",
                   i === active ? "border-primary" : "border-transparent",
                 )}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="" className="size-full object-cover"
+                <img src={src} alt="" className="size-full object-contain"
                   onError={(e) => { const i = e.currentTarget; i.onerror = null; i.src = FALLBACK_IMG; }}
                 />
               </button>

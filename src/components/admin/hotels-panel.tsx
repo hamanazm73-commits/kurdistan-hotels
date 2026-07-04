@@ -266,7 +266,7 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
               <img
                 src={h.image}
                 alt={h.name}
-                className="size-16 shrink-0 rounded-lg object-cover"
+                className="size-16 shrink-0 rounded-lg bg-muted object-contain"
               />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
