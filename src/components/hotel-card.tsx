@@ -18,6 +18,7 @@ import {
   effectivePrice,
   pickLang,
   mapsUrl,
+  mediaSrc,
   totalAvailable,
   type Hotel,
 } from "@/lib/types";
@@ -71,12 +72,12 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
           <div
             aria-hidden
             className="absolute inset-0 scale-110 bg-cover bg-center opacity-55 blur-xl"
-            style={{ backgroundImage: `url("${hotel.image || FALLBACK_IMG}")` }}
+            style={{ backgroundImage: `url("${mediaSrc(hotel.image) || FALLBACK_IMG}")` }}
           />
           <Link href={`/hotels/${hotel.id}`} className="relative block size-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={hotel.image || FALLBACK_IMG}
+              src={mediaSrc(hotel.image) || FALLBACK_IMG}
               alt={hotel.name}
               className="size-full object-contain transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {

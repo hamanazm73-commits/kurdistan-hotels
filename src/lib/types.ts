@@ -97,6 +97,14 @@ export function effectivePrice(h: Pick<Hotel, "price" | "discount">): number {
   return h.discount?.active ? h.discount.newPrice : h.price;
 }
 
+/** Route an R2 public-dev image URL through our cached /api/img proxy (fast,
+    CDN-cached). Non-r2.dev URLs (Unsplash, base64, video) are returned as-is. */
+export function mediaSrc(url: string | undefined | null): string {
+  if (!url) return "";
+  const m = url.match(/^https:\/\/pub-[a-z0-9]+\.r2\.dev\/(.+)$/i);
+  return m ? `/api/img/${m[1]}` : url;
+}
+
 export function formatPrice(price: number, lang: Lang): string {
   const n = price.toLocaleString("en-US");
   return lang === "en" || lang === "kmr" ? `${n} IQD` : `${n} دینار`;

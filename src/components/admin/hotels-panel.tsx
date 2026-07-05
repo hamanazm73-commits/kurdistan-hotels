@@ -48,7 +48,7 @@ import {
   seedHotels,
   getHotelMedia,
 } from "@/lib/hotels-db";
-import { effectivePrice, formatPrice, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
+import { effectivePrice, formatPrice, mediaSrc, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
@@ -264,7 +264,7 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={h.image}
+                src={mediaSrc(h.image)}
                 alt={h.name}
                 className="size-16 shrink-0 rounded-lg bg-muted object-contain"
               />

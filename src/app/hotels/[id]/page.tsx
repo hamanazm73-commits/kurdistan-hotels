@@ -25,7 +25,7 @@ import { BookingDialog } from "@/components/booking-dialog";
 import { useHotels } from "@/lib/use-hotels";
 import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, pickLang, mapsUrl } from "@/lib/types";
+import { effectivePrice, pickLang, mapsUrl, mediaSrc } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
@@ -123,7 +123,7 @@ export default function HotelDetailPage() {
   const hasDiscount = hotel.discount?.active;
   const galleryImages = media?.images ?? hotel.images ?? [];
   const video = media?.video ?? hotel.video ?? "";
-  const gallery = [hotel.image, ...galleryImages].filter(Boolean);
+  const gallery = [hotel.image, ...galleryImages].filter(Boolean).map(mediaSrc);
   const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const description = pickLang(hotel.description, hotel.descriptionI18n, lang);
 

@@ -6,6 +6,7 @@ import { Upload, Loader2, X, Plus, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
+import { mediaSrc } from "@/lib/types";
 import { remoteUploadsEnabled, uploadMedia } from "@/lib/uploads";
 
 /**
@@ -182,11 +183,11 @@ export function ImageUpload({
           <div
             aria-hidden
             className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-xl"
-            style={{ backgroundImage: `url("${value}")` }}
+            style={{ backgroundImage: `url("${mediaSrc(value)}")` }}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={value}
+            src={mediaSrc(value)}
             alt=""
             className="relative mx-auto h-40 w-full object-contain"
           />
@@ -301,7 +302,7 @@ export function GalleryUpload({
           className="relative size-20 overflow-hidden rounded-lg border bg-muted"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={url} alt="" className="size-full object-contain" />
+          <img src={mediaSrc(url)} alt="" className="size-full object-contain" />
           <button
             type="button"
             onClick={() => onChange(value.filter((_, j) => j !== i))}
