@@ -23,6 +23,14 @@ const COVER_MAX_CHARS = 220_000;
 const GALLERY_ITEM_MAX_CHARS = 130_000;
 const GALLERY_TOTAL_BUDGET = 720_000; // leaves room for the cover + text fields
 
+/** Toast the failure WITH the underlying reason so the owner can report it. */
+function reportUploadError(e: unknown, fallback: string) {
+  const detail = e instanceof Error && e.message ? e.message : String(e ?? "");
+  toast.error(detail ? `${fallback} — ${detail.slice(0, 160)}` : fallback, {
+    duration: 12000,
+  });
+}
+
 function readFileAsDataURL(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
@@ -101,8 +109,8 @@ export function ImageUpload({
           ? await uploadMedia(file, "image")
           : await compressImage(file, { maxDim: 1600, maxChars: COVER_MAX_CHARS }),
       );
-    } catch {
-      toast.error(t("admin_upload_failed"));
+    } catch (e) {
+      reportUploadError(e, t("admin_upload_failed"));
     } finally {
       setUploading(false);
     }
@@ -211,8 +219,8 @@ export function GalleryUpload({
       }
       onChange(next);
       if (hitLimit) toast.error(t("admin_gallery_full"));
-    } catch {
-      toast.error(t("admin_upload_failed"));
+    } catch (e) {
+      reportUploadError(e, t("admin_upload_failed"));
     } finally {
       setUploading(false);
     }
@@ -301,8 +309,8 @@ export function VideoUpload({
           : await readFileAsDataURL(file),
       );
       toast.success(t("admin_video_added"));
-    } catch {
-      toast.error(t("admin_upload_failed"));
+    } catch (e) {
+      reportUploadError(e, t("admin_upload_failed"));
     } finally {
       setUploading(false);
     }
@@ -320,7 +328,6 @@ export function VideoUpload({
               {t("admin_video_youtube_linked")}
             </div>
           ) : (
-            // eslint-disable-next-line jsx-a11y/media-has-caption
             <video src={value} controls className="max-h-44 w-full bg-black" />
           )}
           <Button
