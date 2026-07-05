@@ -171,6 +171,8 @@ const ckb: Dict = {
     "ئەم ڤیدیۆیە زۆر گەورەیە ({size} مێگابایت). زۆرترین قەبارەی بارکردنی ڕاستەوخۆ 0.5 مێگابایتە. بۆ ڤیدیۆی درێژتر، بیخە سەر YouTube (بەخۆڕاییە) و بەستەرەکەی لێرە بلکێنە.",
   admin_video_hint:
     "ڤیدیۆی کورت (کەمتر لە 0.5 مێگابایت) ڕاستەوخۆ باردەکرێت و لە لاپەڕەی هۆتێلەکەدا دەردەکەوێت. بۆ ڤیدیۆی گەورەتر/درێژتر، بیخە سەر YouTube و بەستەرەکەی بلکێنە.",
+  admin_video_hint_cloud:
+    "ڤیدیۆ ڕاستەوخۆ لە مۆبایل باردەکرێت بەبێ سنووری قەبارە. یان بەستەری ڤیدیۆیەک بلکێنە.",
   admin_too_large_save:
     "زانیارییەکان زۆر گەورەن بۆ پاشەکەوتکردن. ڤیدیۆکە یان وێنەکان قەبارەیان زۆرە — بۆ ڤیدیۆ بەستەری YouTube بەکاربهێنە لە جیاتی بارکردن، یان هەندێک وێنە لە گالێری بسڕەوە.",
   admin_location: "شوێن (Google Maps)",
@@ -355,6 +357,8 @@ const en: Dict = {
     "This video is too large ({size} MB). The maximum for direct upload is 0.5 MB. For a longer video, upload it to YouTube (free) and paste the link here.",
   admin_video_hint:
     "Short clips (under 0.5 MB) upload directly and show on the hotel page. For a bigger/longer video, put it on YouTube and paste the link.",
+  admin_video_hint_cloud:
+    "Videos upload directly from your phone with no size limit. Or paste a video link.",
   admin_too_large_save:
     "The data is too large to save. The video or images are too big — use a YouTube link for the video instead of uploading, or remove some gallery images.",
   admin_location: "Location (Google Maps)",
@@ -539,6 +543,8 @@ const ar: Dict = {
     "هذا الفيديو كبير جداً ({size} ميغابايت). الحد الأقصى للرفع المباشر هو 0.5 ميغابايت. لفيديو أطول، ارفعه على YouTube (مجاناً) والصق الرابط هنا.",
   admin_video_hint:
     "المقاطع القصيرة (أقل من 0.5 ميغابايت) تُرفع مباشرة وتظهر في صفحة الفندق. للفيديو الأكبر/الأطول، ضعه على YouTube والصق الرابط.",
+  admin_video_hint_cloud:
+    "يتم رفع الفيديو مباشرة من هاتفك بدون حد للحجم. أو الصق رابط فيديو.",
   admin_too_large_save:
     "البيانات كبيرة جداً للحفظ. الفيديو أو الصور كبيرة الحجم — استخدم رابط YouTube للفيديو بدلاً من الرفع، أو احذف بعض صور المعرض.",
   admin_location: "الموقع (خرائط Google)",
@@ -723,6 +729,8 @@ const kmr: Dict = {
     "Ev vîdyo pir mezin e ({size} MB). Sînorê barkirina rasterast 0.5 MB e. Ji bo vîdyoyeke dirêjtir, wê bixe YouTube (belaş) û girêdanê li vir pêve bike.",
   admin_video_hint:
     "Vîdyoyên kurt (di bin 0.5 MB) rasterast bar dibin û li rûpela otêlê xuya dibin. Ji bo vîdyoyeke mezintir/dirêjtir, wê bixe YouTube û girêdanê pêve bike.",
+  admin_video_hint_cloud:
+    "Vîdyo rasterast ji telefonê bar dibin bê sînorê mezinahiyê. An girêdaneke vîdyoyê pêve bike.",
   admin_too_large_save:
     "Dane pir mezin in ji bo tomarkirinê. Vîdyo an wêne pir mezin in — ji bo vîdyoyê girêdana YouTube bi kar bîne li şûna barkirinê, an hin wêneyên galeriyê rake.",
   admin_location: "Cih (Google Maps)",

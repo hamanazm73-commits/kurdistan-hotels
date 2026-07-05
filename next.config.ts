@@ -19,9 +19,9 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com https://firebasestorage.googleapis.com https://lh3.googleusercontent.com https://i.ytimg.com",
+      "img-src 'self' data: blob: https://images.unsplash.com https://firebasestorage.googleapis.com https://res.cloudinary.com https://lh3.googleusercontent.com https://i.ytimg.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com",
+      "connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://*.googleapis.com https://identitytoolkit.googleapis.com https://api.cloudinary.com",
       "media-src 'self' blob: data: https:",
       "frame-src https://www.youtube.com https://www.youtube-nocookie.com",
       "object-src 'none'",
@@ -37,6 +37,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "firebasestorage.googleapis.com" },
+      { protocol: "https", hostname: "res.cloudinary.com" },
     ],
   },
   async headers() {
