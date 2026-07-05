@@ -12,6 +12,21 @@ export const runtime = "nodejs";
  * keeps this route free of the Admin SDK, which otherwise fails to load in the
  * serverless function and 500s the whole endpoint.
  */
+/**
+ * The Blob read-write token. Vercel usually names it BLOB_READ_WRITE_TOKEN, but
+ * a connection with an env-var prefix names it e.g. FOO_READ_WRITE_TOKEN — so
+ * fall back to any var whose value looks like a Blob token.
+ */
+function getBlobToken(): string | undefined {
+  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
+  for (const [key, val] of Object.entries(process.env)) {
+    if (key.endsWith("READ_WRITE_TOKEN") && val?.startsWith("vercel_blob_")) {
+      return val;
+    }
+  }
+  return undefined;
+}
+
 async function isSignedIn(idToken: string): Promise<boolean> {
   const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
   // If no API key is configured we can't verify — allow (dev / self-host).
@@ -46,6 +61,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const json = await handleUpload({
       body,
       request,
+      token: getBlobToken(),
       onBeforeGenerateToken: async (_pathname, clientPayload) => {
         if (!(await isSignedIn(clientPayload ?? "")))
           throw new Error("not signed in");
