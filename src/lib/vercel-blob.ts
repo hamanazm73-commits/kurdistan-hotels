@@ -9,8 +9,11 @@ import { auth } from "./firebase";
  * on the server). The browser uploads straight to Blob via a token minted by
  * /api/upload, so large videos aren't limited by the serverless body size.
  */
+// On by default — the /api/upload route + BLOB_READ_WRITE_TOKEN gate real use,
+// and callers fall back to inline base64 if a Blob upload can't be made. Set
+// NEXT_PUBLIC_BLOB_UPLOADS=off to force the base64 path (e.g. offline dev).
 export const blobUploadsEnabled =
-  process.env.NEXT_PUBLIC_BLOB_UPLOADS === "on";
+  process.env.NEXT_PUBLIC_BLOB_UPLOADS !== "off";
 
 export async function uploadToBlob(
   file: File,

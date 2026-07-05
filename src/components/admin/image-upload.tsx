@@ -23,6 +23,25 @@ const COVER_MAX_CHARS = 220_000;
 const GALLERY_ITEM_MAX_CHARS = 130_000;
 const GALLERY_TOTAL_BUDGET = 720_000; // leaves room for the cover + text fields
 
+/**
+ * Store an image: upload it to the remote host (Vercel Blob) and return the URL;
+ * if remote uploads aren't available or fail, fall back to an inline base64 data
+ * URL so the owner is never blocked.
+ */
+async function storeImage(
+  file: File,
+  opts: { maxDim: number; maxChars: number },
+): Promise<string> {
+  if (remoteUploadsEnabled) {
+    try {
+      return await uploadMedia(file, "image");
+    } catch {
+      /* remote unavailable/failed — fall through to inline base64 */
+    }
+  }
+  return compressImage(file, opts);
+}
+
 /** Toast the failure WITH the underlying reason so the owner can report it. */
 function reportUploadError(e: unknown, fallback: string) {
   const detail = e instanceof Error && e.message ? e.message : String(e ?? "");
@@ -104,11 +123,7 @@ export function ImageUpload({
   async function handleFile(file: File) {
     setUploading(true);
     try {
-      onChange(
-        remoteUploadsEnabled
-          ? await uploadMedia(file, "image")
-          : await compressImage(file, { maxDim: 1600, maxChars: COVER_MAX_CHARS }),
-      );
+      onChange(await storeImage(file, { maxDim: 1600, maxChars: COVER_MAX_CHARS }));
     } catch (e) {
       reportUploadError(e, t("admin_upload_failed"));
     } finally {
@@ -197,7 +212,12 @@ export function GalleryUpload({
       if (remoteUploadsEnabled) {
         const uploaded: string[] = [];
         for (const file of Array.from(files)) {
-          uploaded.push(await uploadMedia(file, "image"));
+          uploaded.push(
+            await storeImage(file, {
+              maxDim: 1280,
+              maxChars: GALLERY_ITEM_MAX_CHARS,
+            }),
+          );
         }
         onChange([...value, ...uploaded]);
         return;
