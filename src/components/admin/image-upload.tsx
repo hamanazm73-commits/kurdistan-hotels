@@ -6,7 +6,7 @@ import { Upload, Loader2, X, Plus, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useI18n } from "@/lib/i18n";
-import { cloudinaryEnabled, uploadToCloudinary } from "@/lib/cloudinary";
+import { remoteUploadsEnabled, uploadMedia } from "@/lib/uploads";
 
 /**
  * Image handling WITHOUT Firebase Storage.
@@ -97,8 +97,8 @@ export function ImageUpload({
     setUploading(true);
     try {
       onChange(
-        cloudinaryEnabled
-          ? await uploadToCloudinary(file, "image")
+        remoteUploadsEnabled
+          ? await uploadMedia(file, "image")
           : await compressImage(file, { maxDim: 1600, maxChars: COVER_MAX_CHARS }),
       );
     } catch {
@@ -185,11 +185,11 @@ export function GalleryUpload({
   async function handleFiles(files: FileList) {
     setUploading(true);
     try {
-      // Cloudinary: upload each file, store just the URL (no size budget).
-      if (cloudinaryEnabled) {
+      // Remote host: upload each file, store just the URL (no size budget).
+      if (remoteUploadsEnabled) {
         const uploaded: string[] = [];
         for (const file of Array.from(files)) {
-          uploaded.push(await uploadToCloudinary(file, "image"));
+          uploaded.push(await uploadMedia(file, "image"));
         }
         onChange([...value, ...uploaded]);
         return;
@@ -287,8 +287,8 @@ export function VideoUpload({
   const [uploading, setUploading] = useState(false);
 
   async function handleFile(file: File) {
-    // Without Cloudinary, a real video can't fit inline in Firestore.
-    if (!cloudinaryEnabled && file.size > MAX_VIDEO_BYTES) {
+    // Without a remote host, a real video can't fit inline in Firestore.
+    if (!remoteUploadsEnabled && file.size > MAX_VIDEO_BYTES) {
       const mb = (file.size / (1024 * 1024)).toFixed(1);
       toast.error(t("admin_video_too_large", { size: mb }), { duration: 10000 });
       return;
@@ -296,8 +296,8 @@ export function VideoUpload({
     setUploading(true);
     try {
       onChange(
-        cloudinaryEnabled
-          ? await uploadToCloudinary(file, "video")
+        remoteUploadsEnabled
+          ? await uploadMedia(file, "video")
           : await readFileAsDataURL(file),
       );
       toast.success(t("admin_video_added"));
@@ -366,7 +366,7 @@ export function VideoUpload({
         onChange={(e) => onChange(e.target.value)}
       />
       <p className="text-xs leading-relaxed text-muted-foreground">
-        {cloudinaryEnabled ? t("admin_video_hint_cloud") : t("admin_video_hint")}
+        {remoteUploadsEnabled ? t("admin_video_hint_cloud") : t("admin_video_hint")}
       </p>
     </div>
   );
