@@ -80,9 +80,9 @@ export async function POST(request: Request): Promise<NextResponse> {
           addRandomSuffix: true,
         };
       },
-      onUploadCompleted: async () => {
-        /* nothing to do — the URL is returned to the client */
-      },
+      // No onUploadCompleted: we read the URL from the client result, so we
+      // don't need Vercel's completion webhook (which was making the upload
+      // hang waiting on a callback).
     });
     return NextResponse.json(json);
   } catch (e) {
