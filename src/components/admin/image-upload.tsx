@@ -399,7 +399,7 @@ export function VideoUpload({
               {t("admin_video_youtube_linked")}
             </div>
           ) : (
-            <video src={value} controls className="max-h-44 w-full bg-black" />
+            <video src={mediaSrc(value)} controls className="max-h-44 w-full bg-black" />
           )}
           <Button
             type="button"

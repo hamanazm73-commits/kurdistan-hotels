@@ -265,7 +265,7 @@ export default function HotelDetailPage() {
                   </div>
                 ) : (
                   <video
-                    src={video}
+                    src={mediaSrc(video)}
                     controls
                     playsInline
                     className="aspect-video w-full rounded-xl border bg-black"
