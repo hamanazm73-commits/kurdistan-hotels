@@ -1,8 +1,15 @@
 import "server-only";
 import { existsSync, readdirSync } from "fs";
 import { join } from "path";
-import { initializeApp, getApps, getApp, cert } from "firebase-admin/app";
+import {
+  initializeApp,
+  getApps,
+  getApp,
+  cert,
+  type App,
+} from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 
 /**
  * Server-side Firebase Admin. Used by API routes (e.g. the rate-limited
@@ -30,8 +37,9 @@ function findServiceAccountFile(): string | null {
   return null;
 }
 
-export function getAdminDb() {
-  if (getApps().length) return getFirestore(getApp());
+/** Initialise (once) and return the Admin app, or null when no creds exist. */
+function getAdminApp(): App | null {
+  if (getApps().length) return getApp();
 
   const saJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   const jsonPath = findServiceAccountFile();
@@ -59,6 +67,15 @@ export function getAdminDb() {
     return null;
   }
 
-  const app = initializeApp({ credential });
-  return getFirestore(app);
+  return initializeApp({ credential });
+}
+
+export function getAdminDb() {
+  const app = getAdminApp();
+  return app ? getFirestore(app) : null;
+}
+
+export function getAdminAuth() {
+  const app = getAdminApp();
+  return app ? getAuth(app) : null;
 }
