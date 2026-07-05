@@ -21,7 +21,7 @@ export async function uploadMedia(
   kind: "image" | "video" = "image",
   onProgress?: (percent: number) => void,
 ): Promise<string> {
-  if (s3UploadsEnabled) return uploadToS3(file, kind);
+  if (s3UploadsEnabled) return uploadToS3(file, kind, onProgress);
   if (blobUploadsEnabled) return uploadToBlob(file, kind, onProgress);
   if (storageUploadsEnabled) return uploadToStorage(file, kind);
   if (cloudinaryEnabled) return uploadToCloudinary(file, kind);

@@ -74,7 +74,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const uploadUrl = await getSignedUrl(
       s3,
       new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
-      { expiresIn: 600 },
+      { expiresIn: 3600 }, // 1h — big videos on slow connections need time
     );
     const publicUrl = `${publicBase.replace(/\/$/, "")}/${key}`;
     return NextResponse.json({ uploadUrl, publicUrl, contentType });

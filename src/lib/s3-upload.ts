@@ -14,6 +14,7 @@ export const s3UploadsEnabled = process.env.NEXT_PUBLIC_S3_UPLOADS === "on";
 export async function uploadToS3(
   file: File,
   kind: "image" | "video" = "image",
+  onProgress?: (percent: number) => void,
 ): Promise<string> {
   const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
   const contentType = file.type || (kind === "video" ? "video/mp4" : "image/jpeg");
@@ -32,11 +33,23 @@ export async function uploadToS3(
     publicUrl: string;
   };
 
-  const put = await fetch(uploadUrl, {
-    method: "PUT",
-    body: file,
-    headers: { "Content-Type": contentType },
+  // XHR (not fetch) so we can report upload progress for large videos.
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", uploadUrl);
+    xhr.setRequestHeader("Content-Type", contentType);
+    xhr.upload.onprogress = (e) => {
+      if (onProgress && e.lengthComputable) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new Error(`upload-failed-${xhr.status}`));
+    xhr.onerror = () => reject(new Error("upload-network-error"));
+    xhr.ontimeout = () => reject(new Error("upload-timeout"));
+    xhr.send(file);
   });
-  if (!put.ok) throw new Error(`upload-failed-${put.status}`);
   return publicUrl;
 }

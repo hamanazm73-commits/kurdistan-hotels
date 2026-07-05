@@ -35,7 +35,14 @@ async function storeImage(
 ): Promise<string> {
   if (remoteUploadsEnabled) {
     try {
-      return await uploadMedia(file, "image", onProgress);
+      // Shrink + JPEG-compress first so uploads and page loads stay fast.
+      let toUpload = file;
+      try {
+        toUpload = await compressToFile(file, opts.maxDim);
+      } catch {
+        /* couldn't compress (e.g. odd format) — upload the original */
+      }
+      return await uploadMedia(toUpload, "image", onProgress);
     } catch {
       /* remote unavailable/failed — fall through to inline base64 */
     }
@@ -107,6 +114,32 @@ async function compressImage(
     dim = Math.round(dim * 0.8); // still too big — shrink and retry
   }
   return last; // smallest we could manage
+}
+
+/** Downscale + JPEG-compress into a small File, for fast remote uploads. */
+async function compressToFile(file: File, maxDim = 1600): Promise<File> {
+  const src = await readFileAsDataURL(file);
+  const img = await loadImage(src);
+  let width = img.width || maxDim;
+  let height = img.height || maxDim;
+  const longest = Math.max(width, height);
+  if (longest > maxDim) {
+    const scale = maxDim / longest;
+    width = Math.max(1, Math.round(width * scale));
+    height = Math.max(1, Math.round(height * scale));
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("canvas-unavailable");
+  ctx.drawImage(img, 0, 0, width, height);
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob(resolve, "image/jpeg", 0.82),
+  );
+  if (!blob) throw new Error("compress-failed");
+  const name = file.name.replace(/\.[^./\\]+$/, "") + ".jpg";
+  return new File([blob], name, { type: "image/jpeg" });
 }
 
 /** Single cover image: upload (compressed inline), preview, remove, or paste a URL. */
