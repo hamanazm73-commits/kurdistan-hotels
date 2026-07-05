@@ -31,10 +31,11 @@ const GALLERY_TOTAL_BUDGET = 720_000; // leaves room for the cover + text fields
 async function storeImage(
   file: File,
   opts: { maxDim: number; maxChars: number },
+  onProgress?: (percent: number) => void,
 ): Promise<string> {
   if (remoteUploadsEnabled) {
     try {
-      return await uploadMedia(file, "image");
+      return await uploadMedia(file, "image", onProgress);
     } catch {
       /* remote unavailable/failed — fall through to inline base64 */
     }
@@ -119,15 +120,24 @@ export function ImageUpload({
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
 
   async function handleFile(file: File) {
     setUploading(true);
+    setProgress(null);
     try {
-      onChange(await storeImage(file, { maxDim: 1600, maxChars: COVER_MAX_CHARS }));
+      onChange(
+        await storeImage(
+          file,
+          { maxDim: 1600, maxChars: COVER_MAX_CHARS },
+          setProgress,
+        ),
+      );
     } catch (e) {
       reportUploadError(e, t("admin_upload_failed"));
     } finally {
       setUploading(false);
+      setProgress(null);
     }
   }
 
@@ -170,7 +180,11 @@ export function ImageUpload({
         ) : (
           <Upload className="size-4" />
         )}
-        {uploading ? t("admin_uploading") : t("admin_upload")}
+        {uploading
+          ? progress != null
+            ? `${t("admin_uploading")} ${progress}%`
+            : t("admin_uploading")
+          : t("admin_upload")}
       </Button>
       <input
         ref={inputRef}
@@ -313,6 +327,7 @@ export function VideoUpload({
   const { t } = useI18n();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
 
   async function handleFile(file: File) {
     // Without a remote host, a real video can't fit inline in Firestore.
@@ -322,10 +337,11 @@ export function VideoUpload({
       return;
     }
     setUploading(true);
+    setProgress(null);
     try {
       onChange(
         remoteUploadsEnabled
-          ? await uploadMedia(file, "video")
+          ? await uploadMedia(file, "video", setProgress)
           : await readFileAsDataURL(file),
       );
       toast.success(t("admin_video_added"));
@@ -333,6 +349,7 @@ export function VideoUpload({
       reportUploadError(e, t("admin_upload_failed"));
     } finally {
       setUploading(false);
+      setProgress(null);
     }
   }
 
@@ -373,7 +390,11 @@ export function VideoUpload({
         ) : (
           <Film className="size-4" />
         )}
-        {uploading ? t("admin_uploading") : t("admin_video_upload")}
+        {uploading
+          ? progress != null
+            ? `${t("admin_uploading")} ${progress}%`
+            : t("admin_uploading")
+          : t("admin_video_upload")}
       </Button>
       <input
         ref={inputRef}

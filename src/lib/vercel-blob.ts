@@ -18,6 +18,7 @@ export const blobUploadsEnabled =
 export async function uploadToBlob(
   file: File,
   kind: "image" | "video" = "image",
+  onProgress?: (percent: number) => void,
 ): Promise<string> {
   const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
   const result = await upload(`hotels/${kind}s/${file.name}`, file, {
@@ -25,6 +26,9 @@ export async function uploadToBlob(
     handleUploadUrl: "/api/upload",
     clientPayload: idToken,
     contentType: file.type || undefined,
+    onUploadProgress: onProgress
+      ? (e) => onProgress(Math.round(e.percentage))
+      : undefined,
   });
   return result.url;
 }

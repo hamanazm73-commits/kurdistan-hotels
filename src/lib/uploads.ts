@@ -15,8 +15,9 @@ export const remoteUploadsEnabled =
 export async function uploadMedia(
   file: File,
   kind: "image" | "video" = "image",
+  onProgress?: (percent: number) => void,
 ): Promise<string> {
-  if (blobUploadsEnabled) return uploadToBlob(file, kind);
+  if (blobUploadsEnabled) return uploadToBlob(file, kind, onProgress);
   if (storageUploadsEnabled) return uploadToStorage(file, kind);
   if (cloudinaryEnabled) return uploadToCloudinary(file, kind);
   throw new Error("no-remote-uploads-configured");
