@@ -105,7 +105,10 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
           </div>
 
           <div className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-sm font-bold text-white shadow-lg backdrop-blur-sm">
-            <Star className="star-shine size-3.5 fill-gold text-gold" />
+            <Star
+              className="star-shine size-3.5 fill-gold text-gold"
+              style={{ animationDelay: `${(index % 6) * 0.5}s` }}
+            />
             {hotel.rating.toFixed(1)}
           </div>
         </div>

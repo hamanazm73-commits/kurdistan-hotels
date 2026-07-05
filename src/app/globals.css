@@ -204,18 +204,30 @@
   animation: shimmer 2.5s infinite;
 }
 
-/* gently glowing rating star */
-@keyframes star-glow {
+/* twinkling rating star — irregular sparkle, like a real star */
+@keyframes star-twinkle {
   0%,
   100% {
-    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 50%, transparent));
+    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 40%, transparent));
+    transform: scale(1);
   }
-  50% {
-    filter: drop-shadow(0 0 6px color-mix(in oklch, var(--gold) 95%, transparent));
+  20% {
+    filter: drop-shadow(0 0 7px color-mix(in oklch, var(--gold) 95%, transparent));
+    transform: scale(1.18);
+  }
+  38% {
+    filter: drop-shadow(0 0 2px color-mix(in oklch, var(--gold) 55%, transparent));
+    transform: scale(1.02);
+  }
+  60% {
+    filter: drop-shadow(0 0 5px color-mix(in oklch, var(--gold) 88%, transparent));
+    transform: scale(1.1);
   }
 }
 .star-shine {
-  animation: star-glow 2.4s ease-in-out infinite;
+  animation: star-twinkle 3s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform, filter;
 }
 
 /* respect reduced motion */
