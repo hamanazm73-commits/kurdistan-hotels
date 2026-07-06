@@ -30,6 +30,35 @@ export interface Discount {
   newPrice: number;
 }
 
+/**
+ * One online-payment option for a hotel. `url` is a link the guest is sent to
+ * so they pay the hotel directly — the platform never touches the money.
+ */
+export interface PaymentMethod {
+  /** one of PAYMENT_TYPES ids: fib | fastpay | zaincash | nass | card | link */
+  type: string;
+  /** the payment link / page for this hotel */
+  url: string;
+}
+
+/** Supported online-payment rails in Kurdistan (brand names, not translated). */
+export const PAYMENT_TYPES = [
+  { id: "fib", label: "FIB", color: "#00A651" },
+  { id: "fastpay", label: "FastPay", color: "#1E4F9C" },
+  { id: "zaincash", label: "ZainCash", color: "#8DC63F" },
+  { id: "nass", label: "Nass", color: "#E4002B" },
+  { id: "card", label: "Visa / MasterCard", color: "#1A1F71" },
+  { id: "link", label: "Payment link", color: "#6B7280" },
+] as const;
+
+export function paymentLabel(type: string): string {
+  return PAYMENT_TYPES.find((p) => p.id === type)?.label ?? type;
+}
+
+export function paymentColor(type: string): string {
+  return PAYMENT_TYPES.find((p) => p.id === type)?.color ?? "#6B7280";
+}
+
 export interface Hotel {
   id: string;
   name: string;
@@ -63,6 +92,8 @@ export interface Hotel {
   mapUrl?: string;
   /** when true, the hotel is hidden from the public site (still shown in admin) */
   hidden?: boolean;
+  /** online-payment options; guests pay the hotel directly via these links */
+  payments?: PaymentMethod[];
   createdAt?: number;
 }
 

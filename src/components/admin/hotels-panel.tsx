@@ -48,7 +48,7 @@ import {
   seedHotels,
   getHotelMedia,
 } from "@/lib/hotels-db";
-import { effectivePrice, formatPrice, mediaSrc, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
+import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
@@ -109,6 +109,7 @@ const empty = {
   phone: "",
   video: "",
   mapUrl: "",
+  payments: [] as { type: string; url: string }[],
   rooms: defaultRooms(),
   featured: false,
   recommended: false,
@@ -428,6 +429,7 @@ export function HotelFormDialog({
       phone: h.phone ?? "",
       video: h.video ?? "",
       mapUrl: h.mapUrl ?? "",
+      payments: (h.payments ?? []).map((p) => ({ type: p.type, url: p.url })),
       rooms: h.rooms?.length
         ? h.rooms.map((r) => ({
             type: r.type,
@@ -490,6 +492,9 @@ export function HotelFormDialog({
       phone: f.phone.trim(),
       video: f.video.trim(),
       mapUrl: f.mapUrl.trim(),
+      payments: f.payments
+        .map((p) => ({ type: p.type, url: p.url.trim() }))
+        .filter((p) => p.url),
       rooms,
       featured: f.featured,
       recommended: f.recommended,
@@ -734,6 +739,81 @@ export function HotelFormDialog({
 
           <Field label={t("admin_video")}>
             <VideoUpload value={form.video} onChange={(url) => set("video", url)} />
+          </Field>
+
+          {/* online payment methods — each is a link the guest pays the hotel through */}
+          <Field label={t("admin_payments")}>
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">
+                {t("admin_payments_hint")}
+              </p>
+              {form.payments.map((p, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Select
+                    value={p.type}
+                    onValueChange={(v) =>
+                      set(
+                        "payments",
+                        form.payments.map((x, j) =>
+                          j === i ? { ...x, type: v ?? "link" } : x,
+                        ),
+                      )
+                    }
+                  >
+                    <SelectTrigger className="w-32 shrink-0">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_TYPES.map((pt) => (
+                        <SelectItem key={pt.id} value={pt.id}>
+                          {pt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    dir="ltr"
+                    className="min-w-0 flex-1"
+                    placeholder={t("admin_payment_url")}
+                    value={p.url}
+                    onChange={(e) =>
+                      set(
+                        "payments",
+                        form.payments.map((x, j) =>
+                          j === i ? { ...x, url: e.target.value } : x,
+                        ),
+                      )
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={() =>
+                      set("payments", form.payments.filter((_, j) => j !== i))
+                    }
+                  >
+                    <X className="size-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() =>
+                  set("payments", [
+                    ...form.payments,
+                    { type: PAYMENT_TYPES[0].id, url: "" },
+                  ])
+                }
+              >
+                <Plus className="size-4" />
+                {t("admin_add_payment")}
+              </Button>
+            </div>
           </Field>
 
           <Field label={t("admin_features")}>

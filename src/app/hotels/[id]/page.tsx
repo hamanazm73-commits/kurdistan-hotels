@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
+  CreditCard,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -25,7 +26,14 @@ import { BookingDialog } from "@/components/booking-dialog";
 import { useHotels } from "@/lib/use-hotels";
 import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
 import { useI18n } from "@/lib/i18n";
-import { effectivePrice, pickLang, mapsUrl, mediaSrc } from "@/lib/types";
+import {
+  effectivePrice,
+  pickLang,
+  mapsUrl,
+  mediaSrc,
+  paymentLabel,
+  paymentColor,
+} from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 
@@ -396,6 +404,29 @@ export default function HotelDetailPage() {
                     <WhatsAppIcon className="size-4" />
                     {t("whatsapp_cta")}
                   </a>
+                )}
+
+                {hotel.payments && hotel.payments.length > 0 && (
+                  <div className="mt-1 border-t pt-3">
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">
+                      {t("pay_online")}
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {hotel.payments.map((p, i) => (
+                        <a
+                          key={i}
+                          href={p.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow transition hover:opacity-90 active:scale-95"
+                          style={{ backgroundColor: paymentColor(p.type) }}
+                        >
+                          <CreditCard className="size-4" />
+                          {t("pay_online_via")} {paymentLabel(p.type)}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
             </Card>
