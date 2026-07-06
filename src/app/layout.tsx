@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     "هۆتێل سلێمانی",
   ],
   alternates: { canonical: "/" },
+  verification: {
+    google: "UT4bf6T1LZ4-9pd0JnUeNIrh4MUB8uBacpWpcg3weGA",
+  },
   openGraph: {
     title: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
     description:
