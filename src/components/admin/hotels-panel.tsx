@@ -107,6 +107,7 @@ const empty = {
   description: "",
   address: "",
   phone: "",
+  notifyEmail: "",
   video: "",
   mapUrl: "",
   payments: [] as { type: string; url: string }[],
@@ -427,6 +428,7 @@ export function HotelFormDialog({
       description: h.description ?? "",
       address: h.address ?? "",
       phone: h.phone ?? "",
+      notifyEmail: h.notifyEmail ?? "",
       video: h.video ?? "",
       mapUrl: h.mapUrl ?? "",
       payments: (h.payments ?? []).map((p) => ({ type: p.type, url: p.url })),
@@ -490,6 +492,7 @@ export function HotelFormDialog({
       descriptionI18n: i18nObj(f.descCkb, f.descKmr, f.descEn, f.descAr),
       address: f.address.trim(),
       phone: f.phone.trim(),
+      notifyEmail: f.notifyEmail.trim(),
       video: f.video.trim(),
       mapUrl: f.mapUrl.trim(),
       payments: f.payments
@@ -727,6 +730,19 @@ export function HotelFormDialog({
               />
             </Field>
           </div>
+
+          <Field label={t("admin_notify_email")}>
+            <Input
+              dir="ltr"
+              type="email"
+              placeholder="owner@example.com"
+              value={form.notifyEmail}
+              onChange={(e) => set("notifyEmail", e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              {t("admin_notify_email_hint")}
+            </p>
+          </Field>
 
           <Field label={t("admin_location")}>
             <Input

@@ -191,6 +191,9 @@ const ckb: Dict = {
   admin_too_large_save:
     "زانیارییەکان زۆر گەورەن بۆ پاشەکەوتکردن. ڤیدیۆکە یان وێنەکان قەبارەیان زۆرە — بۆ ڤیدیۆ بەستەری YouTube بەکاربهێنە لە جیاتی بارکردن، یان هەندێک وێنە لە گالێری بسڕەوە.",
   admin_location: "شوێن (Google Maps)",
+  admin_notify_email: "ئیمەیل بۆ ئاگادارکردنەوەی حجز",
+  admin_notify_email_hint:
+    "کاتێک حجزێک بۆ ئەم هۆتێلە دەکرێت، نامەیەک بۆ ئەم ئیمەیلە دەنێردرێت.",
   admin_location_ph: "بەستەری Google Maps بلکێنە",
   detail_video: "ڤیدیۆ",
   detail_pick_room: "کلیک لەسەر ژوورێک بکە بۆ حجزکردنی",
@@ -392,6 +395,9 @@ const en: Dict = {
   admin_too_large_save:
     "The data is too large to save. The video or images are too big — use a YouTube link for the video instead of uploading, or remove some gallery images.",
   admin_location: "Location (Google Maps)",
+  admin_notify_email: "Booking notification email",
+  admin_notify_email_hint:
+    "When a booking is made for this hotel, an email is sent to this address.",
   admin_location_ph: "Paste a Google Maps link",
   detail_video: "Video",
   detail_pick_room: "Tap a room to book it",
@@ -593,6 +599,9 @@ const ar: Dict = {
   admin_too_large_save:
     "البيانات كبيرة جداً للحفظ. الفيديو أو الصور كبيرة الحجم — استخدم رابط YouTube للفيديو بدلاً من الرفع، أو احذف بعض صور المعرض.",
   admin_location: "الموقع (خرائط Google)",
+  admin_notify_email: "بريد إشعار الحجز",
+  admin_notify_email_hint:
+    "عند إجراء حجز لهذا الفندق، يُرسل بريد إلى هذا العنوان.",
   admin_location_ph: "الصق رابط خرائط Google",
   detail_video: "فيديو",
   detail_pick_room: "اضغط على غرفة لحجزها",
@@ -794,6 +803,9 @@ const kmr: Dict = {
   admin_too_large_save:
     "Dane pir mezin in ji bo tomarkirinê. Vîdyo an wêne pir mezin in — ji bo vîdyoyê girêdana YouTube bi kar bîne li şûna barkirinê, an hin wêneyên galeriyê rake.",
   admin_location: "Cih (Google Maps)",
+  admin_notify_email: "E-maila agahdariya rezervasyonê",
+  admin_notify_email_hint:
+    "Gava rezervasyonek ji bo vê otêlê tê kirin, e-mailek ji vê navnîşanê re tê şandin.",
   admin_location_ph: "Girêdana Google Maps deyne",
   detail_video: "Vîdyo",
   detail_pick_room: "Ji bo rezervekirinê li odeyekê bike",

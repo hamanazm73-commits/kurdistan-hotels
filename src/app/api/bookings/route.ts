@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { notifyBooking } from "@/lib/notify";
+import { notifyBooking, sendBookingEmail } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -59,12 +59,14 @@ export async function POST(req: Request) {
     // Transaction: check availability, decrement the hotel by 1, save booking.
     const outcome = await adminDb.runTransaction(async (tx) => {
       let roomsLeft: number | null = null;
+      let notifyEmail: string | undefined;
 
       if (hotelId) {
         const hotelRef = adminDb.collection("hotels").doc(hotelId);
         const snap = await tx.get(hotelRef);
         if (snap.exists) {
           const data = snap.data() ?? {};
+          if (typeof data.notifyEmail === "string") notifyEmail = data.notifyEmail;
           const rooms = Array.isArray(data.rooms) ? [...data.rooms] : [];
           const idx = rooms.findIndex((r) => r?.type === booking.roomType);
           const roomTracked =
@@ -98,13 +100,14 @@ export async function POST(req: Request) {
         hotelId: hotelId ?? null,
         createdAt: Date.now(),
       });
-      return { soldOut: false as const, roomsLeft };
+      return { soldOut: false as const, roomsLeft, notifyEmail };
     });
 
     if (outcome.soldOut) {
       return NextResponse.json({ error: "sold_out" }, { status: 409 });
     }
     await notifyBooking(parsed.data);
+    await sendBookingEmail(parsed.data, outcome.notifyEmail);
     return NextResponse.json({
       ok: true,
       persisted: true,

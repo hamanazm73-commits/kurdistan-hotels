@@ -1,4 +1,5 @@
 import "server-only";
+import nodemailer from "nodemailer";
 import type { Booking } from "./types";
 
 /**
@@ -33,5 +34,53 @@ export async function notifyBooking(b: Booking) {
     });
   } catch {
     /* best-effort */
+  }
+}
+
+/**
+ * Best-effort booking email to the hotel's own address (via a Gmail sender).
+ * No-op when GMAIL_USER / GMAIL_APP_PASSWORD or the recipient are unset, and
+ * never throws — an email must never block a booking.
+ * The app password comes from Google Account → Security → App passwords.
+ */
+export async function sendBookingEmail(b: Booking, to: string | undefined) {
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!user || !pass || !to) return;
+
+  const esc = (s: unknown) =>
+    String(s).replace(/[<>&]/g, (c) =>
+      c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;",
+    );
+
+  const row = (label: string, value: unknown) =>
+    `<tr><td style="padding:6px 12px;color:#666;">${label}</td><td style="padding:6px 12px;font-weight:600;">${esc(value)}</td></tr>`;
+
+  const html = `
+    <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;">
+      <h2 style="color:#1e3a5f;">🏨 حیجزی نوێ — New booking</h2>
+      <table style="border-collapse:collapse;width:100%;background:#f8f8f8;border-radius:8px;">
+        ${row("هۆتێل / Hotel", b.hotel)}
+        ${row("ناو / Name", b.name)}
+        ${row("تەلەفۆن / Phone", b.phone)}
+        ${row("ژوور / Room", b.roomType)}
+        ${row("بەروار / Check-in", b.checkIn)}
+        ${row("شەو / Nights", b.nights)}
+      </table>
+    </div>`;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+    await transporter.sendMail({
+      from: `"Kurdistan Hotels" <${user}>`,
+      to,
+      subject: `حیجزی نوێ — ${b.hotel}`,
+      html,
+    });
+  } catch {
+    /* best-effort — a failed email must never block a booking */
   }
 }

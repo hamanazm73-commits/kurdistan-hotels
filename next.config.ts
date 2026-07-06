@@ -32,7 +32,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   // firebase-admin is server-only and ships its own binaries — don't bundle it
-  serverExternalPackages: ["firebase-admin"],
+  serverExternalPackages: ["firebase-admin", "nodemailer"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

@@ -86,6 +86,8 @@ export interface Hotel {
   address?: string;
   /** contact phone */
   phone?: string;
+  /** email to send booking notifications for this hotel to (owner's email) */
+  notifyEmail?: string;
   /** optional promo video (YouTube link or direct mp4 URL) */
   video?: string;
   /** Google Maps link / place URL for the hotel */
