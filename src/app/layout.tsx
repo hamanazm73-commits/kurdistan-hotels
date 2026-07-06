@@ -16,15 +16,31 @@ const arabic = Noto_Naskh_Arabic({
 });
 
 export const metadata: Metadata = {
-  title: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
+  metadataBase: new URL("https://hotelskurdistan.com"),
+  title: {
+    default: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
+    template: "%s — Kurdistan Hotels",
+  },
   description:
     "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
+  keywords: [
+    "Kurdistan hotels",
+    "hotels Kurdistan",
+    "hotelskurdistan",
+    "Erbil hotels",
+    "Sulaymaniyah hotels",
+    "Dukan hotels",
+    "هۆتێلەکانی کوردستان",
+    "هۆتێل هەولێر",
+    "هۆتێل سلێمانی",
+  ],
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
     description:
       "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
     type: "website",
-    url: "https://kurdistan-hotels.vercel.app",
+    url: "https://hotelskurdistan.com",
     images: [
       {
         url: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=630&fit=crop&q=85",
