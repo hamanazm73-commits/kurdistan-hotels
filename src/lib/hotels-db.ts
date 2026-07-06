@@ -9,6 +9,7 @@ import {
   setDoc,
   getDoc,
   getDocs,
+  onSnapshot,
   deleteField,
   query,
   where,
@@ -199,17 +200,42 @@ export async function removeAdmin(email: string) {
 
 /* ---------------- bookings (read for admin) ---------------- */
 
-export async function listBookings(
-  hotelId?: string,
-): Promise<(Booking & { id: string })[]> {
+function bookingsQuery(hotelId?: string) {
   const col = collection(requireDb(), "bookings");
   // For a hotel owner, filter by hotelId (sorted client-side to avoid a
   // composite index). Owners/admins get all, sorted by Firestore.
-  const q = hotelId
+  return hotelId
     ? query(col, where("hotelId", "==", hotelId))
     : query(col, orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
+}
+
+export async function listBookings(
+  hotelId?: string,
+): Promise<(Booking & { id: string })[]> {
+  const snap = await getDocs(bookingsQuery(hotelId));
   const rows = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Booking) }));
   if (hotelId) rows.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
   return rows;
+}
+
+/**
+ * Live bookings — calls `onData` whenever a booking is added/changed/removed,
+ * so the admin panel updates on its own (no manual refresh). Returns an
+ * unsubscribe function. On error the existing rows are kept (onData isn't
+ * called with an empty list).
+ */
+export function watchBookings(
+  hotelId: string | undefined,
+  onData: (rows: (Booking & { id: string })[]) => void,
+  onError?: () => void,
+): () => void {
+  return onSnapshot(
+    bookingsQuery(hotelId),
+    (snap) => {
+      const rows = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Booking) }));
+      if (hotelId) rows.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+      onData(rows);
+    },
+    () => onError?.(),
+  );
 }

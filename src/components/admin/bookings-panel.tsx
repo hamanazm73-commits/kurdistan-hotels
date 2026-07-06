@@ -23,7 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { useHotels } from "@/lib/use-hotels";
-import { listBookings } from "@/lib/hotels-db";
+import { watchBookings } from "@/lib/hotels-db";
 import { formatPrice, type Booking } from "@/lib/types";
 
 type Range = "week" | "month" | "all";
@@ -62,14 +62,18 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
   // "now" captured when data loads, so render stays pure (no Date.now() in render)
   const [now, setNow] = useState(0);
 
+  // Live subscription — new bookings appear on their own, no manual refresh.
   useEffect(() => {
-    listBookings(hotelId)
-      .then((r) => {
+    const unsub = watchBookings(
+      hotelId,
+      (r) => {
         setRows(r);
         setNow(Date.now());
-      })
-      .catch(() => setRows([]))
-      .finally(() => setLoading(false));
+        setLoading(false);
+      },
+      () => setLoading(false),
+    );
+    return unsub;
   }, [hotelId]);
 
   // A stable key + city for each booking's hotel (by id, else by name).
@@ -257,7 +261,11 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
             </Button>
           )}
         </div>
-        <span className="w-full text-sm font-medium text-muted-foreground sm:w-auto">
+        <span className="flex w-full items-center gap-2 text-sm font-medium text-muted-foreground sm:w-auto">
+          <span className="relative flex size-2 shrink-0" title={t("bookings_live")}>
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+          </span>
           {t("bookings_count", { n: filtered.length })}
         </span>
       </div>
