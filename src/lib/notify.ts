@@ -64,9 +64,10 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
   const html = `
   <div style="font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;padding:24px;">
     <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
-      <div style="background:#1e3a5f;padding:26px 24px;text-align:center;">
-        <div style="font-size:22px;font-weight:800;color:#f5c542;">🏨 حیجزی نوێ — New booking</div>
-        <div style="color:#cbd5e1;font-size:15px;margin-top:6px;">${esc(b.hotel)}</div>
+      <div style="background:#1e3a5f;padding:24px;text-align:center;">
+        <img src="https://kurdistan-hotels.vercel.app/api/logo" alt="Kurdistan Hotels" width="240" style="width:240px;max-width:80%;height:auto;" />
+        <div style="font-size:18px;font-weight:700;color:#f5c542;margin-top:16px;">حیجزی نوێ — New booking</div>
+        <div style="color:#cbd5e1;font-size:15px;margin-top:4px;">${esc(b.hotel)}</div>
       </div>
       <div style="padding:22px 24px;">
         <table style="width:100%;border-collapse:collapse;font-size:15px;">
