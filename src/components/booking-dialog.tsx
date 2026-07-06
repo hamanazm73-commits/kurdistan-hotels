@@ -24,6 +24,7 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { type Hotel } from "@/lib/types";
+import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
 
 export function BookingDialog({
@@ -107,6 +108,17 @@ export function BookingDialog({
         toast.error(t("book_required"));
         return;
       }
+      // keep a copy on the guest's device so they can see it in "My bookings"
+      addMyBooking({
+        hotelId: hotel.id,
+        hotel: hotel.name,
+        roomType,
+        roomPrice: room?.price ?? 0,
+        checkIn,
+        nights: Number(nights) || 1,
+        name: name.trim(),
+        phone: phone.trim(),
+      });
       toast.success(t("book_success"));
       setOpen(false);
       setName("");

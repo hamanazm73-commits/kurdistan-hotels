@@ -58,6 +58,13 @@ export function SiteHeader() {
           >
             {t("nav_hotels")}
           </Button>
+          <Button
+            variant="ghost"
+            nativeButton={false}
+            render={<Link href="/bookings" />}
+          >
+            {t("my_bookings")}
+          </Button>
         </nav>
 
         <div className="flex items-center gap-1">
@@ -127,6 +134,14 @@ export function SiteHeader() {
                   render={<Link href="/#hotels" />}
                 >
                   {t("nav_hotels")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  nativeButton={false}
+                  render={<Link href="/bookings" />}
+                >
+                  {t("my_bookings")}
                 </Button>
                 {role ? (
                   <>
