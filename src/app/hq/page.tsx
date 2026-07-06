@@ -105,6 +105,9 @@ export default function AdminPage() {
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-6 py-8">
+          <div className="mb-6">
+            <ExchangeRateCard />
+          </div>
           <Tabs defaultValue="hotel">
             <TabsList>
               <TabsTrigger value="hotel">{t("admin_my_hotel")}</TabsTrigger>

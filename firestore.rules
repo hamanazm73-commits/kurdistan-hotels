@@ -70,10 +70,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Global settings (e.g. the market USD rate): anyone can read; owner/admins write.
+    // Global settings (e.g. the market USD rate): anyone can read; owner/admins
+    // and hotel owners can update it (it's the same market rate for everyone).
     match /settings/{id} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isAdmin() ||
+        (hasRole() && myRole().enabled == true && myRole().role == 'hotel');
     }
 
     // Roles: a user may read their own role; only the owner manages roles.
