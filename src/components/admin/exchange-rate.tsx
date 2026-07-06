@@ -13,23 +13,25 @@ import { DEFAULT_IQD_PER_USD } from "@/lib/currency";
 /** Owner/admin control for the market USD rate used to show prices in dollars. */
 export function ExchangeRateCard() {
   const { t } = useI18n();
-  const [rate, setRate] = useState(DEFAULT_IQD_PER_USD);
+  // Kurdistan quotes the rate per 100 USD (e.g. 153,000), so the field is
+  // per-100; we store it internally as IQD per 1 USD.
+  const [per100, setPer100] = useState(DEFAULT_IQD_PER_USD * 100);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     getSettings().then((s) => {
-      if (s.iqdPerUsd && s.iqdPerUsd > 0) setRate(s.iqdPerUsd);
+      if (s.iqdPerUsd && s.iqdPerUsd > 0) setPer100(s.iqdPerUsd * 100);
     });
   }, []);
 
   async function save() {
-    if (!rate || rate <= 0) {
+    if (!per100 || per100 <= 0) {
       toast.error(t("admin_usd_rate"));
       return;
     }
     setSaving(true);
     try {
-      await setIqdPerUsd(rate);
+      await setIqdPerUsd(per100 / 100);
       toast.success(t("admin_saved"));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
@@ -48,15 +50,15 @@ export function ExchangeRateCard() {
         {t("admin_usd_rate_hint")}
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm">1 USD =</span>
+        <span className="text-sm whitespace-nowrap">100 USD =</span>
         <Input
           type="text"
           inputMode="numeric"
-          value={rate ? rate.toLocaleString("en-US") : ""}
+          value={per100 ? per100.toLocaleString("en-US") : ""}
           onChange={(e) =>
-            setRate(Number(e.target.value.replace(/\D/g, "")) || 0)
+            setPer100(Number(e.target.value.replace(/\D/g, "")) || 0)
           }
-          className="w-28"
+          className="w-32"
         />
         <span className="text-sm">IQD</span>
         <Button onClick={save} disabled={saving} size="sm" className="gap-1.5">

@@ -78,7 +78,7 @@ const ckb: Dict = {
   admin_filter_city: "بەپێی شار",
   admin_usd_rate: "نرخی دۆلاری بازاڕ",
   admin_usd_rate_hint:
-    "چەند دیناری بازاڕ بۆ ١ دۆلار. ڕۆژانە نوێی بکەرەوە بەپێی بازاڕ — چونکە APIـی فۆرێکس تەنها نرخی فەرمی هەیە.",
+    "چەند دیناری بازاڕ بۆ ١٠٠ دۆلار (نموونە: ١٥٣٬٠٠٠). ڕۆژانە نوێی بکەرەوە بەپێی بازاڕ.",
   owner_hidden_notice:
     "ئەم هۆتێلە لەلایەن بەڕێوەبەرایەتییەوە شاردراوەتەوە، بۆیە ناتوانیت دەستکاری بکەیت. بۆ چالاککردنەوە پەیوەندی بە بەڕێوەبەرایەتی بکە.",
   per_night: "/ شەو",
@@ -267,7 +267,7 @@ const en: Dict = {
   admin_filter_city: "By city",
   admin_usd_rate: "Market USD rate",
   admin_usd_rate_hint:
-    "How many market IQD equal 1 USD. Update it as the market moves — forex APIs only carry the official rate.",
+    "How many market IQD for 100 USD (e.g. 153,000). Update it as the market moves.",
   owner_hidden_notice:
     "This hotel has been hidden by the administration, so you can't edit it. Contact the administration to restore it.",
   per_night: "/ night",
@@ -456,7 +456,7 @@ const ar: Dict = {
   admin_filter_city: "حسب المدينة",
   admin_usd_rate: "سعر الدولار في السوق",
   admin_usd_rate_hint:
-    "كم ديناراً في السوق يساوي 1 دولار. حدّثه حسب السوق — واجهات الفوركس تحمل السعر الرسمي فقط.",
+    "كم ديناراً في السوق مقابل 100 دولار (مثلاً 153,000). حدّثه حسب السوق.",
   owner_hidden_notice:
     "تم إخفاء هذا الفندق من قبل الإدارة، لذا لا يمكنك تعديله. تواصل مع الإدارة لإعادة إظهاره.",
   per_night: "/ ليلة",
@@ -645,7 +645,7 @@ const kmr: Dict = {
   admin_filter_city: "Li gorî bajêr",
   admin_usd_rate: "Rêjeya dolarê ya bazarê",
   admin_usd_rate_hint:
-    "Çend dînarên bazarê 1 dolar in. Li gorî bazarê nû bike — API'yên forex tenê rêjeya fermî hene.",
+    "Çend dînarên bazarê ji bo 100 dolar (mînak 153,000). Li gorî bazarê nû bike.",
   owner_hidden_notice:
     "Ev otêl ji aliyê rêveberiyê ve hatiye veşartin, loma tu nikarî wê biguherînî. Ji bo vegerandinê bi rêveberiyê re têkilî deyne.",
   per_night: "/ şev",
