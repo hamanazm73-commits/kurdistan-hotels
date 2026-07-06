@@ -48,7 +48,7 @@ import {
   seedHotels,
   getHotelMedia,
 } from "@/lib/hotels-db";
-import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
+import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
@@ -743,37 +743,57 @@ export function HotelFormDialog({
 
           {/* online payment methods — each is a link the guest pays the hotel through */}
           <Field label={t("admin_payments")}>
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">
+            <div className="space-y-2.5">
+              <p className="text-xs leading-relaxed text-muted-foreground">
                 {t("admin_payments_hint")}
               </p>
               {form.payments.map((p, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Select
-                    value={p.type}
-                    onValueChange={(v) =>
-                      set(
-                        "payments",
-                        form.payments.map((x, j) =>
-                          j === i ? { ...x, type: v ?? "link" } : x,
-                        ),
-                      )
-                    }
-                  >
-                    <SelectTrigger className="w-32 shrink-0">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PAYMENT_TYPES.map((pt) => (
-                        <SelectItem key={pt.id} value={pt.id}>
-                          {pt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div key={i} className="rounded-xl border bg-muted/30 p-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      aria-hidden
+                      className="size-3 shrink-0 rounded-full ring-2 ring-background"
+                      style={{ backgroundColor: paymentColor(p.type) }}
+                    />
+                    <Select
+                      value={p.type}
+                      onValueChange={(v) =>
+                        set(
+                          "payments",
+                          form.payments.map((x, j) =>
+                            j === i ? { ...x, type: v ?? "link" } : x,
+                          ),
+                        )
+                      }
+                    >
+                      <SelectTrigger className="h-9 flex-1">
+                        <SelectValue>
+                          {(v) => paymentLabel(String(v ?? ""))}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PAYMENT_TYPES.map((pt) => (
+                          <SelectItem key={pt.id} value={pt.id}>
+                            {pt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 shrink-0 text-muted-foreground hover:text-destructive"
+                      onClick={() =>
+                        set("payments", form.payments.filter((_, j) => j !== i))
+                      }
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
                   <Input
                     dir="ltr"
-                    className="min-w-0 flex-1"
+                    className="mt-2 h-9"
                     placeholder={t("admin_payment_url")}
                     value={p.url}
                     onChange={(e) =>
@@ -785,24 +805,13 @@ export function HotelFormDialog({
                       )
                     }
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0"
-                    onClick={() =>
-                      set("payments", form.payments.filter((_, j) => j !== i))
-                    }
-                  >
-                    <X className="size-4 text-destructive" />
-                  </Button>
                 </div>
               ))}
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                className="gap-1.5"
+                className="w-full gap-1.5"
                 onClick={() =>
                   set("payments", [
                     ...form.payments,
