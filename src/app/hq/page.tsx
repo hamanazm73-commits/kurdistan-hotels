@@ -16,6 +16,7 @@ import { useHotels } from "@/lib/use-hotels";
 import { HotelsPanel } from "@/components/admin/hotels-panel";
 import { BookingsPanel } from "@/components/admin/bookings-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
+import { ExchangeRateCard } from "@/components/admin/exchange-rate";
 
 export default function AdminPage() {
   const { t } = useI18n();
@@ -167,6 +168,9 @@ export default function AdminPage() {
         transition={{ duration: 0.4 }}
         className="mx-auto max-w-6xl px-6 py-8"
       >
+        <div className="mb-6">
+          <ExchangeRateCard />
+        </div>
         <Tabs defaultValue="hotels">
           <TabsList>
             <TabsTrigger value="hotels">{t("admin_hotels")}</TabsTrigger>

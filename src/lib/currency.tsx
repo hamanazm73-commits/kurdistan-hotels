@@ -10,6 +10,11 @@ import {
 } from "react";
 import { useI18n } from "./i18n";
 import { formatPrice } from "./types";
+import { getSettings } from "./hotels-db";
+
+/** Fallback IQD-per-USD until the owner sets the market rate in the admin.
+    (Kurdistan market rate, roughly — the owner keeps it current.) */
+export const DEFAULT_IQD_PER_USD = 1500;
 
 export interface CurrencyInfo {
   code: string;
@@ -44,6 +49,18 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrencyState] = useState("IQD");
   const [rates, setRates] = useState<Record<string, number> | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  // Owner-set market rate (IQD per 1 USD), the anchor for the IQD peg.
+  const [iqdPerUsd, setIqdPerUsd] = useState(DEFAULT_IQD_PER_USD);
+
+  useEffect(() => {
+    let alive = true;
+    getSettings().then((s) => {
+      if (alive && s.iqdPerUsd && s.iqdPerUsd > 0) setIqdPerUsd(s.iqdPerUsd);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => {
     // hydrate the saved choice after mount (avoids SSR hydration mismatch)
@@ -74,23 +91,32 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("currency", c);
   }, []);
 
+  const money = (amount: number, cur: string) => {
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: cur,
+        maximumFractionDigits: 0,
+      }).format(amount);
+    } catch {
+      return `${Math.round(amount).toLocaleString("en-US")} ${cur}`;
+    }
+  };
+
   const format = useCallback(
     (iqd: number): string => {
-      // Base currency, or rates not ready → show IQD in the current language.
-      if (currency === "IQD" || !rates || !rates[currency])
+      if (currency === "IQD") return formatPrice(iqd, lang);
+      // The market rate anchors the IQD→USD conversion (forex only has the
+      // official rate, which is off for the Kurdistan market).
+      const usd = iqd / iqdPerUsd;
+      if (currency === "USD") return money(usd, "USD");
+      // Other currencies: convert USD→target with the accurate forex cross-rate.
+      if (!rates || !rates[currency] || !rates.USD)
         return formatPrice(iqd, lang);
-      const converted = iqd * rates[currency];
-      try {
-        return new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency,
-          maximumFractionDigits: 0,
-        }).format(converted);
-      } catch {
-        return `${Math.round(converted).toLocaleString("en-US")} ${currency}`;
-      }
+      return money(usd * (rates[currency] / rates.USD), currency);
     },
-    [currency, rates, lang],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currency, rates, iqdPerUsd, lang],
   );
 
   return (

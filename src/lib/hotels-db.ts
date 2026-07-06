@@ -136,6 +136,31 @@ export async function seedHotels() {
   );
 }
 
+/* ---------------- global settings ---------------- */
+
+export interface AppSettings {
+  /** market exchange rate: how many IQD per 1 USD. Owner-set and updated as the
+      Kurdistan market moves — forex APIs only carry the official rate. */
+  iqdPerUsd?: number;
+}
+
+export async function getSettings(): Promise<AppSettings> {
+  try {
+    const snap = await getDoc(doc(requireDb(), "settings", "config"));
+    return snap.exists() ? (snap.data() as AppSettings) : {};
+  } catch {
+    return {};
+  }
+}
+
+export async function setIqdPerUsd(iqdPerUsd: number) {
+  return setDoc(
+    doc(requireDb(), "settings", "config"),
+    { iqdPerUsd },
+    { merge: true },
+  );
+}
+
 /* ---------------- admins ---------------- */
 
 export async function listAdmins(): Promise<AdminRecord[]> {

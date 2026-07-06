@@ -70,6 +70,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Global settings (e.g. the market USD rate): anyone can read; owner/admins write.
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Roles: a user may read their own role; only the owner manages roles.
     match /roles/{email} {
       allow get: if isOwner() || (isSignedIn() && emailLower() == email);
