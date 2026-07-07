@@ -24,15 +24,32 @@ export const metadata: Metadata = {
   description:
     "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
   keywords: [
+    // brand + common variant spellings people actually type
     "Kurdistan hotels",
     "hotels Kurdistan",
+    "Kurdistan hotel",
+    "hotel Kurdistan",
+    "hotels in Kurdistan",
     "hotelskurdistan",
+    // cities — many transliterations, so cover the common ones
     "Erbil hotels",
+    "Hawler hotels",
+    "Arbil hotels",
     "Sulaymaniyah hotels",
+    "Slemani hotels",
+    "Sulaimani hotels",
+    "Duhok hotels",
+    "Dohuk hotels",
     "Dukan hotels",
+    "Dokan hotels",
+    "Halabja hotels",
+    "Kirkuk hotels",
+    // native scripts
     "هۆتێلەکانی کوردستان",
     "هۆتێل هەولێر",
     "هۆتێل سلێمانی",
+    "هۆتێل دووکان",
+    "فنادق كردستان",
   ],
   alternates: { canonical: "/" },
   verification: {
@@ -63,6 +80,64 @@ export const metadata: Metadata = {
   },
 };
 
+// Structured data: tells Google the brand's alternate names and the many
+// spellings of the Kurdish cities we serve, so misspelled/variant searches
+// (Hawler/Arbil, Slemani, Dohuk, Dokan …) still resolve to this site.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://hotelskurdistan.com/#organization",
+      name: "Kurdistan Hotels",
+      alternateName: [
+        "Kurdistan Hotel",
+        "Hotels Kurdistan",
+        "Hotel Kurdistan",
+        "Hotels in Kurdistan",
+        "هۆتێلەکانی کوردستان",
+        "هۆتێلی کوردستان",
+        "فنادق كردستان",
+      ],
+      url: "https://hotelskurdistan.com",
+      logo: "https://hotelskurdistan.com/logo-square.png",
+      image: "https://hotelskurdistan.com/logo-square.png",
+      description:
+        "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
+      areaServed: [
+        "Kurdistan",
+        "Erbil",
+        "Hawler",
+        "Hewler",
+        "Arbil",
+        "Sulaymaniyah",
+        "Slemani",
+        "Sulaimani",
+        "Duhok",
+        "Dohuk",
+        "Dukan",
+        "Dokan",
+        "Halabja",
+        "Kirkuk",
+        "Kerkuk",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://hotelskurdistan.com/#website",
+      name: "Kurdistan Hotels",
+      alternateName: [
+        "Kurdistan Hotel",
+        "Hotels Kurdistan",
+        "hotelskurdistan",
+      ],
+      url: "https://hotelskurdistan.com",
+      inLanguage: ["ckb", "en", "ar", "kmr"],
+      publisher: { "@id": "https://hotelskurdistan.com/#organization" },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -71,6 +146,12 @@ export default function RootLayout({
       <body
         className={`${sans.variable} ${arabic.variable} min-h-dvh antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          }}
+        />
         <SiteProtection />
         <Providers>{children}</Providers>
       </body>
