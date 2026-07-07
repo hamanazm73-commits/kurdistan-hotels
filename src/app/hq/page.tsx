@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Crown, Lock, Loader2, ArrowLeft, Home } from "lucide-react";
+import { Crown, Lock, Loader2, ArrowLeft, Home, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -70,18 +70,20 @@ export default function AdminPage() {
   if (role === "hotel") {
     const myHotel = hotels.find((h) => h.id === hotelId);
     return (
-      <div className="min-h-dvh bg-muted/30">
+      <div className="min-h-dvh overflow-x-hidden bg-muted/30">
         <header className="border-b bg-background">
-          <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
-            <div>
-              <h1 className="text-xl font-bold">
+          <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-bold">
                 {myHotel?.name ?? t("admin_my_hotel")}
               </h1>
               {user?.email && (
-                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <p className="truncate text-sm text-muted-foreground">
+                  {user.email}
+                </p>
               )}
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <Button
                 variant="outline"
                 size="sm"
@@ -96,8 +98,9 @@ export default function AdminPage() {
               <ThemeToggle />
               <LogoutButton
                 trigger={
-                  <Button variant="ghost" size="sm">
-                    {t("nav_logout")}
+                  <Button variant="ghost" size="sm" className="gap-1.5">
+                    <LogOut className="size-4" />
+                    <span className="hidden sm:inline">{t("nav_logout")}</span>
                   </Button>
                 }
               />
@@ -123,22 +126,27 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-muted/30">
+    <div className="min-h-dvh overflow-x-hidden bg-muted/30">
       <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-          <div>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold">{t("admin_title")}</h1>
-              <Badge variant={isOwner ? "default" : "secondary"} className="gap-1">
+              <h1 className="truncate text-xl font-bold">{t("admin_title")}</h1>
+              <Badge
+                variant={isOwner ? "default" : "secondary"}
+                className="shrink-0 gap-1"
+              >
                 {isOwner && <Crown className="size-3" />}
                 {t(isOwner ? "role_owner" : "role_admin")}
               </Badge>
             </div>
             {user?.email && (
-              <p className="text-sm text-muted-foreground">{user.email}</p>
+              <p className="truncate text-sm text-muted-foreground">
+                {user.email}
+              </p>
             )}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex shrink-0 items-center gap-1">
             <LanguageSwitcher />
             <ThemeToggle />
             <Button
@@ -153,8 +161,9 @@ export default function AdminPage() {
             </Button>
             <LogoutButton
               trigger={
-                <Button variant="ghost" size="sm">
-                  {t("nav_logout")}
+                <Button variant="ghost" size="sm" className="gap-1.5">
+                  <LogOut className="size-4" />
+                  <span className="hidden sm:inline">{t("nav_logout")}</span>
                 </Button>
               }
             />

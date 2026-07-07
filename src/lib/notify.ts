@@ -46,7 +46,15 @@ export async function notifyBooking(b: Booking) {
 export async function sendBookingEmail(b: Booking, to: string | undefined) {
   const user = process.env.GMAIL_USER;
   const pass = process.env.GMAIL_APP_PASSWORD;
-  if (!user || !pass || !to) return;
+  // Log WHY an email is skipped so a missing sender/recipient is diagnosable
+  // from the Vercel logs (the sender vars are set once; `to` is the hotel's
+  // notifyEmail field, which each hotel must fill in).
+  if (!user || !pass || !to) {
+    console.warn(
+      `[email] skipped — GMAIL_USER:${!!user} GMAIL_APP_PASSWORD:${!!pass} recipient:${to ? "set" : "missing"}`,
+    );
+    return;
+  }
 
   const esc = (s: unknown) =>
     String(s).replace(/[<>&]/g, (c) =>
@@ -105,7 +113,12 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
       subject: `حیجزی نوێ — ${b.hotel} (${money(total)})`,
       html,
     });
-  } catch {
-    /* best-effort — a failed email must never block a booking */
+    console.log(`[email] sent to ${to}`);
+  } catch (e) {
+    // best-effort — a failed email must never block a booking, but log the
+    // reason (bad app password, blocked login, etc.) so it can be fixed
+    console.error(
+      `[email] send failed: ${e instanceof Error ? e.message : String(e)}`,
+    );
   }
 }
