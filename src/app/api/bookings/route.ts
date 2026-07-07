@@ -65,7 +65,7 @@ export async function POST(req: Request) {
       if (typeof em === "string") notifyEmail = em;
     }
 
-    await adminDb.collection("bookings").add({
+    const ref = await adminDb.collection("bookings").add({
       ...booking,
       hotelId: hotelId ?? null,
       status: "pending",
@@ -74,7 +74,8 @@ export async function POST(req: Request) {
 
     await notifyBooking(parsed.data);
     await sendBookingEmail(parsed.data, notifyEmail);
-    return NextResponse.json({ ok: true, persisted: true, status: "pending" });
+    // id lets the guest's device follow this booking's live status
+    return NextResponse.json({ ok: true, persisted: true, status: "pending", id: ref.id });
   } catch {
     return NextResponse.json({ error: "write_failed" }, { status: 500 });
   }

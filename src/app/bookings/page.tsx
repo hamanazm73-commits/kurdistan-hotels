@@ -16,12 +16,34 @@ import {
   type MyBooking,
 } from "@/lib/my-bookings";
 import { mediaSrc, paymentLabel, paymentColor } from "@/lib/types";
+import { cn } from "@/lib/utils";
+
+/** How each live booking status looks on the guest's "My bookings" page. */
+const STATUS_META: Record<string, { key: string; cls: string }> = {
+  pending: {
+    key: "booking_status_pending",
+    cls: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300",
+  },
+  confirmed: {
+    key: "bk_confirmed",
+    cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
+  },
+  cancelled: {
+    key: "bk_cancelled",
+    cls: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+  },
+  noshow: {
+    key: "bk_noshow",
+    cls: "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+  },
+};
 
 export default function MyBookingsPage() {
   const { t } = useI18n();
   const { format } = useCurrency();
   const { hotels } = useHotels();
   const [bookings, setBookings] = useState<MyBooking[]>([]);
+  const [statuses, setStatuses] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const load = () => setBookings(getMyBookings());
@@ -29,6 +51,34 @@ export default function MyBookingsPage() {
     window.addEventListener("my-bookings-changed", load);
     return () => window.removeEventListener("my-bookings-changed", load);
   }, []);
+
+  // Follow the live status of these bookings (owner confirm/cancel) by asking
+  // the server for just their status strings. Polls so it updates on its own.
+  useEffect(() => {
+    const ids = bookings.map((b) => b.docId).filter(Boolean) as string[];
+    if (ids.length === 0) return;
+    let stopped = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/bookings/status", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids }),
+        });
+        if (!res.ok) return;
+        const d = (await res.json()) as { statuses?: Record<string, string> };
+        if (!stopped && d.statuses) setStatuses(d.statuses);
+      } catch {
+        /* offline / transient — keep the last known statuses */
+      }
+    };
+    load();
+    const timer = setInterval(load, 25_000);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [bookings]);
 
   return (
     <>
@@ -76,9 +126,21 @@ export default function MyBookingsPage() {
                           >
                             {b.hotel}
                           </Link>
-                          <span className="ms-2 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-950 dark:text-amber-300">
-                            {t("booking_status_pending")}
-                          </span>
+                          {(() => {
+                            const st =
+                              (b.docId && statuses[b.docId]) || "pending";
+                            const meta = STATUS_META[st] ?? STATUS_META.pending;
+                            return (
+                              <span
+                                className={cn(
+                                  "ms-2 inline-block rounded-full px-2 py-0.5 text-xs font-semibold",
+                                  meta.cls,
+                                )}
+                              >
+                                {t(meta.key)}
+                              </span>
+                            );
+                          })()}
                         </div>
                         <button
                           type="button"

@@ -108,8 +108,11 @@ export function BookingDialog({
         toast.error(t("book_required"));
         return;
       }
-      // keep a copy on the guest's device so they can see it in "My bookings"
+      const data = (await res.json().catch(() => ({}))) as { id?: string };
+      // keep a copy on the guest's device so they can see it in "My bookings";
+      // docId lets that page follow the live status once the owner confirms
       addMyBooking({
+        docId: data.id,
         hotelId: hotel.id,
         hotel: hotel.name,
         roomType,

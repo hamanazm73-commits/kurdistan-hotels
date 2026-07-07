@@ -7,6 +7,8 @@
  */
 export interface MyBooking {
   id: string;
+  /** the Firestore booking id, used to look up the live status (owner confirm) */
+  docId?: string;
   hotelId: string;
   hotel: string;
   roomType: string;
