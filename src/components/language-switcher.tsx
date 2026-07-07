@@ -66,8 +66,12 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger
         render={<Button variant="ghost" size="sm" className="gap-2" />}
       >
-        <Globe className="size-4" />
-        <span className="hidden sm:inline">{LANGS[lang].label}</span>
+        <Globe className="size-4 shrink-0" />
+        {/* fixed width so the navbar doesn't shift when the language label
+            (سۆرانی / English / Kurmancî / العراقي) changes width */}
+        <span className="hidden w-[4.5rem] truncate text-start sm:block">
+          {LANGS[lang].label}
+        </span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-40">
         <DropdownMenuSub>

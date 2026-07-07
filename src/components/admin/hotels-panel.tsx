@@ -893,80 +893,91 @@ export function HotelFormDialog({
                 ))}
               </datalist>
               {form.rooms.map((r, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <Input
-                    className="min-w-0 flex-1"
-                    list="room-type-suggestions"
-                    placeholder={t("admin_room_type")}
-                    value={r.type}
-                    onChange={(e) =>
-                      set(
-                        "rooms",
-                        form.rooms.map((x, j) =>
-                          j === i ? { ...x, type: e.target.value } : x,
-                        ),
-                      )
-                    }
-                  />
-                  <MoneyInput
-                    className="w-24"
-                    placeholder={t("admin_room_price")}
-                    value={r.price}
-                    onChange={(n) =>
-                      set(
-                        "rooms",
-                        form.rooms.map((x, j) =>
-                          j === i ? { ...x, price: n } : x,
-                        ),
-                      )
-                    }
-                  />
-                  <Input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    title={t("admin_room_available")}
-                    placeholder={t("admin_room_available")}
-                    className="w-16 shrink-0"
-                    value={r.available ?? ""}
-                    onChange={(e) =>
-                      set(
-                        "rooms",
-                        form.rooms.map((x, j) =>
-                          j === i
-                            ? {
-                                ...x,
-                                available:
-                                  e.target.value === ""
-                                    ? undefined
-                                    : Math.max(0, Number(e.target.value)),
-                              }
-                            : x,
-                        ),
-                      )
-                    }
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0"
-                    onClick={() =>
-                      set(
-                        "rooms",
-                        form.rooms.filter((_, j) => j !== i),
-                      )
-                    }
-                  >
-                    <X className="size-4 text-destructive" />
-                  </Button>
+                <div key={i} className="rounded-xl border bg-muted/30 p-3">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      className="min-w-0 flex-1"
+                      list="room-type-suggestions"
+                      placeholder={t("admin_room_type")}
+                      value={r.type}
+                      onChange={(e) =>
+                        set(
+                          "rooms",
+                          form.rooms.map((x, j) =>
+                            j === i ? { ...x, type: e.target.value } : x,
+                          ),
+                        )
+                      }
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 shrink-0 text-muted-foreground hover:text-destructive"
+                      title={t("admin_delete")}
+                      onClick={() =>
+                        set(
+                          "rooms",
+                          form.rooms.filter((_, j) => j !== i),
+                        )
+                      }
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <div className="grid gap-1">
+                      <label className="text-xs text-muted-foreground">
+                        {t("admin_room_price")}
+                      </label>
+                      <MoneyInput
+                        placeholder={t("admin_room_price")}
+                        value={r.price}
+                        onChange={(n) =>
+                          set(
+                            "rooms",
+                            form.rooms.map((x, j) =>
+                              j === i ? { ...x, price: n } : x,
+                            ),
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-1">
+                      <label className="text-xs text-muted-foreground">
+                        {t("admin_room_available")}
+                      </label>
+                      <Input
+                        type="number"
+                        min={0}
+                        inputMode="numeric"
+                        placeholder="0"
+                        value={r.available ?? ""}
+                        onChange={(e) =>
+                          set(
+                            "rooms",
+                            form.rooms.map((x, j) =>
+                              j === i
+                                ? {
+                                    ...x,
+                                    available:
+                                      e.target.value === ""
+                                        ? undefined
+                                        : Math.max(0, Number(e.target.value)),
+                                  }
+                                : x,
+                            ),
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
-                className="gap-1.5"
+                className="w-full gap-1.5"
                 onClick={() =>
                   set("rooms", [...form.rooms, { type: "", price: 0 }])
                 }
