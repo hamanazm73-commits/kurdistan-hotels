@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check } from "lucide-react";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check, Ban, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -57,8 +57,16 @@ function StatusBadge({ b }: { b: Booking }) {
   );
 }
 
-/** Confirm / reject / cancel / no-show buttons for one booking. */
-function BookingActions({ b }: { b: Booking & { id: string } }) {
+/** Confirm / reject / cancel / no-show buttons for one booking.
+    `compact` (desktop table) uses icon-only buttons so the column stays narrow;
+    the mobile cards use the full-text version. */
+function BookingActions({
+  b,
+  compact = false,
+}: {
+  b: Booking & { id: string };
+  compact?: boolean;
+}) {
   const { t } = useI18n();
   const [busy, setBusy] = useState(false);
   const status = statusOf(b);
@@ -79,41 +87,55 @@ function BookingActions({ b }: { b: Booking & { id: string } }) {
 
   if (status === "pending")
     return (
-      <div className="flex flex-wrap gap-1.5">
-        <Button size="sm" className="h-8 gap-1" onClick={() => set("confirmed")}>
+      <div className="flex flex-nowrap gap-1.5">
+        <Button
+          size={compact ? "icon" : "sm"}
+          className={compact ? "size-8" : "h-8 gap-1"}
+          title={t("bk_confirm")}
+          onClick={() => set("confirmed")}
+        >
           <Check className="size-4" />
-          {t("bk_confirm")}
+          {!compact && t("bk_confirm")}
         </Button>
         <Button
-          size="sm"
+          size={compact ? "icon" : "sm"}
           variant="outline"
-          className="h-8 gap-1"
+          className={compact ? "size-8 text-destructive" : "h-8 gap-1"}
+          title={t("bk_reject")}
           onClick={() => set("cancelled")}
         >
           <X className="size-4" />
-          {t("bk_reject")}
+          {!compact && t("bk_reject")}
         </Button>
       </div>
     );
 
   if (status === "confirmed")
     return (
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-nowrap gap-1.5">
         <Button
-          size="sm"
+          size={compact ? "icon" : "sm"}
           variant="outline"
-          className="h-8"
+          className={compact ? "size-8" : "h-8 gap-1 whitespace-nowrap"}
+          title={t("bk_cancel")}
           onClick={() => set("cancelled")}
         >
-          {t("bk_cancel")}
+          <Ban className="size-4" />
+          {!compact && t("bk_cancel")}
         </Button>
         <Button
-          size="sm"
+          size={compact ? "icon" : "sm"}
           variant="ghost"
-          className="h-8 text-muted-foreground"
+          className={
+            compact
+              ? "size-8 text-muted-foreground"
+              : "h-8 gap-1 whitespace-nowrap text-muted-foreground"
+          }
+          title={t("bk_noshow")}
           onClick={() => set("noshow")}
         >
-          {t("bk_noshow")}
+          <UserX className="size-4" />
+          {!compact && t("bk_noshow")}
         </Button>
       </div>
     );
@@ -520,7 +542,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                 </TableCell>
                 <TableCell className="text-end">
                   <div className="flex justify-end">
-                    <BookingActions b={b} />
+                    <BookingActions b={b} compact />
                   </div>
                 </TableCell>
               </TableRow>
