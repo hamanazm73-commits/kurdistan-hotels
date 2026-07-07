@@ -567,7 +567,7 @@ const ar: Dict = {
   bk_confirm: "تأكيد",
   bk_reject: "رفض",
   bk_cancel: "إلغاء",
-  bk_updated: "انتحدثت حالة الحجز ✅",
+  bk_updated: "تم تحديث حالة الحجز ✅",
 
   footer_about: "أحسن منصة للقاء الفنادق بكردستان.",
   footer_links: "روابط",
