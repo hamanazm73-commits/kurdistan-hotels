@@ -96,6 +96,9 @@ export interface Hotel {
   hidden?: boolean;
   /** online-payment options; guests pay the hotel directly via these links */
   payments?: PaymentMethod[];
+  /** this hotel's own IQD-per-USD rate for the $ view; when unset (or 0) the
+      site-wide default rate is used. Lets each owner price their own $ view. */
+  iqdPerUsd?: number;
   createdAt?: number;
 }
 

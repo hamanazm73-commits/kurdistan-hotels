@@ -38,8 +38,9 @@ interface CurrencyValue {
   rates: Record<string, number> | null;
   /** UTC date string of the rate snapshot */
   updatedAt: string | null;
-  /** Format an IQD amount in the selected currency (converts at the live rate). */
-  format: (iqd: number) => string;
+  /** Format an IQD amount in the selected currency (converts at the live rate).
+      Pass a hotel's own iqdPerUsd as `rateOverride` to price its $ view itself. */
+  format: (iqd: number, rateOverride?: number) => string;
 }
 
 const CurrencyContext = createContext<CurrencyValue | null>(null);
@@ -104,11 +105,13 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   };
 
   const format = useCallback(
-    (iqd: number): string => {
+    (iqd: number, rateOverride?: number): string => {
       if (currency === "IQD") return formatPrice(iqd, lang);
-      // The market rate anchors the IQD→USD conversion (forex only has the
-      // official rate, which is off for the Kurdistan market).
-      const usd = iqd / iqdPerUsd;
+      // A hotel can set its own IQD→USD rate; otherwise use the site default.
+      // The market rate anchors the conversion (forex only has the official
+      // rate, which is off for the Kurdistan market).
+      const perUsd = rateOverride && rateOverride > 0 ? rateOverride : iqdPerUsd;
+      const usd = iqd / perUsd;
       if (currency === "USD") return money(usd, "USD");
       // Other currencies: convert USD→target with the accurate forex cross-rate.
       if (!rates || !rates[currency] || !rates.USD)

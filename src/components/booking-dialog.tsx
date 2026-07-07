@@ -223,7 +223,7 @@ export function BookingDialog({
                         )}
                       </span>
                       <span className="whitespace-nowrap text-muted-foreground">
-                        {format(r.price)}
+                        {format(r.price, hotel.iqdPerUsd)}
                       </span>
                     </span>
                   </SelectItem>
@@ -235,7 +235,7 @@ export function BookingDialog({
           {total > 0 && (
             <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3 text-sm font-medium">
               <span>{t("book_total")}</span>
-              <span className="text-lg font-bold text-primary">{format(total)}</span>
+              <span className="text-lg font-bold text-primary">{format(total, hotel.iqdPerUsd)}</span>
             </div>
           )}
         </div>

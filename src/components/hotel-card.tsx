@@ -187,11 +187,11 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               <div className="flex items-baseline gap-2">
                 {hasDiscount && (
                   <span className="text-sm text-muted-foreground line-through">
-                    {format(hotel.discount.oldPrice)}
+                    {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
                   </span>
                 )}
                 <span className="text-2xl font-extrabold text-gold">
-                  {format(price)}
+                  {format(price, hotel.iqdPerUsd)}
                 </span>
               </div>
               <span className="text-xs text-muted-foreground">

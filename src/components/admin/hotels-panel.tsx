@@ -111,6 +111,7 @@ const empty = {
   video: "",
   mapUrl: "",
   payments: [] as { type: string; url: string }[],
+  iqdPerUsd: 0,
   rooms: defaultRooms(),
   featured: false,
   recommended: false,
@@ -432,6 +433,7 @@ export function HotelFormDialog({
       video: h.video ?? "",
       mapUrl: h.mapUrl ?? "",
       payments: (h.payments ?? []).map((p) => ({ type: p.type, url: p.url })),
+      iqdPerUsd: h.iqdPerUsd ?? 0,
       rooms: h.rooms?.length
         ? h.rooms.map((r) => ({
             type: r.type,
@@ -498,6 +500,7 @@ export function HotelFormDialog({
       payments: f.payments
         .map((p) => ({ type: p.type, url: p.url.trim() }))
         .filter((p) => p.url),
+      iqdPerUsd: Number(f.iqdPerUsd) || 0,
       rooms,
       featured: f.featured,
       recommended: f.recommended,
@@ -713,6 +716,18 @@ export function HotelFormDialog({
               />
             </Field>
           </div>
+
+          {/* per-hotel USD rate: only this hotel's $ prices use it */}
+          <Field label={t("admin_hotel_usd_rate")}>
+            <MoneyInput
+              value={form.iqdPerUsd}
+              onChange={(n) => set("iqdPerUsd", n)}
+              placeholder={t("admin_hotel_usd_rate_ph")}
+            />
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {t("admin_hotel_usd_rate_hint")}
+            </p>
+          </Field>
 
           <Field label={t("admin_cover_image")}>
             <ImageUpload value={form.image} onChange={onImageChange} />

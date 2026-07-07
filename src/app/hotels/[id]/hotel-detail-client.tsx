@@ -328,7 +328,7 @@ export function HotelDetailClient({
                     </span>
                     <span className="flex shrink-0 items-center gap-1.5 font-bold text-primary">
                       <span>
-                        {format(r.price)}
+                        {format(r.price, hotel.iqdPerUsd)}
                         <span className="text-xs font-normal text-muted-foreground">
                           {" "}
                           {t("per_night")}
@@ -385,11 +385,11 @@ export function HotelDetailClient({
               <div className="flex items-baseline gap-2">
                 {hasDiscount && (
                   <span className="text-base text-muted-foreground line-through">
-                    {format(hotel.discount.oldPrice)}
+                    {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
                   </span>
                 )}
                 <span className="text-3xl font-extrabold text-primary">
-                  {format(price)}
+                  {format(price, hotel.iqdPerUsd)}
                 </span>
                 <span className="text-sm text-muted-foreground">
                   {t("per_night")}
