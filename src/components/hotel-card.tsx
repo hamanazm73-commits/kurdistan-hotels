@@ -20,6 +20,7 @@ import {
   mapsUrl,
   mediaSrc,
   totalAvailable,
+  roomTypeLabel,
   type Hotel,
 } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
@@ -165,7 +166,7 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                   )}
                 >
                   <BedDouble className="size-3" />
-                  {r.type} ·{" "}
+                  {roomTypeLabel(r.type, lang)} ·{" "}
                   {(r.available ?? 0) <= 0 ? t("room_full") : r.available}
                 </span>
               ))}

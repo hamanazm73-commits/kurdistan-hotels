@@ -15,7 +15,7 @@ import {
   removeMyBooking,
   type MyBooking,
 } from "@/lib/my-bookings";
-import { mediaSrc, paymentLabel, paymentColor } from "@/lib/types";
+import { mediaSrc, paymentLabel, paymentColor, roomTypeLabel } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 /** How each live booking status looks on the guest's "My bookings" page. */
@@ -39,7 +39,7 @@ const STATUS_META: Record<string, { key: string; cls: string }> = {
 };
 
 export default function MyBookingsPage() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { format } = useCurrency();
   const { hotels } = useHotels();
   const [bookings, setBookings] = useState<MyBooking[]>([]);
@@ -154,7 +154,7 @@ export default function MyBookingsPage() {
                       <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <BedDouble className="size-3.5 shrink-0" />
-                          {b.roomType}
+                          {roomTypeLabel(b.roomType, lang)}
                         </span>
                         <span dir="ltr" className="flex items-center gap-1">
                           <CalendarDays className="size-3.5 shrink-0" />

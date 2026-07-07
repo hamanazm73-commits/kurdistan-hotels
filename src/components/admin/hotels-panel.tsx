@@ -48,7 +48,7 @@ import {
   seedHotels,
   getHotelMedia,
 } from "@/lib/hotels-db";
-import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
+import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, ROOM_TYPES, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
@@ -406,7 +406,7 @@ export function HotelFormDialog({
   /** hotel owners can't touch featured / recommended / discount */
   restricted?: boolean;
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -886,10 +886,17 @@ export function HotelFormDialog({
           {/* rooms editor */}
           <Field label={t("admin_rooms")}>
             <div className="space-y-2">
+              {/* standard names so the type shows in every language on the site */}
+              <datalist id="room-type-suggestions">
+                {ROOM_TYPES.map((rt) => (
+                  <option key={rt.id} value={rt.labels[lang]} />
+                ))}
+              </datalist>
               {form.rooms.map((r, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <Input
                     className="min-w-0 flex-1"
+                    list="room-type-suggestions"
                     placeholder={t("admin_room_type")}
                     value={r.type}
                     onChange={(e) =>

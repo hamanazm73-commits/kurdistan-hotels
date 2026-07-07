@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { useHotels } from "@/lib/use-hotels";
 import { watchBookings, updateBookingStatus } from "@/lib/hotels-db";
-import { formatPrice, type Booking, type BookingStatus } from "@/lib/types";
+import { formatPrice, roomTypeLabel, type Booking, type BookingStatus } from "@/lib/types";
 
 type Range = "week" | "month" | "all";
 const DAY_MS = 86_400_000;
@@ -322,13 +322,19 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
               </label>
               <Select value={roomFilter} onValueChange={(v) => setRoomFilter(v ?? "all")}>
                 <SelectTrigger className="h-9">
-                  <SelectValue />
+                  <SelectValue>
+                    {(v: string | null) =>
+                      !v || v === "all"
+                        ? t("bookings_all_rooms")
+                        : roomTypeLabel(v, lang)
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t("bookings_all_rooms")}</SelectItem>
                   {bookingRoomTypes.map((rt) => (
                     <SelectItem key={rt} value={rt}>
-                      {rt}
+                      {roomTypeLabel(rt, lang)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -438,7 +444,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
               <span className="text-muted-foreground">{t("book_roomtype")}</span>
               <span className="flex items-center gap-1 font-medium">
                 <BedDouble className="size-3.5 shrink-0 text-muted-foreground" />
-                {b.roomType}
+                {roomTypeLabel(b.roomType, lang)}
               </span>
               <span className="text-muted-foreground">{t("book_checkin")}</span>
               <span dir="ltr" className="flex items-center gap-1 font-medium">
@@ -530,7 +536,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                     </a>
                   </div>
                 </TableCell>
-                <TableCell>{b.roomType}</TableCell>
+                <TableCell>{roomTypeLabel(b.roomType, lang)}</TableCell>
                 <TableCell>
                   <span dir="ltr">{b.checkIn}</span>
                 </TableCell>

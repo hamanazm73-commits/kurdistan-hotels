@@ -22,6 +22,46 @@ export interface RoomType {
   available?: number;
 }
 
+/** Standard room types with a name in every language. Owners usually type a
+    standard name (Single, Suite, …) — in any language — and we translate it on
+    display. Anything custom falls back to the exact text entered, so nothing
+    is lost. */
+export const ROOM_TYPES: { id: string; labels: Record<Lang, string> }[] = [
+  { id: "single", labels: { en: "Single", ckb: "تاکەکەسی", ar: "مفردة", kmr: "Yekkesî" } },
+  { id: "double", labels: { en: "Double", ckb: "دووکەسی", ar: "مزدوجة", kmr: "Dukesî" } },
+  { id: "twin", labels: { en: "Twin", ckb: "دووتەختی", ar: "بسريرين", kmr: "Twin" } },
+  { id: "triple", labels: { en: "Triple", ckb: "سێکەسی", ar: "ثلاثية", kmr: "Sêkesî" } },
+  { id: "quad", labels: { en: "Quad", ckb: "چوارکەسی", ar: "رباعية", kmr: "Çarkesî" } },
+  { id: "family", labels: { en: "Family", ckb: "خێزانی", ar: "عائلية", kmr: "Malbatî" } },
+  { id: "suite", labels: { en: "Suite", ckb: "سویت", ar: "جناح", kmr: "Suît" } },
+  { id: "deluxe", labels: { en: "Deluxe", ckb: "دیلوکس", ar: "ديلوكس", kmr: "Delûks" } },
+  { id: "studio", labels: { en: "Studio", ckb: "ستۆدیۆ", ar: "استوديو", kmr: "Studyo" } },
+  { id: "king", labels: { en: "King", ckb: "کینگ", ar: "كينج", kmr: "King" } },
+  { id: "queen", labels: { en: "Queen", ckb: "کوین", ar: "كوين", kmr: "Queen" } },
+  { id: "vip", labels: { en: "VIP", ckb: "VIP", ar: "VIP", kmr: "VIP" } },
+];
+
+/** Match a stored room-type string to a standard type by its id or any of its
+    language names (case-insensitive), so a type typed in one language still
+    translates to the others. */
+const ROOM_TYPE_INDEX: Map<string, Record<Lang, string>> = (() => {
+  const m = new Map<string, Record<Lang, string>>();
+  for (const rt of ROOM_TYPES) {
+    m.set(rt.id, rt.labels);
+    for (const name of Object.values(rt.labels))
+      m.set(name.trim().toLowerCase(), rt.labels);
+  }
+  return m;
+})();
+
+/** The room-type name to show in `lang`; falls back to the raw text for custom
+    types the owner typed themselves. */
+export function roomTypeLabel(type: string, lang: Lang): string {
+  if (!type) return "";
+  const hit = ROOM_TYPE_INDEX.get(type.trim().toLowerCase());
+  return hit ? hit[lang] : type;
+}
+
 export interface Discount {
   active: boolean;
   /** price before the discount */

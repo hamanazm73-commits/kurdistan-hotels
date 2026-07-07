@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
-import { type Hotel } from "@/lib/types";
+import { roomTypeLabel, type Hotel } from "@/lib/types";
 import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
 
@@ -43,7 +43,7 @@ export function BookingDialog({
   /** render the built-in "Book now" trigger button (default true) */
   trigger?: boolean;
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { format } = useCurrency();
   const controlled = openProp !== undefined;
   const [openState, setOpenState] = useState(false);
@@ -196,7 +196,11 @@ export function BookingDialog({
               onValueChange={(v) => setRoomType(v ?? "")}
             >
               <SelectTrigger>
-                <SelectValue placeholder={t("book_select_room")} />
+                <SelectValue>
+                  {(v: string | null) =>
+                    v ? roomTypeLabel(v, lang) : t("book_select_room")
+                  }
+                </SelectValue>
               </SelectTrigger>
               <SelectContent className="w-[min(92vw,22rem)]">
                 {hotel.rooms.map((r) => (
@@ -207,7 +211,7 @@ export function BookingDialog({
                   >
                     <span className="flex w-full items-center justify-between gap-4 pe-4">
                       <span className="flex items-center gap-2 font-medium">
-                        {r.type}
+                        {roomTypeLabel(r.type, lang)}
                         {typeof r.available === "number" && (
                           <span
                             className={cn(

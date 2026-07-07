@@ -32,6 +32,7 @@ import {
   mediaSrc,
   paymentLabel,
   paymentColor,
+  roomTypeLabel,
   type Hotel,
 } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
@@ -308,7 +309,7 @@ export function HotelDetailClient({
                   >
                     <span className="flex min-w-0 flex-wrap items-center gap-2 font-medium">
                       <BedDouble className="size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
-                      {r.type}
+                      {roomTypeLabel(r.type, lang)}
                       {typeof r.available === "number" && (
                         <span
                           className={cn(
