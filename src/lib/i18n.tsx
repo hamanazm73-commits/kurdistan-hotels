@@ -121,6 +121,7 @@ const ckb: Dict = {
   bk_confirm: "پشتڕاستکردنەوە",
   bk_reject: "ڕەتکردنەوە",
   bk_cancel: "هەڵوەشاندنەوە",
+  bk_updated: "دۆخی حیجز نوێکرایەوە ✅",
 
   footer_about: "باشترین پلاتفۆڕم بۆ دۆزینەوەی هۆتێل لە کوردستان.",
   footer_links: "بەستەرەکان",
@@ -343,6 +344,7 @@ const en: Dict = {
   bk_confirm: "Confirm",
   bk_reject: "Reject",
   bk_cancel: "Cancel",
+  bk_updated: "Booking status updated ✅",
 
   footer_about: "The best platform to find hotels across Kurdistan.",
   footer_links: "Links",
@@ -565,6 +567,7 @@ const ar: Dict = {
   bk_confirm: "تأكيد",
   bk_reject: "رفض",
   bk_cancel: "إلغاء",
+  bk_updated: "انتحدثت حالة الحجز ✅",
 
   footer_about: "أحسن منصة للقاء الفنادق بكردستان.",
   footer_links: "روابط",
@@ -787,6 +790,7 @@ const kmr: Dict = {
   bk_confirm: "Piştrast bike",
   bk_reject: "Red bike",
   bk_cancel: "Betal bike",
+  bk_updated: "Rewşa rezervasyonê hate nûkirin ✅",
 
   footer_about: "Baştirîn platforma dîtina otêlan li Kurdistanê.",
   footer_links: "Girêdan",

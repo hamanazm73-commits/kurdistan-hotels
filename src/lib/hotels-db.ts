@@ -32,14 +32,20 @@ export async function updateBookingStatus(
   status: Exclude<BookingStatus, "pending">,
 ) {
   const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
-  const res = await fetch("/api/bookings/update", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, status, idToken }),
-  });
+  if (!idToken) throw new Error("not signed in (no token)");
+  let res: Response;
+  try {
+    res = await fetch("/api/bookings/update", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status, idToken }),
+    });
+  } catch (e) {
+    throw new Error(`network: ${e instanceof Error ? e.message : String(e)}`);
+  }
   if (!res.ok) {
     const e = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new Error(e.error || "update_failed");
+    throw new Error(`${res.status}: ${e.error || "update_failed"}`);
   }
 }
 

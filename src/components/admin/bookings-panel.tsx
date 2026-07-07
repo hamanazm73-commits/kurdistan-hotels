@@ -75,6 +75,7 @@ function BookingActions({
     setBusy(true);
     try {
       await updateBookingStatus(b.id, next); // live subscription refreshes the row
+      toast.success(t("bk_updated"));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
     } finally {
