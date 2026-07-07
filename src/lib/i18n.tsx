@@ -114,7 +114,7 @@ const ckb: Dict = {
 
   bk_status: "دۆخ",
   bk_actions: "کردار",
-  bk_pending: "چاوەڕوانی پشتڕاستکردنەوە",
+  bk_pending: "چاوەڕوانی",
   bk_confirmed: "پشتڕاستکراوە",
   bk_cancelled: "هەڵوەشێنراوە",
   bk_noshow: "نەهاتووە",
@@ -336,7 +336,7 @@ const en: Dict = {
 
   bk_status: "Status",
   bk_actions: "Actions",
-  bk_pending: "Awaiting confirmation",
+  bk_pending: "Pending",
   bk_confirmed: "Confirmed",
   bk_cancelled: "Cancelled",
   bk_noshow: "No-show",
@@ -558,7 +558,7 @@ const ar: Dict = {
 
   bk_status: "الحالة",
   bk_actions: "إجراءات",
-  bk_pending: "بانتظار التأكيد",
+  bk_pending: "بانتظار",
   bk_confirmed: "مؤكّد",
   bk_cancelled: "ملغى",
   bk_noshow: "ما حضر",
@@ -780,7 +780,7 @@ const kmr: Dict = {
 
   bk_status: "Rewş",
   bk_actions: "Kiryar",
-  bk_pending: "Li benda piştrastkirinê",
+  bk_pending: "Li bendê",
   bk_confirmed: "Piştrastkirî",
   bk_cancelled: "Betalkirî",
   bk_noshow: "Nehat",

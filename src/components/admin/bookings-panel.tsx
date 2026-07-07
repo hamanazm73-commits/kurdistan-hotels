@@ -458,6 +458,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
 
       {/* ── Desktop: table ── */}
       <Card className="hidden overflow-hidden p-0 md:block">
+        <div className="overflow-x-auto">
         <Table className="[&_tbody_tr:nth-child(even)]:bg-muted/30">
           <TableHeader>
             <TableRow>
@@ -526,6 +527,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
             ))}
           </TableBody>
         </Table>
+        </div>
       </Card>
         </>
       )}
