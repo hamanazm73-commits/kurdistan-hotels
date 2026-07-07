@@ -68,17 +68,25 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
     >
       <Card className="group h-full overflow-hidden p-0 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
         <div className="relative aspect-[3/2] overflow-hidden bg-muted">
-          {/* blurred fill so any image shape shows whole & looks nice */}
-          <div
+          {/* blurred fill so any image shape shows whole & looks nice.
+              An <img> (not a CSS background) so it respects lazy-loading —
+              off-screen cards don't fetch their image until scrolled near. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             aria-hidden
-            className="absolute inset-0 scale-110 bg-cover bg-center opacity-55 blur-xl"
-            style={{ backgroundImage: `url("${mediaSrc(hotel.image) || FALLBACK_IMG}")` }}
+            alt=""
+            src={mediaSrc(hotel.image) || FALLBACK_IMG}
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 size-full scale-110 object-cover opacity-55 blur-xl"
           />
           <Link href={`/hotels/${hotel.id}`} className="relative block size-full">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={mediaSrc(hotel.image) || FALLBACK_IMG}
               alt={hotel.name}
+              loading="lazy"
+              decoding="async"
               className="size-full object-contain transition-transform duration-500 group-hover:scale-105"
               onError={(e) => {
                 const img = e.currentTarget;

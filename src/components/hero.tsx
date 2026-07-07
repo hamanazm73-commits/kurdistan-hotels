@@ -113,7 +113,9 @@ export function Hero() {
       <motion.div style={{ y: bgY }} className="absolute inset-0 scale-[1.22] origin-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=90"
+          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80"
+          srcSet="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=768&q=72 768w, https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&q=78 1280w, https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80 1920w"
+          sizes="100vw"
           alt=""
           aria-hidden="true"
           className="size-full object-cover"

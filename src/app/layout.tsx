@@ -143,6 +143,24 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ckb" dir="rtl" suppressHydrationWarning>
+      <head>
+        {/* Warm up connections to the image CDN and Firestore so the hero
+            image and the first hotel data arrive sooner. */}
+        <link
+          rel="preconnect"
+          href="https://images.unsplash.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://firestore.googleapis.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://firebasestorage.googleapis.com"
+        />
+      </head>
       <body
         className={`${sans.variable} ${arabic.variable} min-h-dvh antialiased`}
       >
