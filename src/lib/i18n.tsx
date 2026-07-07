@@ -151,8 +151,8 @@ const ckb: Dict = {
   admin_rating: "هەڵسەنگاندن",
   admin_image: "بەستەری وێنە",
   admin_available: "ژووری بەردەست",
-  admin_hotel_usd_rate: "نرخی دۆلار بۆ ئەم هۆتێلە (١ $ = چەند دینار)",
-  admin_hotel_usd_rate_ph: "بۆ نموونە ١٤٥٠",
+  admin_hotel_usd_rate: "نرخی دۆلار بۆ ئەم هۆتێلە (١٠٠ $ = چەند دینار)",
+  admin_hotel_usd_rate_ph: "بۆ نموونە ١٥٣٠٠٠",
   admin_hotel_usd_rate_hint:
     "تەنها نرخی دۆلاری ئەم هۆتێلە دەگۆڕێت. بەتاڵ (٠) بیهێڵەرەوە بۆ بەکارهێنانی نرخی گشتی سایتەکە.",
   admin_features: "تایبەتمەندییەکان (بە کۆما)",
@@ -374,8 +374,8 @@ const en: Dict = {
   admin_rating: "Rating",
   admin_image: "Image URL",
   admin_available: "Available rooms",
-  admin_hotel_usd_rate: "USD rate for this hotel (1 $ = ? IQD)",
-  admin_hotel_usd_rate_ph: "e.g. 1450",
+  admin_hotel_usd_rate: "USD rate for this hotel (100 $ = ? IQD)",
+  admin_hotel_usd_rate_ph: "e.g. 153000",
   admin_hotel_usd_rate_hint:
     "Changes only this hotel's $ prices. Leave empty (0) to use the site's default rate.",
   admin_features: "Features (comma separated)",
@@ -597,8 +597,8 @@ const ar: Dict = {
   admin_rating: "التقييم",
   admin_image: "رابط الصورة",
   admin_available: "الغرف المتوفرة",
-  admin_hotel_usd_rate: "سعر الدولار لهذا الفندق (1 $ = ؟ دينار)",
-  admin_hotel_usd_rate_ph: "مثال 1450",
+  admin_hotel_usd_rate: "سعر الدولار لهذا الفندق (100 $ = ؟ دينار)",
+  admin_hotel_usd_rate_ph: "مثال 153000",
   admin_hotel_usd_rate_hint:
     "يغيّر أسعار الدولار لهذا الفندق فقط. اتركه فارغًا (0) لاستخدام سعر الموقع الافتراضي.",
   admin_features: "الميزات (مفصولة بفاصلة)",
@@ -820,8 +820,8 @@ const kmr: Dict = {
   admin_rating: "Nirxandin",
   admin_image: "Girêdana wêneyê",
   admin_available: "Odeyên berdest",
-  admin_hotel_usd_rate: "Rêjeya Dolar ji vê otêlê re (1 $ = ? IQD)",
-  admin_hotel_usd_rate_ph: "wek 1450",
+  admin_hotel_usd_rate: "Rêjeya Dolar ji vê otêlê re (100 $ = ? IQD)",
+  admin_hotel_usd_rate_ph: "wek 153000",
   admin_hotel_usd_rate_hint:
     "Tenê bihayên Dolar ên vê otêlê diguhere. Vala (0) bihêle ji bo rêjeya giştî ya malperê.",
   admin_features: "Taybetmendî (bi virgul)",

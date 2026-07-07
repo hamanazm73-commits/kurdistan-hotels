@@ -433,7 +433,8 @@ export function HotelFormDialog({
       video: h.video ?? "",
       mapUrl: h.mapUrl ?? "",
       payments: (h.payments ?? []).map((p) => ({ type: p.type, url: p.url })),
-      iqdPerUsd: h.iqdPerUsd ?? 0,
+      // shown/edited per 100 USD (Kurdistan convention); stored as per 1 USD
+      iqdPerUsd: Math.round((h.iqdPerUsd ?? 0) * 100),
       rooms: h.rooms?.length
         ? h.rooms.map((r) => ({
             type: r.type,
@@ -500,7 +501,8 @@ export function HotelFormDialog({
       payments: f.payments
         .map((p) => ({ type: p.type, url: p.url.trim() }))
         .filter((p) => p.url),
-      iqdPerUsd: Number(f.iqdPerUsd) || 0,
+      // form holds the per-100-USD figure; store it back as IQD per 1 USD
+      iqdPerUsd: (Number(f.iqdPerUsd) || 0) / 100,
       rooms,
       featured: f.featured,
       recommended: f.recommended,
