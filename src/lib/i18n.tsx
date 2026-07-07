@@ -39,6 +39,10 @@ const ckb: Dict = {
   language: "زمان",
   currency: "دراو",
   currency_rate_note: "نرخەکان بەپێی بازاڕی ئەمڕۆ",
+  fx_note_title: "نرخ بە دۆلار ($)",
+  fx_note_body:
+    "نرخەکان بۆ دۆلار بەپێی نرخی بازاڕی کوردستان دەگۆڕدرێن، نەک نرخی فەرمی (بۆرسە) — بۆیە لەوانەیە کەمێک جیاواز بێت لەگەڵ نرخی بانک. نرخی بنەڕەتی هەمیشە بە دیناری عێراقییە.",
+  fx_note_ok: "تێگەیشتم",
 
   hero_badge: "✨ باشترین هۆتێلەکانی کوردستان",
   hero_title: "ماڵی دووەمت لە کوردستان بدۆزەرەوە",
@@ -243,6 +247,10 @@ const en: Dict = {
   language: "Language",
   currency: "Currency",
   currency_rate_note: "Prices at today's market rate",
+  fx_note_title: "Prices in US Dollars ($)",
+  fx_note_body:
+    "Prices are converted to US Dollars using the Kurdistan market (bazaar) rate — not the official exchange rate — so they may differ slightly from bank rates. The base price is always in Iraqi Dinar.",
+  fx_note_ok: "Got it",
 
   hero_badge: "✨ The finest stays in Kurdistan",
   hero_title: "Find your second home in Kurdistan",
@@ -447,6 +455,10 @@ const ar: Dict = {
   language: "اللغة",
   currency: "العملة",
   currency_rate_note: "الأسعار حسب سعر السوق اليوم",
+  fx_note_title: "الأسعار بالدولار ($)",
+  fx_note_body:
+    "يتم تحويل الأسعار إلى الدولار حسب سعر السوق في كردستان (البازار)، وليس السعر الرسمي — لذا قد تختلف قليلاً عن أسعار البنوك. السعر الأساسي دائمًا بالدينار العراقي.",
+  fx_note_ok: "فهمت",
 
   hero_badge: "✨ أحلى فنادق بكردستان",
   hero_title: "لگه بيتك الثاني بكردستان",
@@ -651,6 +663,10 @@ const kmr: Dict = {
   language: "Ziman",
   currency: "Diravê",
   currency_rate_note: "Bihayên li gorî sûka îro",
+  fx_note_title: "Biha bi Dolar ($)",
+  fx_note_body:
+    "Biha bi rêjeya bazara Kurdistanê tê guhertin bo Dolar — ne bi rêjeya fermî — loma dibe ku hindik ji rêjeya bankê cuda be. Bihayê bingehîn her bi Dînarê Iraqî ye.",
+  fx_note_ok: "Fêm kir",
 
   hero_badge: "✨ Baştirîn otêlên Kurdistanê",
   hero_title: "Mala xwe ya duyemîn li Kurdistanê bibîne",
