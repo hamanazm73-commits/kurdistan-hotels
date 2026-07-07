@@ -163,6 +163,20 @@ export interface Booking {
   createdAt?: number;
 }
 
+/** A visitor's feedback about the site (not tied to a booking). */
+export interface Feedback {
+  /** optional name the visitor gave */
+  name?: string;
+  /** optional way to reach them back (phone or email) */
+  contact?: string;
+  /** optional 1–5 satisfaction rating */
+  rating?: number;
+  message: string;
+  /** the page they sent it from */
+  page?: string;
+  createdAt?: number;
+}
+
 export interface AdminRecord {
   email: string;
   role: Role;

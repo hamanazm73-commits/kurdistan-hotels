@@ -21,6 +21,7 @@ import type {
   AdminRecord,
   Booking,
   BookingStatus,
+  Feedback,
   HotelInput,
   Role,
 } from "./types";
@@ -52,6 +53,49 @@ export async function updateBookingStatus(
 function requireDb() {
   if (!db) throw new Error("Firebase not configured");
   return db;
+}
+
+/* ---------------- feedback ---------------- */
+
+/** Send visitor feedback (public — no login). Goes through the Admin-SDK API. */
+export async function submitFeedback(input: {
+  name?: string;
+  contact?: string;
+  rating?: number;
+  message: string;
+  page?: string;
+}) {
+  const res = await fetch("/api/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (res.status === 429) throw new Error("rate_limited");
+  if (!res.ok) {
+    const e = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(e.error || "failed");
+  }
+}
+
+/** Read all feedback for the admin panel (signed-in only, via the Admin-SDK API). */
+export async function listFeedback(): Promise<(Feedback & { id: string })[]> {
+  const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
+  const res = await fetch("/api/feedback", {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) throw new Error("failed");
+  const data = (await res.json()) as { items?: (Feedback & { id: string })[] };
+  return data.items ?? [];
+}
+
+/** Delete one feedback entry (signed-in only, via the Admin-SDK API). */
+export async function deleteFeedback(id: string) {
+  const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
+  const res = await fetch(`/api/feedback?id=${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  if (!res.ok) throw new Error("failed");
 }
 
 /* ---------------- hotels CRUD ----------------

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, Mail, Phone, MapPin } from "lucide-react";
+import { Building2, Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
+import { FeedbackDialog } from "@/components/feedback-dialog";
 
 const PHONE = "0770 057 2004";
 const WHATSAPP = "9647700572004";
@@ -59,6 +60,16 @@ export function SiteFooter() {
                 </Link>
               </li>
             ))}
+            <li>
+              <FeedbackDialog
+                trigger={
+                  <button className="inline-flex items-center gap-1.5 transition-colors hover:translate-x-0.5 hover:text-gold rtl:hover:-translate-x-0.5">
+                    <MessageSquare className="size-4" />
+                    {t("fb_link")}
+                  </button>
+                }
+              />
+            </li>
           </ul>
         </div>
 

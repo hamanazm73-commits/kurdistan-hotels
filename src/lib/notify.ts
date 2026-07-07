@@ -1,6 +1,6 @@
 import "server-only";
 import nodemailer from "nodemailer";
-import type { Booking } from "./types";
+import type { Booking, Feedback } from "./types";
 
 /**
  * Best-effort booking notification to Telegram. No-op when the env vars
@@ -119,6 +119,83 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
     // reason (bad app password, blocked login, etc.) so it can be fixed
     console.error(
       `[email] send failed: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
+}
+
+/**
+ * Best-effort notification to the SITE owner when a visitor sends feedback —
+ * Telegram + an email to OWNER_EMAIL (falls back to the Gmail sender). Never
+ * throws, so a notification hiccup can't block the feedback being saved.
+ */
+export async function notifyFeedback(fb: Feedback) {
+  const esc = (s: unknown) =>
+    String(s).replace(/[<>&]/g, (c) =>
+      c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;",
+    );
+  const stars = fb.rating ? "⭐".repeat(Math.max(1, Math.min(5, fb.rating))) : "—";
+
+  // 1) Telegram
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (token && chatId) {
+    const text =
+      `💬 <b>فیدباکی نوێ — New feedback</b>\n\n` +
+      `<b>ناو / Name:</b> ${esc(fb.name || "—")}\n` +
+      `<b>هەڵسەنگاندن / Rating:</b> ${stars}\n` +
+      `<b>پەیوەندی / Contact:</b> ${esc(fb.contact || "—")}\n` +
+      `<b>نامە / Message:</b>\n${esc(fb.message)}`;
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+      });
+    } catch {
+      /* best-effort */
+    }
+  }
+
+  // 2) Email to the site owner
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  const to = process.env.OWNER_EMAIL || user;
+  if (!user || !pass || !to) return;
+
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;padding:24px;">
+    <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
+      <div style="background:#1e3a5f;padding:22px;text-align:center;">
+        <div style="font-size:18px;font-weight:700;color:#f5c542;">فیدباکی نوێ — New feedback</div>
+      </div>
+      <div style="padding:22px 24px;font-size:15px;color:#0f172a;">
+        <p style="margin:0 0 8px;"><b>ناو / Name:</b> ${esc(fb.name || "—")}</p>
+        <p style="margin:0 0 8px;"><b>هەڵسەنگاندن / Rating:</b> ${stars}</p>
+        <p style="margin:0 0 8px;"><b>پەیوەندی / Contact:</b> ${esc(fb.contact || "—")}</p>
+        <p style="margin:14px 0 6px;color:#64748b;">نامە / Message</p>
+        <div style="padding:14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;white-space:pre-wrap;">${esc(fb.message)}</div>
+      </div>
+      <div style="background:#f1f5f9;padding:14px;text-align:center;color:#94a3b8;font-size:12px;">
+        Kurdistan Hotels — هۆتێلەکانی کوردستان
+      </div>
+    </div>
+  </div>`;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+    await transporter.sendMail({
+      from: `"Kurdistan Hotels" <${user}>`,
+      to,
+      subject: `فیدباکی نوێ — New feedback ${stars !== "—" ? `(${stars})` : ""}`,
+      html,
+    });
+    console.log(`[feedback-email] sent to ${to}`);
+  } catch (e) {
+    console.error(
+      `[feedback-email] send failed: ${e instanceof Error ? e.message : String(e)}`,
     );
   }
 }

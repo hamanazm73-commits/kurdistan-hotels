@@ -15,6 +15,7 @@ import { useAuth } from "@/lib/auth";
 import { useHotels } from "@/lib/use-hotels";
 import { HotelsPanel } from "@/components/admin/hotels-panel";
 import { BookingsPanel } from "@/components/admin/bookings-panel";
+import { FeedbackPanel } from "@/components/admin/feedback-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 import { ExchangeRateCard } from "@/components/admin/exchange-rate";
 
@@ -184,6 +185,7 @@ export default function AdminPage() {
           <TabsList>
             <TabsTrigger value="hotels">{t("admin_hotels")}</TabsTrigger>
             <TabsTrigger value="bookings">{t("admin_bookings")}</TabsTrigger>
+            <TabsTrigger value="feedback">{t("admin_feedback")}</TabsTrigger>
             {isOwner && (
               <TabsTrigger value="admins">{t("admin_admins")}</TabsTrigger>
             )}
@@ -194,6 +196,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="bookings" className="mt-6">
             <BookingsPanel />
+          </TabsContent>
+          <TabsContent value="feedback" className="mt-6">
+            <FeedbackPanel />
           </TabsContent>
           {isOwner && (
             <TabsContent value="admins" className="mt-6">
