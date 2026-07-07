@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import {
   Plus,
@@ -305,7 +305,7 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
                           if (e.key === "Escape") setEditingPriceId(null);
                         }}
                         autoFocus
-                        className="h-6 w-28 px-1.5 text-xs"
+                        className="h-7 w-28 px-2"
                       />
                       <span className="text-xs">
                         {lang === "en" || lang === "kmr" ? "IQD" : "دینار"}
@@ -576,6 +576,24 @@ export function HotelFormDialog({
     if (hotelRef.current) scheduleAutoSave();
   }
 
+  // Stable callbacks for the heavy media widgets so they stay memoized and
+  // don't re-render (and re-process their base64 previews) while the owner
+  // types in other fields — keeps the editor smooth on mobile.
+  const setRef = useRef(set);
+  setRef.current = set;
+  const onImageChange = useCallback(
+    (url: string) => setRef.current("image", url),
+    [],
+  );
+  const onGalleryChange = useCallback(
+    (urls: string[]) => setRef.current("images", urls),
+    [],
+  );
+  const onVideoChange = useCallback(
+    (url: string) => setRef.current("video", url),
+    [],
+  );
+
   async function save() {
     if (!form.name.trim() || Number(form.price) <= 0) {
       toast.error(t("book_required"));
@@ -697,14 +715,11 @@ export function HotelFormDialog({
           </div>
 
           <Field label={t("admin_cover_image")}>
-            <ImageUpload value={form.image} onChange={(url) => set("image", url)} />
+            <ImageUpload value={form.image} onChange={onImageChange} />
           </Field>
 
           <Field label={t("admin_gallery")}>
-            <GalleryUpload
-              value={form.images}
-              onChange={(urls) => set("images", urls)}
-            />
+            <GalleryUpload value={form.images} onChange={onGalleryChange} />
           </Field>
 
           <Field label={t("admin_description")}>
@@ -754,7 +769,7 @@ export function HotelFormDialog({
           </Field>
 
           <Field label={t("admin_video")}>
-            <VideoUpload value={form.video} onChange={(url) => set("video", url)} />
+            <VideoUpload value={form.video} onChange={onVideoChange} />
           </Field>
 
           {/* online payment methods — each is a link the guest pays the hotel through */}

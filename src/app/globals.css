@@ -123,6 +123,18 @@
   }
   html {
     @apply font-sans;
+    /* stop mobile browsers auto-inflating text on rotate/reflow */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  /* On phones, keep every text field at 16px so focusing it never triggers
+     iOS Safari's auto-zoom (and gives bigger, easier tap targets). Uses
+     !important to beat utility classes like text-xs / text-sm. */
+  @media (max-width: 767px) {
+    input:not([type="checkbox"]):not([type="radio"]),
+    textarea {
+      font-size: 16px !important;
+    }
   }
   /* Kurdish Sorani + Arabic use the Naskh font automatically when RTL */
   html[dir="rtl"] body {

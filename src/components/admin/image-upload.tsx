@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { memo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Upload, Loader2, X, Plus, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -143,8 +143,10 @@ async function compressToFile(file: File, maxDim = 1600): Promise<File> {
   return new File([blob], name, { type: "image/jpeg" });
 }
 
-/** Single cover image: upload (compressed inline), preview, remove, or paste a URL. */
-export function ImageUpload({
+/** Single cover image: upload (compressed inline), preview, remove, or paste a URL.
+    Memoized so it doesn't re-render (and re-process its base64 preview) when an
+    unrelated form field changes — keeps the editor fast on mobile. */
+export const ImageUpload = memo(function ImageUpload({
   value,
   onChange,
 }: {
@@ -239,10 +241,11 @@ export function ImageUpload({
       />
     </div>
   );
-}
+});
 
-/** Gallery: multiple images (compressed inline) with add/remove. */
-export function GalleryUpload({
+/** Gallery: multiple images (compressed inline) with add/remove. Memoized so
+    typing in other fields doesn't re-render its image previews. */
+export const GalleryUpload = memo(function GalleryUpload({
   value,
   onChange,
 }: {
@@ -337,7 +340,7 @@ export function GalleryUpload({
       />
     </div>
   );
-}
+});
 
 /**
  * Video: pick from the phone gallery (stored inline as a data URL) OR paste a
@@ -351,7 +354,7 @@ function isYouTube(url: string) {
   return /youtu\.?be/i.test(url);
 }
 
-export function VideoUpload({
+export const VideoUpload = memo(function VideoUpload({
   value,
   onChange,
 }: {
@@ -452,4 +455,4 @@ export function VideoUpload({
       </p>
     </div>
   );
-}
+});
