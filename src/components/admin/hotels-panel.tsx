@@ -618,7 +618,10 @@ export function HotelFormDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={trigger} />
-      <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
+      {/* Mobile: a full-height sheet anchored to the top so it scrolls
+          naturally and never re-centres/jumps when the keyboard opens.
+          Desktop (sm+): the usual centred modal. */}
+      <DialogContent className="top-0 left-0 h-dvh max-h-dvh w-full max-w-full translate-x-0 translate-y-0 overflow-x-hidden overflow-y-auto rounded-none sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[90dvh] sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl">
         <DialogHeader>
           <DialogTitle>
             {hotel ? t("admin_edit_hotel") : t("admin_add_hotel")}
