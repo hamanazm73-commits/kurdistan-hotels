@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X } from "lucide-react";
+import { toast } from "sonner";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,11 +24,102 @@ import {
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { useHotels } from "@/lib/use-hotels";
-import { watchBookings } from "@/lib/hotels-db";
-import { formatPrice, type Booking } from "@/lib/types";
+import { watchBookings, updateBookingStatus } from "@/lib/hotels-db";
+import { formatPrice, type Booking, type BookingStatus } from "@/lib/types";
 
 type Range = "week" | "month" | "all";
 const DAY_MS = 86_400_000;
+
+/** Legacy bookings (no status) are treated as already confirmed. */
+function statusOf(b: Booking): BookingStatus {
+  return b.status ?? "confirmed";
+}
+
+const STATUS_STYLE: Record<BookingStatus, string> = {
+  pending: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+  confirmed: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+  cancelled: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300",
+  noshow: "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
+};
+
+function StatusBadge({ b }: { b: Booking }) {
+  const { t } = useI18n();
+  const s = statusOf(b);
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
+        STATUS_STYLE[s],
+      )}
+    >
+      {t(`bk_${s}`)}
+    </span>
+  );
+}
+
+/** Confirm / reject / cancel / no-show buttons for one booking. */
+function BookingActions({ b }: { b: Booking & { id: string } }) {
+  const { t } = useI18n();
+  const [busy, setBusy] = useState(false);
+  const status = statusOf(b);
+
+  async function set(next: Exclude<BookingStatus, "pending">) {
+    setBusy(true);
+    try {
+      await updateBookingStatus(b.id, next); // live subscription refreshes the row
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (busy)
+    return <Loader2 className="size-4 animate-spin text-muted-foreground" />;
+
+  if (status === "pending")
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        <Button size="sm" className="h-8 gap-1" onClick={() => set("confirmed")}>
+          <Check className="size-4" />
+          {t("bk_confirm")}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8 gap-1"
+          onClick={() => set("cancelled")}
+        >
+          <X className="size-4" />
+          {t("bk_reject")}
+        </Button>
+      </div>
+    );
+
+  if (status === "confirmed")
+    return (
+      <div className="flex flex-wrap gap-1.5">
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-8"
+          onClick={() => set("cancelled")}
+        >
+          {t("bk_cancel")}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-8 text-muted-foreground"
+          onClick={() => set("noshow")}
+        >
+          {t("bk_noshow")}
+        </Button>
+      </div>
+    );
+
+  return null; // cancelled / noshow — terminal
+}
 
 /** Stable grouping key for a booking's hotel: its id, else its name. */
 function hotelKeyOf(b: Booking): string {
@@ -309,6 +401,9 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                     {tCity(cityByHotel(b)!)}
                   </p>
                 )}
+                <div className="mt-1.5">
+                  <StatusBadge b={b} />
+                </div>
               </div>
               <span className="shrink-0 text-base font-extrabold text-gold">
                 {formatPrice(b.roomPrice * b.nights, lang)}
@@ -351,6 +446,12 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                 <WhatsAppIcon className="size-5" />
               </a>
             </div>
+
+            {statusOf(b) !== "cancelled" && statusOf(b) !== "noshow" && (
+              <div className="mt-3 border-t pt-3">
+                <BookingActions b={b} />
+              </div>
+            )}
           </Card>
         ))}
       </div>
@@ -367,6 +468,8 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
               <TableHead>{t("book_checkin")}</TableHead>
               <TableHead>{t("book_nights")}</TableHead>
               <TableHead>{t("book_total")}</TableHead>
+              <TableHead>{t("bk_status")}</TableHead>
+              <TableHead className="text-end">{t("bk_actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -410,6 +513,14 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                 <TableCell>{b.nights}</TableCell>
                 <TableCell className="font-bold text-gold">
                   {formatPrice(b.roomPrice * b.nights, lang)}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge b={b} />
+                </TableCell>
+                <TableCell className="text-end">
+                  <div className="flex justify-end">
+                    <BookingActions b={b} />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

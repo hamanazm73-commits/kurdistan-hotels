@@ -104,8 +104,14 @@ export interface Hotel {
 
 export type HotelInput = Omit<Hotel, "id">;
 
+/** A booking starts as a request the hotel owner must confirm; the room is only
+    held on confirm. cancelled/noshow release a held room. */
+export type BookingStatus = "pending" | "confirmed" | "cancelled" | "noshow";
+
 export interface Booking {
   hotel: string;
+  /** owner-confirmation workflow status (undefined = legacy = treated as confirmed) */
+  status?: BookingStatus;
   /** id of the booked hotel (used to look up its city) */
   hotelId?: string | null;
   name: string;

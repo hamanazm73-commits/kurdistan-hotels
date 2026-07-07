@@ -15,9 +15,33 @@ import {
   where,
   orderBy,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
 import { SAMPLE_HOTELS } from "./sample-data";
-import type { AdminRecord, Booking, Hotel, HotelInput, Role } from "./types";
+import type {
+  AdminRecord,
+  Booking,
+  BookingStatus,
+  HotelInput,
+  Role,
+} from "./types";
+
+/** Confirm / cancel / mark no-show for a booking (server-side, holds/releases
+    the room). Goes through the Admin-SDK API since bookings aren't client-writable. */
+export async function updateBookingStatus(
+  id: string,
+  status: Exclude<BookingStatus, "pending">,
+) {
+  const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
+  const res = await fetch("/api/bookings/update", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, status, idToken }),
+  });
+  if (!res.ok) {
+    const e = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(e.error || "update_failed");
+  }
+}
 
 function requireDb() {
   if (!db) throw new Error("Firebase not configured");

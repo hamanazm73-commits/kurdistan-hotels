@@ -83,6 +83,10 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
           <div style="font-size:26px;font-weight:800;color:#1e3a5f;margin-top:4px;">${money(total)}</div>
           <div style="color:#94a3b8;font-size:12px;margin-top:2px;">${money(b.roomPrice || 0)} × ${esc(b.nights)} شەو</div>
         </div>
+        <div style="margin-top:16px;padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:12px;color:#92400e;font-size:13px;line-height:1.6;">
+          ⏳ ئەمە داواکاریی حیجزە — تکایە لە داشبۆردەکەتدا پشتڕاستی بکەرەوە تاکو ژوورەکە بۆ دەگیردرێت.<br/>
+          This is a booking <b>request</b> — please confirm it in your dashboard to hold the room.
+        </div>
       </div>
       <div style="background:#f1f5f9;padding:14px;text-align:center;color:#94a3b8;font-size:12px;">
         Kurdistan Hotels — هۆتێلەکانی کوردستان
