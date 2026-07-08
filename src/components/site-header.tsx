@@ -39,7 +39,12 @@ export function SiteHeader() {
           : "bg-transparent",
       )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+      {/* lock the bar to one direction (RTL) so it never flips sides when the
+          language changes — the brand stays on the right, controls on the left */}
+      <div
+        dir="rtl"
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
+      >
         <Link href="/" className="flex items-center gap-2 font-bold">
           <span className="grid size-9 place-items-center rounded-xl bg-gold text-gold-foreground shadow-md">
             <Building2 className="size-5" />
