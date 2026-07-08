@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { MapPin, Star, BedDouble } from "lucide-react";
+import { MapPin, Star, BedDouble, Pencil } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -24,8 +25,16 @@ import {
   type Hotel,
 } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { BookingDialog } from "./booking-dialog";
+
+// The admin edit dialog is heavy — load it only when an owner can actually
+// edit, so it never ships in an ordinary visitor's bundle.
+const HotelFormDialog = dynamic(
+  () => import("./admin/hotels-panel").then((m) => m.HotelFormDialog),
+  { ssr: false },
+);
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
@@ -49,6 +58,12 @@ function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string
 export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }) {
   const { t, tCity, tFeature, lang } = useI18n();
   const { format } = useCurrency();
+  const { role, hotelId } = useAuth();
+  // owner/admin can edit any hotel; a hotel owner only their own
+  const canEdit =
+    role === "owner" ||
+    role === "admin" ||
+    (role === "hotel" && hotelId === hotel.id);
   const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const price = effectivePrice(hotel);
   const hasDiscount = hotel.discount?.active;
@@ -121,6 +136,24 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             />
             {hotel.rating.toFixed(1)}
           </div>
+
+          {/* owners get a quick edit button on their own hotel's card, so they
+              can add/remove rooms without leaving the page */}
+          {canEdit && (
+            <HotelFormDialog
+              hotel={hotel}
+              restricted={role === "hotel"}
+              trigger={
+                <button
+                  type="button"
+                  className="absolute bottom-3 start-3 z-10 inline-flex items-center gap-1.5 rounded-lg bg-gold px-3 py-1.5 text-xs font-semibold text-gold-foreground shadow-lg transition hover:bg-gold/90 active:scale-95"
+                >
+                  <Pencil className="size-3.5" />
+                  {t("admin_edit")}
+                </button>
+              }
+            />
+          )}
         </div>
 
         <div className="flex flex-col gap-3 p-5">

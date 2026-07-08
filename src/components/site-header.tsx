@@ -72,37 +72,46 @@ export function SiteHeader() {
           <LanguageSwitcher />
           <ThemeToggle />
 
+          {/* icon-only so their (per-language) label width can't shift the
+              language/currency switchers when the language changes */}
           <div className="hidden items-center gap-1 md:flex">
             {role ? (
               <>
                 <Button
                   variant="secondary"
-                  size="sm"
-                  className="gap-1.5"
+                  size="icon"
+                  className="size-9"
+                  title={t("nav_admin")}
+                  aria-label={t("nav_admin")}
                   nativeButton={false}
                   render={<Link href="/hq" />}
                 >
                   <LayoutDashboard className="size-4" />
-                  {t("nav_admin")}
                 </Button>
                 <LogoutButton
                   trigger={
-                    <Button variant="ghost" size="sm" className="gap-1.5">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-9"
+                      title={t("nav_logout")}
+                      aria-label={t("nav_logout")}
+                    >
                       <LogOut className="size-4" />
-                      {t("nav_logout")}
                     </Button>
                   }
                 />
               </>
             ) : (
               <Button
-                size="sm"
-                className="gap-1.5"
+                size="icon"
+                className="size-9"
+                title={t("nav_login")}
+                aria-label={t("nav_login")}
                 nativeButton={false}
                 render={<Link href="/login" />}
               >
                 <LogIn className="size-4" />
-                {t("nav_login")}
               </Button>
             )}
           </div>
