@@ -627,8 +627,6 @@ export function HotelFormDialog({
     }
   }
 
-  const autoPrice = minRoomPrice(form.rooms);
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={trigger} />
@@ -721,23 +719,13 @@ export function HotelFormDialog({
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <Field label={t("admin_price")}>
-              <div className="flex h-8 items-center rounded-lg border border-input bg-muted/50 px-2.5 text-base text-muted-foreground">
-                {autoPrice > 0 ? formatPrice(autoPrice, lang) : "—"}
-              </div>
-              <p className="text-[11px] leading-tight text-muted-foreground">
-                {t("admin_price_auto")}
-              </p>
-            </Field>
-            <Field label={t("admin_available")}>
-              <Input
-                type="number"
-                value={form.available || ""}
-                onChange={(e) => set("available", Number(e.target.value))}
-              />
-            </Field>
-          </div>
+          <Field label={t("admin_available")}>
+            <Input
+              type="number"
+              value={form.available || ""}
+              onChange={(e) => set("available", Number(e.target.value))}
+            />
+          </Field>
 
           {/* per-hotel USD rate: only this hotel's $ prices use it */}
           <Field label={t("admin_hotel_usd_rate")}>
