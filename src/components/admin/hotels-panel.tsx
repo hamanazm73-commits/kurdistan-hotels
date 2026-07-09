@@ -486,10 +486,12 @@ export function HotelFormDialog({
         return room;
       })
       .filter((r) => r.type);
-    const tracked = rooms.filter((r) => typeof r.available === "number");
-    const available = tracked.length
-      ? tracked.reduce((s, r) => s + (r.available ?? 0), 0)
-      : Number(f.available);
+    // total availability is simply the sum of the per-room availabilities
+    const available = rooms.reduce(
+      (s, r) =>
+        s + (typeof r.available === "number" ? Math.max(0, r.available) : 0),
+      0,
+    );
     return {
       name: f.name.trim(),
       nameI18n: i18nObj(f.nameCkb, f.nameKmr, f.nameEn, f.nameAr),
@@ -719,13 +721,6 @@ export function HotelFormDialog({
             </Field>
           </div>
 
-          <Field label={t("admin_available")}>
-            <Input
-              type="number"
-              value={form.available || ""}
-              onChange={(e) => set("available", Number(e.target.value))}
-            />
-          </Field>
 
           {/* per-hotel USD rate: only this hotel's $ prices use it */}
           <Field label={t("admin_hotel_usd_rate")}>
