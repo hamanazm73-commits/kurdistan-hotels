@@ -18,6 +18,7 @@ import { useI18n, CITY_KEYS } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
 import { effectivePrice } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { SectionIntro } from "./section-intro";
 
 type Sort = "recommended" | "price_low" | "price_high" | "rating";
 
@@ -74,6 +75,11 @@ export function HotelsSection() {
 
   return (
     <section id="hotels" className="mx-auto max-w-7xl scroll-mt-20 px-6 py-16">
+      <SectionIntro
+        eyebrow={t("hotels_eyebrow")}
+        title={t("hotels_title")}
+        subtitle={t("hotels_sub")}
+      />
       <div className="mb-8 flex flex-col gap-5">
         {/* search */}
         <div className="relative">

@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { FAQ_HEADING, FAQ_ITEMS } from "@/lib/site-content";
+import { FAQ_EYEBROW, FAQ_HEADING, FAQ_ITEMS } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
+import { SectionIntro } from "./section-intro";
 
 export function FaqSection() {
   const { lang } = useI18n();
@@ -13,9 +14,11 @@ export function FaqSection() {
 
   return (
     <section className="mx-auto max-w-3xl px-6 py-16">
-      <h2 className="mb-10 text-center text-3xl font-extrabold tracking-tight">
-        {FAQ_HEADING[lang]}
-      </h2>
+      <SectionIntro
+        center
+        eyebrow={FAQ_EYEBROW[lang]}
+        title={FAQ_HEADING[lang]}
+      />
       <div className="flex flex-col gap-3">
         {FAQ_ITEMS.map((item, i) => {
           const isOpen = open === i;

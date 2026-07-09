@@ -3,7 +3,8 @@
 import { motion } from "motion/react";
 import { ShieldCheck, Wallet, Headset, Zap } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { TRUST_HEADING, TRUST_ITEMS } from "@/lib/site-content";
+import { TRUST_EYEBROW, TRUST_HEADING, TRUST_ITEMS } from "@/lib/site-content";
+import { SectionIntro } from "./section-intro";
 
 const ICONS = {
   "shield-check": ShieldCheck,
@@ -17,9 +18,11 @@ export function TrustSection() {
 
   return (
     <section className="mx-auto max-w-7xl px-6 py-16">
-      <h2 className="mb-10 text-center text-3xl font-extrabold tracking-tight">
-        {TRUST_HEADING[lang]}
-      </h2>
+      <SectionIntro
+        center
+        eyebrow={TRUST_EYEBROW[lang]}
+        title={TRUST_HEADING[lang]}
+      />
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {TRUST_ITEMS.map((item, i) => {
           const Icon = ICONS[item.icon];

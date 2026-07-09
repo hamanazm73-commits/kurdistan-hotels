@@ -5,6 +5,13 @@ type L = Record<Lang, string>;
 
 /* ---------------- "Why book with us" trust section ---------------- */
 
+export const TRUST_EYEBROW: L = {
+  ckb: "متمانە",
+  en: "Trusted",
+  ar: "موثوق",
+  kmr: "Bawer",
+};
+
 export const TRUST_HEADING: L = {
   ckb: "بۆچی لە ئێمەوە حجز بکەیت؟",
   en: "Why book with us?",
@@ -83,6 +90,13 @@ export const TRUST_ITEMS: TrustItem[] = [
 ];
 
 /* ---------------- Frequently asked questions ---------------- */
+
+export const FAQ_EYEBROW: L = {
+  ckb: "یارمەتی",
+  en: "Help",
+  ar: "مساعدة",
+  kmr: "Alîkarî",
+};
 
 export const FAQ_HEADING: L = {
   ckb: "پرسیارە باوەکان",

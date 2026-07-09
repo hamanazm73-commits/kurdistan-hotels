@@ -76,6 +76,9 @@ const ckb: Dict = {
   max_price: "زۆرترین نرخ",
   results_found: "{n} هۆتێل دۆزرایەوە",
   no_results: "هیچ هۆتێلێک نەدۆزرایەوە 😔",
+  hotels_eyebrow: "بگەڕێ و حجز بکە",
+  hotels_title: "هۆتێلە هەڵبژێردراوەکان",
+  hotels_sub: "لە باشترین هۆتێلەکانی کوردستان بگەڕێ و بە چەند کلیکێک حجز بکە.",
 
   badge_featured: "تایبەت",
   badge_recommended: "پێشنیارکراو",
@@ -318,6 +321,9 @@ const en: Dict = {
   max_price: "Max price",
   results_found: "{n} hotels found",
   no_results: "No hotels found 😔",
+  hotels_eyebrow: "Find & Book",
+  hotels_title: "Handpicked Hotels",
+  hotels_sub: "Browse the finest stays across Kurdistan and book in a few clicks.",
 
   badge_featured: "Featured",
   badge_recommended: "Recommended",
@@ -560,6 +566,9 @@ const ar: Dict = {
   max_price: "أعلى سعر",
   results_found: "{n} فندق متوفر",
   no_results: "ماكو ولا فندق 😔",
+  hotels_eyebrow: "ابحث واحجز",
+  hotels_title: "فنادق مختارة",
+  hotels_sub: "تصفّح أفضل فنادق كردستان واحجز بنقرات قليلة.",
 
   badge_featured: "مميز",
   badge_recommended: "منصوح بيه",
@@ -802,6 +811,9 @@ const kmr: Dict = {
   max_price: "Bihayê herî zêde",
   results_found: "{n} otêl hatin dîtin",
   no_results: "Hîç otêl nehate dîtin 😔",
+  hotels_eyebrow: "Bigere û Rezerve",
+  hotels_title: "Otêlên Hilbijartî",
+  hotels_sub: "Li otêlên herî baş ên Kurdistanê bigere û bi çend klîkan rezerve bike.",
 
   badge_featured: "Taybet",
   badge_recommended: "Pêşniyarkirî",
