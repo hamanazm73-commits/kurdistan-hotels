@@ -70,6 +70,15 @@ function defaultRooms(): FormRoom[] {
   ];
 }
 
+/** The hotel's headline price = its cheapest room (shown as "from …" on cards).
+    Derived automatically so the owner only sets room prices, not a separate one. */
+function minRoomPrice(rooms: FormRoom[]): number {
+  const prices = rooms
+    .map((r) => Number(r.price))
+    .filter((p) => Number.isFinite(p) && p > 0);
+  return prices.length ? Math.min(...prices) : 0;
+}
+
 /** Build a {ckb,kmr,en,ar} map, skipping empty values (Firestore-safe). */
 function i18nObj(ckb: string, kmr: string, en: string, ar: string) {
   const o: { ckb?: string; kmr?: string; en?: string; ar?: string } = {};
@@ -485,7 +494,8 @@ export function HotelFormDialog({
       name: f.name.trim(),
       nameI18n: i18nObj(f.nameCkb, f.nameKmr, f.nameEn, f.nameAr),
       city: f.city,
-      price: Number(f.price),
+      // headline price is derived from the cheapest room, not set separately
+      price: minRoomPrice(f.rooms) || Number(f.price) || 0,
       rating: Number(f.rating),
       image: f.image.trim(),
       images: f.images.filter(Boolean),
@@ -523,8 +533,8 @@ export function HotelFormDialog({
       return;
     }
     const f = formRef.current;
-    // don't auto-save while a required number is empty (mid-edit)
-    if (!f.name.trim() || Number(f.price) <= 0) return;
+    // don't auto-save while there's no name or no priced room (mid-edit)
+    if (!f.name.trim() || minRoomPrice(f.rooms) <= 0) return;
     setAutoSaveStatus("saving");
     try {
       await updateHotel(h.id, buildData(f));
@@ -600,7 +610,7 @@ export function HotelFormDialog({
   );
 
   async function save() {
-    if (!form.name.trim() || Number(form.price) <= 0) {
+    if (!form.name.trim() || minRoomPrice(form.rooms) <= 0) {
       toast.error(t("book_required"));
       return;
     }
@@ -616,6 +626,8 @@ export function HotelFormDialog({
       setSaving(false);
     }
   }
+
+  const autoPrice = minRoomPrice(form.rooms);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -711,7 +723,12 @@ export function HotelFormDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <Field label={t("admin_price")}>
-              <MoneyInput value={form.price} onChange={(n) => set("price", n)} />
+              <div className="flex h-8 items-center rounded-lg border border-input bg-muted/50 px-2.5 text-base text-muted-foreground">
+                {autoPrice > 0 ? formatPrice(autoPrice, lang) : "—"}
+              </div>
+              <p className="text-[11px] leading-tight text-muted-foreground">
+                {t("admin_price_auto")}
+              </p>
             </Field>
             <Field label={t("admin_available")}>
               <Input
