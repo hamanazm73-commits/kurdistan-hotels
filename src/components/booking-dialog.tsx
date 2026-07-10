@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,9 +24,12 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
-import { roomPriceOn, roomTypeLabel, type Hotel } from "@/lib/types";
+import { roomPriceOn, roomTypeLabel, seasonFor, type Hotel } from "@/lib/types";
 import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
+
+/** ISO "YYYY-MM-DD" -> "DD/MM/YYYY" for display. */
+const fmtDate = (iso: string) => iso.split("-").reverse().join("/");
 
 export function BookingDialog({
   hotel,
@@ -73,6 +77,20 @@ export function BookingDialog({
     () => roomPrice * Math.max(1, Number(nights) || 1),
     [roomPrice, nights],
   );
+  // a season covering the chosen check-in date (so we can explain the price)
+  const activeSeason = room ? seasonFor(hotel, checkIn) : undefined;
+  // only note it when the season actually changed this room's price
+  const showSeasonNote = !!activeSeason && !!room && roomPrice !== room.price;
+  const seasonLo = activeSeason
+    ? activeSeason.from <= activeSeason.to
+      ? activeSeason.from
+      : activeSeason.to
+    : "";
+  const seasonHi = activeSeason
+    ? activeSeason.from <= activeSeason.to
+      ? activeSeason.to
+      : activeSeason.from
+    : "";
 
   async function submit() {
     if (!name.trim() || !phone.trim() || !checkIn || !roomType) {
@@ -241,6 +259,18 @@ export function BookingDialog({
               </SelectContent>
             </Select>
           </div>
+
+          {showSeasonNote && (
+            <div className="flex items-start gap-2 rounded-lg border border-gold/40 bg-gold/10 px-3 py-2 text-xs leading-relaxed">
+              <Sparkles className="mt-0.5 size-3.5 shrink-0 text-gold" />
+              <span>
+                {t("book_season_note", {
+                  from: fmtDate(seasonLo),
+                  to: fmtDate(seasonHi),
+                })}
+              </span>
+            </div>
+          )}
 
           {total > 0 && (
             <div className="flex items-center justify-between rounded-lg bg-muted px-4 py-3 text-sm font-medium">

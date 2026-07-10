@@ -208,20 +208,28 @@ export function effectivePrice(h: Pick<Hotel, "price" | "discount">): number {
     that covers that date, otherwise the room's base price. `date` is ISO
     "YYYY-MM-DD" (what an <input type="date"> yields), so the range check is a
     plain string comparison. */
+/** The season (date range) that covers a given check-in date, if any.
+    Tolerates from/to entered in either order. `date` is ISO "YYYY-MM-DD". */
+export function seasonFor(
+  h: Pick<Hotel, "seasons">,
+  date: string | undefined | null,
+): Season | undefined {
+  if (!date) return undefined;
+  return (h.seasons ?? []).find((s) => {
+    if (!s.from || !s.to) return false;
+    const lo = s.from <= s.to ? s.from : s.to;
+    const hi = s.from <= s.to ? s.to : s.from;
+    return lo <= date && date <= hi;
+  });
+}
+
 export function roomPriceOn(
   h: Pick<Hotel, "rooms" | "seasons">,
   roomType: string,
   date: string | undefined | null,
 ): number {
   const base = h.rooms?.find((r) => r.type === roomType)?.price ?? 0;
-  if (!date) return base;
-  const season = (h.seasons ?? []).find((s) => {
-    if (!s.from || !s.to) return false;
-    // tolerate from/to entered in either order (easy to flip in an RTL form)
-    const lo = s.from <= s.to ? s.from : s.to;
-    const hi = s.from <= s.to ? s.to : s.from;
-    return lo <= date && date <= hi;
-  });
+  const season = seasonFor(h, date);
   if (!season) return base;
   const sr = season.rooms?.find((r) => r.type === roomType);
   return sr && sr.price > 0 ? sr.price : base;
