@@ -92,6 +92,12 @@ const ckb: Dict = {
   kind_farm: "مەزرەعە",
   admin_tourism: "تایبەت بە گەشتیاری",
   admin_add_farm: "زیادکردنی مەزرەعە",
+  admin_edit_farm: "دەستکاریکردنی مەزرەعە",
+  admin_farm_usd_rate: "نرخی دۆلار بۆ ئەم مەزرەعەیە (١٠٠ $ = چەند دینار)",
+  admin_farm_usd_rate_hint:
+    "تەنها نرخی دۆلاری ئەم مەزرەعەیە دەگۆڕێت. بەتاڵ (٠) بیهێڵەرەوە بۆ بەکارهێنانی نرخی گشتی سایتەکە.",
+  admin_notify_email_hint_farm:
+    "کاتێک حجزێک بۆ ئەم مەزرەعەیە دەکرێت، نامەیەک بۆ ئەم ئیمەیڵە دەنێردرێت.",
   admin_price_night: "نرخی شەو",
   admin_units: "ژمارەی بەردەست",
   farm_bedrooms: "ژوور",
@@ -366,6 +372,12 @@ const en: Dict = {
   kind_farm: "Farm",
   admin_tourism: "Tourism",
   admin_add_farm: "Add farm",
+  admin_edit_farm: "Edit farm",
+  admin_farm_usd_rate: "USD rate for this farm (100 $ = ? IQD)",
+  admin_farm_usd_rate_hint:
+    "Only changes this farm's dollar prices. Leave empty (0) to use the site-wide rate.",
+  admin_notify_email_hint_farm:
+    "When a booking is made for this farm, an email is sent to this address.",
   admin_price_night: "Price per night",
   admin_units: "How many available",
   farm_bedrooms: "Bedrooms",
@@ -640,6 +652,12 @@ const ar: Dict = {
   kind_farm: "مزرعة",
   admin_tourism: "خاص بالسياحة",
   admin_add_farm: "إضافة مزرعة",
+  admin_edit_farm: "تعديل المزرعة",
+  admin_farm_usd_rate: "سعر الدولار لهذه المزرعة (100 $ = ؟ دينار)",
+  admin_farm_usd_rate_hint:
+    "يغيّر أسعار الدولار لهذه المزرعة فقط. اتركه فارغاً (٠) لاستخدام سعر الموقع العام.",
+  admin_notify_email_hint_farm:
+    "عند إجراء حجز لهذه المزرعة، تُرسَل رسالة إلى هذا الإيميل.",
   admin_price_night: "سعر الليلة",
   admin_units: "كم واحدة متوفرة",
   farm_bedrooms: "غرف",
@@ -914,6 +932,12 @@ const kmr: Dict = {
   kind_farm: "Zevî",
   admin_tourism: "Taybet bi geştyariyê",
   admin_add_farm: "Zevî zêde bike",
+  admin_edit_farm: "Zeviyê biguherîne",
+  admin_farm_usd_rate: "Rêjeya Dolar ji vê zeviyê re (100 $ = ? IQD)",
+  admin_farm_usd_rate_hint:
+    "Tenê bihayên dolar ên vê zeviyê diguherîne. Vala (0) bihêle da ku rêjeya giştî were bikaranîn.",
+  admin_notify_email_hint_farm:
+    "Dema rezervasyonek ji bo vê zeviyê tê kirin, e-nameyek ji vê navnîşanê re tê şandin.",
   admin_price_night: "Bihayê şevê",
   admin_units: "Çend heb amade ne",
   farm_bedrooms: "Jûr",

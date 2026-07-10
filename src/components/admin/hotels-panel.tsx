@@ -464,7 +464,16 @@ export function HotelFormDialog({
 
   function buildForm() {
     const h = hotelRef.current;
-    if (!h) return { ...empty, kind: defaultKind };
+    if (!h)
+      return {
+        ...empty,
+        kind: defaultKind,
+        // a farm's amenities look nothing like a hotel's
+        features:
+          defaultKind === "farm"
+            ? "Pool, Garden, Parking, Mountain view"
+            : empty.features,
+      };
     return {
       kind: propertyKind(h),
       name: h.name,
@@ -744,7 +753,9 @@ export function HotelFormDialog({
       <DialogContent className="top-0 left-0 h-dvh max-h-dvh w-full max-w-full translate-x-0 translate-y-0 overflow-x-hidden overflow-y-auto rounded-none sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[90dvh] sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl">
         <DialogHeader>
           <DialogTitle>
-            {hotel ? t("admin_edit_hotel") : t("admin_add_hotel")}
+            {hotel
+              ? t(isFarm ? "admin_edit_farm" : "admin_edit_hotel")
+              : t(isFarm ? "admin_add_farm" : "admin_add_hotel")}
           </DialogTitle>
         </DialogHeader>
 
@@ -847,16 +858,92 @@ export function HotelFormDialog({
             </Field>
           </div>
 
+          {/* A farm is rented whole, so what a guest cares about — the nightly
+              price and what the place has — comes first, not buried below. */}
+          {isFarm && (
+            <div className="rounded-lg border bg-muted/30 p-3">
+              <p className="mb-3 text-sm font-semibold">{t("detail_farm")}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={t("admin_price_night")}>
+                  <MoneyInput
+                    value={form.price}
+                    onChange={(n) => set("price", n)}
+                  />
+                </Field>
+                <Field label={t("admin_units")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.available}
+                    onChange={(e) =>
+                      set("available", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+                <Field label={t("farm_bedrooms")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.bedrooms}
+                    onChange={(e) =>
+                      set("bedrooms", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+                <Field label={t("farm_bathrooms")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.bathrooms}
+                    onChange={(e) =>
+                      set("bathrooms", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+                <Field label={t("farm_area")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.areaSqm}
+                    onChange={(e) =>
+                      set("areaSqm", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+                <Field label={t("farm_guests")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.guests}
+                    onChange={(e) =>
+                      set("guests", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+              </div>
+            </div>
+          )}
 
-          {/* per-hotel USD rate: only this hotel's $ prices use it */}
-          <Field label={t("admin_hotel_usd_rate")}>
+          {/* per-listing USD rate: only this listing's $ prices use it */}
+          <Field
+            label={t(isFarm ? "admin_farm_usd_rate" : "admin_hotel_usd_rate")}
+          >
             <MoneyInput
               value={form.iqdPerUsd}
               onChange={(n) => set("iqdPerUsd", n)}
               placeholder={t("admin_hotel_usd_rate_ph")}
             />
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {t("admin_hotel_usd_rate_hint")}
+              {t(
+                isFarm
+                  ? "admin_farm_usd_rate_hint"
+                  : "admin_hotel_usd_rate_hint",
+              )}
             </p>
           </Field>
 
@@ -901,7 +988,11 @@ export function HotelFormDialog({
               onChange={(e) => set("notifyEmail", e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              {t("admin_notify_email_hint")}
+              {t(
+                isFarm
+                  ? "admin_notify_email_hint_farm"
+                  : "admin_notify_email_hint",
+              )}
             </p>
           </Field>
 
@@ -1009,77 +1100,7 @@ export function HotelFormDialog({
             />
           </Field>
 
-          {isFarm ? (
-            <>
-              {/* a farm is rented whole: one nightly price + how many are free */}
-              <div className="grid grid-cols-2 gap-3">
-                <Field label={t("admin_price_night")}>
-                  <MoneyInput
-                    value={form.price}
-                    onChange={(n) => set("price", n)}
-                  />
-                </Field>
-                <Field label={t("admin_units")}>
-                  <Input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    value={form.available}
-                    onChange={(e) =>
-                      set("available", Math.max(0, Number(e.target.value) || 0))
-                    }
-                  />
-                </Field>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <Field label={t("farm_bedrooms")}>
-                  <Input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    value={form.bedrooms}
-                    onChange={(e) =>
-                      set("bedrooms", Math.max(0, Number(e.target.value) || 0))
-                    }
-                  />
-                </Field>
-                <Field label={t("farm_bathrooms")}>
-                  <Input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    value={form.bathrooms}
-                    onChange={(e) =>
-                      set("bathrooms", Math.max(0, Number(e.target.value) || 0))
-                    }
-                  />
-                </Field>
-                <Field label={t("farm_area")}>
-                  <Input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    value={form.areaSqm}
-                    onChange={(e) =>
-                      set("areaSqm", Math.max(0, Number(e.target.value) || 0))
-                    }
-                  />
-                </Field>
-                <Field label={t("farm_guests")}>
-                  <Input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    value={form.guests}
-                    onChange={(e) =>
-                      set("guests", Math.max(0, Number(e.target.value) || 0))
-                    }
-                  />
-                </Field>
-              </div>
-            </>
-          ) : (
+          {!isFarm && (
             <>
           {/* rooms editor */}
           <Field label={t("admin_rooms")}>
