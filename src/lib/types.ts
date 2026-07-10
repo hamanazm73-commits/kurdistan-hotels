@@ -215,9 +215,13 @@ export function roomPriceOn(
 ): number {
   const base = h.rooms?.find((r) => r.type === roomType)?.price ?? 0;
   if (!date) return base;
-  const season = (h.seasons ?? []).find(
-    (s) => s.from && s.to && s.from <= date && date <= s.to,
-  );
+  const season = (h.seasons ?? []).find((s) => {
+    if (!s.from || !s.to) return false;
+    // tolerate from/to entered in either order (easy to flip in an RTL form)
+    const lo = s.from <= s.to ? s.from : s.to;
+    const hi = s.from <= s.to ? s.to : s.from;
+    return lo <= date && date <= hi;
+  });
   if (!season) return base;
   const sr = season.rooms?.find((r) => r.type === roomType);
   return sr && sr.price > 0 ? sr.price : base;

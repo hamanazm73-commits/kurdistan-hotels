@@ -528,13 +528,17 @@ export function HotelFormDialog({
       rooms,
       seasons: f.seasons
         .filter((s) => s.from && s.to)
-        .map((s) => ({
-          from: s.from,
-          to: s.to,
-          rooms: s.rooms
-            .map((r) => ({ type: r.type.trim(), price: Number(r.price) }))
-            .filter((r) => r.type && r.price > 0),
-        }))
+        .map((s) => {
+          // store the earlier date as `from` regardless of entry order
+          const [from, to] = s.from <= s.to ? [s.from, s.to] : [s.to, s.from];
+          return {
+            from,
+            to,
+            rooms: s.rooms
+              .map((r) => ({ type: r.type.trim(), price: Number(r.price) }))
+              .filter((r) => r.type && r.price > 0),
+          };
+        })
         .filter((s) => s.rooms.length > 0),
       featured: f.featured,
       recommended: f.recommended,
