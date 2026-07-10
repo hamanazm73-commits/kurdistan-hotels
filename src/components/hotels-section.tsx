@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n, CITY_KEYS } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
-import { effectivePrice } from "@/lib/types";
+import { effectivePrice, propertyKind, type PropertyKind } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { SectionIntro } from "./section-intro";
 
@@ -29,18 +29,59 @@ const SORT_LABEL: Record<Sort, string> = {
   rating: "sort_rating",
 };
 
-export function HotelsSection() {
+/** Copy + accent colour for each kind of listing section. */
+const KIND_META: Record<
+  PropertyKind,
+  {
+    id: string;
+    eyebrow: string;
+    title: string;
+    sub: string;
+    searchPh: string;
+    empty: string;
+    glow: string;
+  }
+> = {
+  hotel: {
+    id: "hotels",
+    eyebrow: "hotels_eyebrow",
+    title: "hotels_title",
+    sub: "hotels_sub",
+    searchPh: "search_ph",
+    empty: "no_results",
+    glow: "bg-gold/20",
+  },
+  farm: {
+    id: "farms",
+    eyebrow: "farms_eyebrow",
+    title: "farms_title",
+    sub: "farms_sub",
+    searchPh: "search_farm_ph",
+    empty: "farms_none",
+    glow: "bg-emerald-500/25",
+  },
+};
+
+/** One listing section (hotels or farms). Both share the same card, filters and
+    booking flow — only the copy and the accent glow differ. */
+function PropertySection({ kind }: { kind: PropertyKind }) {
   const { t, tCity } = useI18n();
   const { hotels, loading } = useHotels();
+  const meta = KIND_META[kind];
 
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [sort, setSort] = useState<Sort>("recommended");
 
+  // every visible listing of this kind — also tells us whether to render at all
+  const all = useMemo(
+    () => hotels.filter((h) => !h.hidden && propertyKind(h) === kind),
+    [hotels, kind],
+  );
+
   const filtered = useMemo(() => {
-    let list = hotels.filter((h) => {
-      if (h.hidden) return false;
+    let list = all.filter((h) => {
       const q = search.trim().toLowerCase();
       const matchesSearch =
         !q ||
@@ -71,22 +112,30 @@ export function HotelsSection() {
       }
     });
     return list;
-  }, [hotels, search, city, featuredOnly, sort]);
+  }, [all, search, city, featuredOnly, sort]);
+
+  // An empty farms section would just be noise on the home page — hide it until
+  // the first farm is added (also while loading, so it never flashes empty).
+  // Hotels always render; the site is about hotels.
+  if (kind === "farm" && all.length === 0) return null;
 
   return (
     <section
-      id="hotels"
+      id={meta.id}
       className="relative mx-auto max-w-7xl scroll-mt-20 px-6 py-16"
     >
-      {/* soft gold glow behind the heading for a premium feel */}
+      {/* soft glow behind the heading for a premium feel */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-4 -z-10 h-48 w-72 -translate-x-1/2 rounded-full bg-gold/20 blur-3xl"
+        className={cn(
+          "pointer-events-none absolute left-1/2 top-4 -z-10 h-48 w-72 -translate-x-1/2 rounded-full blur-3xl",
+          meta.glow,
+        )}
       />
       <SectionIntro
-        eyebrow={t("hotels_eyebrow")}
-        title={t("hotels_title")}
-        subtitle={t("hotels_sub")}
+        eyebrow={t(meta.eyebrow)}
+        title={t(meta.title)}
+        subtitle={t(meta.sub)}
       />
       <div className="mb-8 flex flex-col gap-5">
         {/* search */}
@@ -95,7 +144,7 @@ export function HotelsSection() {
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("search_ph")}
+            placeholder={t(meta.searchPh)}
             className="h-14 rounded-2xl ps-12 text-base shadow-sm"
           />
         </div>
@@ -131,10 +180,7 @@ export function HotelsSection() {
           ))}
 
           <div className="ms-auto flex items-center gap-3">
-            <Select
-              value={sort}
-              onValueChange={(v) => v && setSort(v as Sort)}
-            >
+            <Select value={sort} onValueChange={(v) => v && setSort(v as Sort)}>
               <SelectTrigger className="max-w-[52vw] sm:max-w-none">
                 <ArrowDownUp className="size-4 shrink-0 text-muted-foreground" />
                 <SelectValue>
@@ -170,7 +216,7 @@ export function HotelsSection() {
         </div>
       ) : filtered.length === 0 ? (
         <p className="py-20 text-center text-lg text-muted-foreground">
-          {t("no_results")}
+          {t(meta.empty)}
         </p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -181,6 +227,14 @@ export function HotelsSection() {
       )}
     </section>
   );
+}
+
+export function HotelsSection() {
+  return <PropertySection kind="hotel" />;
+}
+
+export function FarmsSection() {
+  return <PropertySection kind="farm" />;
 }
 
 function FilterChip({

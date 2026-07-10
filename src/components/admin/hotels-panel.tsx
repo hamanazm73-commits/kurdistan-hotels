@@ -48,7 +48,7 @@ import {
   seedHotels,
   getHotelMedia,
 } from "@/lib/hotels-db";
-import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, ROOM_TYPES, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
+import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, propertyKind, ROOM_TYPES, type Hotel, type HotelInput, type PropertyKind, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
@@ -104,6 +104,7 @@ const DESC_FIELDS = [
 ] as const;
 
 const empty = {
+  kind: "hotel" as PropertyKind,
   name: "",
   city: CITIES[0] as string,
   price: 90_000,
@@ -432,6 +433,7 @@ export function HotelFormDialog({
     const h = hotelRef.current;
     if (!h) return { ...empty };
     return {
+      kind: propertyKind(h),
       name: h.name,
       city: h.city,
       price: h.price,
@@ -503,6 +505,7 @@ export function HotelFormDialog({
       0,
     );
     return {
+      kind: f.kind,
       name: f.name.trim(),
       nameI18n: i18nObj(f.nameCkb, f.nameKmr, f.nameEn, f.nameAr),
       city: f.city,
@@ -687,6 +690,26 @@ export function HotelFormDialog({
         </DialogHeader>
 
         <div className="grid gap-4">
+          {/* hotel or farm — decides which section of the site it shows in */}
+          <Field label={t("admin_kind")}>
+            <Select
+              value={form.kind}
+              onValueChange={(v) => v && set("kind", v as PropertyKind)}
+            >
+              <SelectTrigger>
+                <SelectValue>
+                  {(v: PropertyKind | null) =>
+                    t(v === "farm" ? "kind_farm" : "kind_hotel")
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hotel">{t("kind_hotel")}</SelectItem>
+                <SelectItem value="farm">{t("kind_farm")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+
           <Field label={t("admin_name")}>
             <Input
               value={form.name}

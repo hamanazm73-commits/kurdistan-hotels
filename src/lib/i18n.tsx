@@ -80,6 +80,17 @@ const ckb: Dict = {
   hotels_title: "هۆتێلە هەڵبژێردراوەکان",
   hotels_sub: "لە باشترین هۆتێلەکانی کوردستان بگەڕێ و بە چەند کلیکێک حجز بکە.",
 
+  nav_farms: "مەزرەعەکان",
+  farms_eyebrow: "بە کرێ بگرە",
+  farms_title: "مەزرەعە و شوێنە گەشتیارییەکان",
+  farms_sub:
+    "مەزرەعەی جوان لە شەقڵاوە و شوێنە گەشتیارییەکانی تر — بە ئاسانی بە کرێ بیگرە.",
+  farms_none: "هێشتا هیچ مەزرەعەیەک نەدۆزرایەوە 😔",
+  search_farm_ph: "گەڕان بەدوای مەزرەعە یان شار...",
+  admin_kind: "جۆری شوێن",
+  kind_hotel: "هۆتێل",
+  kind_farm: "مەزرەعە",
+
   badge_featured: "تایبەت",
   badge_recommended: "پێشنیارکراو",
   badge_discount: "داشکاندن",
@@ -331,6 +342,17 @@ const en: Dict = {
   hotels_eyebrow: "Find & Book",
   hotels_title: "Handpicked Hotels",
   hotels_sub: "Browse the finest stays across Kurdistan and book in a few clicks.",
+
+  nav_farms: "Farms",
+  farms_eyebrow: "Rent a getaway",
+  farms_title: "Farms & Tourist Retreats",
+  farms_sub:
+    "Beautiful farms in Shaqlawa and other tourist spots — rent one in a few clicks.",
+  farms_none: "No farms found 😔",
+  search_farm_ph: "Search for a farm or city...",
+  admin_kind: "Listing type",
+  kind_hotel: "Hotel",
+  kind_farm: "Farm",
 
   badge_featured: "Featured",
   badge_recommended: "Recommended",
@@ -584,6 +606,17 @@ const ar: Dict = {
   hotels_title: "فنادق مختارة",
   hotels_sub: "تصفّح أفضل فنادق كردستان واحجز بنقرات قليلة.",
 
+  nav_farms: "المزارع",
+  farms_eyebrow: "استأجر استراحتك",
+  farms_title: "المزارع والأماكن السياحية",
+  farms_sub:
+    "مزارع جميلة في شقلاوة وأماكن سياحية أخرى — استأجرها بنقرات قليلة.",
+  farms_none: "ماكو ولا مزرعة 😔",
+  search_farm_ph: "ابحث عن مزرعة أو مدينة...",
+  admin_kind: "نوع المكان",
+  kind_hotel: "فندق",
+  kind_farm: "مزرعة",
+
   badge_featured: "مميز",
   badge_recommended: "منصوح بيه",
   badge_discount: "تخفيض",
@@ -835,6 +868,17 @@ const kmr: Dict = {
   hotels_eyebrow: "Bigere û Rezerve",
   hotels_title: "Otêlên Hilbijartî",
   hotels_sub: "Li otêlên herî baş ên Kurdistanê bigere û bi çend klîkan rezerve bike.",
+
+  nav_farms: "Zevî",
+  farms_eyebrow: "Bi kirê bigire",
+  farms_title: "Zevî û Cihên Geştyarî",
+  farms_sub:
+    "Zeviyên xweşik li Şeqlawa û cihên geştyarî yên din — bi çend klîkan bi kirê bigire.",
+  farms_none: "Hîç zevî nehate dîtin 😔",
+  search_farm_ph: "Li zeviyek an bajarek bigere...",
+  admin_kind: "Cureyê cih",
+  kind_hotel: "Otêl",
+  kind_farm: "Zevî",
 
   badge_featured: "Taybet",
   badge_recommended: "Pêşniyarkirî",

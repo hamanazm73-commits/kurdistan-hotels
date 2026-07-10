@@ -107,8 +107,19 @@ export function paymentColor(type: string): string {
   return PAYMENT_TYPES.find((p) => p.id === type)?.color ?? "#6B7280";
 }
 
+/** What kind of place a listing is. Farms/resorts are booked exactly like
+    hotels, so they reuse the same booking, pricing and admin flow. */
+export type PropertyKind = "hotel" | "farm";
+
+/** Listings saved before farms existed have no `kind` — treat them as hotels. */
+export function propertyKind(h: Pick<Hotel, "kind">): PropertyKind {
+  return h.kind ?? "hotel";
+}
+
 export interface Hotel {
   id: string;
+  /** "hotel" (default) or "farm" — a farm/resort rented out for tourism */
+  kind?: PropertyKind;
   name: string;
   city: string;
   /** base nightly price (used when there is no discount) */

@@ -6,6 +6,7 @@ import { MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useHotels } from "@/lib/use-hotels";
+import { propertyKind } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const fadeUp: Variants = {
@@ -99,7 +100,11 @@ export function Hero() {
     return sum + n;
   }, 0);
   const stats = [
-    { labelKey: "stat_hotels", value: String(visible.length) },
+    // farms live in the same collection, so count only actual hotels here
+    {
+      labelKey: "stat_hotels",
+      value: String(visible.filter((h) => propertyKind(h) === "hotel").length),
+    },
     {
       labelKey: "stat_cities",
       value: String(new Set(visible.map((h) => h.city)).size),

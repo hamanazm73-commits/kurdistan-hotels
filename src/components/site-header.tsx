@@ -68,6 +68,13 @@ export function SiteHeader() {
           <Button
             variant="ghost"
             nativeButton={false}
+            render={<Link href="/#farms" />}
+          >
+            {t("nav_farms")}
+          </Button>
+          <Button
+            variant="ghost"
+            nativeButton={false}
             render={<Link href="/bookings" />}
           >
             {t("my_bookings")}
@@ -150,6 +157,14 @@ export function SiteHeader() {
                   render={<Link href="/#hotels" />}
                 >
                   {t("nav_hotels")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  nativeButton={false}
+                  render={<Link href="/#farms" />}
+                >
+                  {t("nav_farms")}
                 </Button>
                 <Button
                   variant="ghost"
