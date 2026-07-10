@@ -158,7 +158,14 @@ const empty = {
   descAr: "",
 };
 
-export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
+export function HotelsPanel({
+  ownerHotelId,
+  kind,
+}: {
+  ownerHotelId?: string;
+  /** show only this kind of listing (hotels and farms get their own tab) */
+  kind?: PropertyKind;
+} = {}) {
   const { t, tCity, lang } = useI18n();
   const { hotels, usingSamples } = useHotels();
   const [seeding, setSeeding] = useState(false);
@@ -168,11 +175,17 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
 
   const owner = Boolean(ownerHotelId);
 
-  const visibleHotels = hotels.filter((h) =>
+  // a hotel owner always sees their own listing; otherwise keep hotels and
+  // farms in their own tabs so they never mix
+  const ofKind = kind
+    ? hotels.filter((h) => propertyKind(h) === kind)
+    : hotels;
+
+  const visibleHotels = ofKind.filter((h) =>
     owner ? h.id === ownerHotelId : cityFilter === "all" || h.city === cityFilter,
   );
-  // only offer cities that actually have hotels
-  const cityOptions = CITIES.filter((c) => hotels.some((h) => h.city === c));
+  // only offer cities that actually have listings of this kind
+  const cityOptions = CITIES.filter((c) => ofKind.some((h) => h.city === c));
 
   async function onSeed() {
     setSeeding(true);
@@ -242,7 +255,8 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
                 </SelectContent>
               </Select>
             )}
-            {usingSamples && (
+            {/* the sample data is hotels, so never offer it on the farms tab */}
+            {usingSamples && kind !== "farm" && (
               <Button variant="outline" onClick={onSeed} disabled={seeding}>
                 {seeding ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -253,10 +267,11 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
               </Button>
             )}
             <HotelFormDialog
+              defaultKind={kind}
               trigger={
                 <Button>
                   <Plus className="size-4" />
-                  {t("admin_add_hotel")}
+                  {t(kind === "farm" ? "admin_add_farm" : "admin_add_hotel")}
                 </Button>
               }
             />
@@ -430,11 +445,14 @@ export function HotelFormDialog({
   hotel,
   trigger,
   restricted,
+  defaultKind = "hotel",
 }: {
   hotel?: Hotel;
   trigger: React.ReactElement;
   /** hotel owners can't touch featured / recommended / discount */
   restricted?: boolean;
+  /** what a brand-new listing starts as (the tab it was added from) */
+  defaultKind?: PropertyKind;
 }) {
   const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
@@ -446,7 +464,7 @@ export function HotelFormDialog({
 
   function buildForm() {
     const h = hotelRef.current;
-    if (!h) return { ...empty };
+    if (!h) return { ...empty, kind: defaultKind };
     return {
       kind: propertyKind(h),
       name: h.name,
