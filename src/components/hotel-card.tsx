@@ -82,7 +82,14 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.4) }}
     >
-      <Card className="group h-full overflow-hidden p-0 ring-1 ring-transparent transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:ring-gold/40">
+      <Card
+        className={cn(
+          "group relative h-full overflow-hidden rounded-2xl p-0 shadow-lg shadow-black/5 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl active:scale-[0.99]",
+          hotel.featured
+            ? "ring-2 ring-gold/50"
+            : "ring-1 ring-foreground/10 hover:ring-gold/40",
+        )}
+      >
         <div className="relative aspect-[3/2] overflow-hidden bg-muted">
           {/* blurred fill so any image shape shows whole & looks nice.
               An <img> (not a CSS background) so it respects lazy-loading —

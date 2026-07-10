@@ -74,7 +74,15 @@ export function HotelsSection() {
   }, [hotels, search, city, featuredOnly, sort]);
 
   return (
-    <section id="hotels" className="mx-auto max-w-7xl scroll-mt-20 px-6 py-16">
+    <section
+      id="hotels"
+      className="relative mx-auto max-w-7xl scroll-mt-20 px-6 py-16"
+    >
+      {/* soft gold glow behind the heading for a premium feel */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-4 -z-10 h-48 w-72 -translate-x-1/2 rounded-full bg-gold/20 blur-3xl"
+      />
       <SectionIntro
         eyebrow={t("hotels_eyebrow")}
         title={t("hotels_title")}
@@ -88,7 +96,7 @@ export function HotelsSection() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("search_ph")}
-            className="h-14 ps-12 text-base shadow-sm"
+            className="h-14 rounded-2xl ps-12 text-base shadow-sm"
           />
         </div>
 
@@ -190,7 +198,10 @@ function FilterChip({
       size="sm"
       variant={active ? "default" : "outline"}
       onClick={onClick}
-      className={cn("rounded-full", active && "shadow")}
+      className={cn(
+        "rounded-full transition-transform active:scale-95",
+        active && "shadow",
+      )}
     >
       {children}
     </Button>
