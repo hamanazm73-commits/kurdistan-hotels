@@ -26,9 +26,9 @@ export function SectionIntro({
           )}
         >
           <span className="h-0.5 w-6 rounded-full bg-gold" />
-          <span className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
-            {eyebrow}
-          </span>
+          {/* no uppercase / letter-spacing — those break Arabic/Kurdish
+              cursive joining; the audience is mostly RTL */}
+          <span className="text-[13px] font-bold text-gold">{eyebrow}</span>
           {center && <span className="h-0.5 w-6 rounded-full bg-gold" />}
         </div>
       )}
