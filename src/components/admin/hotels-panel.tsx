@@ -122,6 +122,11 @@ const empty = {
   payments: [] as { type: string; url: string }[],
   iqdPerUsd: 0,
   rooms: defaultRooms(),
+  seasons: [] as {
+    from: string;
+    to: string;
+    rooms: { type: string; price: number }[];
+  }[],
   featured: false,
   recommended: false,
   discountActive: false,
@@ -451,6 +456,11 @@ export function HotelFormDialog({
             available: r.available,
           }))
         : defaultRooms(),
+      seasons: (h.seasons ?? []).map((s) => ({
+        from: s.from,
+        to: s.to,
+        rooms: (s.rooms ?? []).map((r) => ({ type: r.type, price: r.price })),
+      })),
       featured: h.featured,
       recommended: h.recommended,
       discountActive: h.discount?.active ?? false,
@@ -516,6 +526,16 @@ export function HotelFormDialog({
       // form holds the per-100-USD figure; store it back as IQD per 1 USD
       iqdPerUsd: (Number(f.iqdPerUsd) || 0) / 100,
       rooms,
+      seasons: f.seasons
+        .filter((s) => s.from && s.to)
+        .map((s) => ({
+          from: s.from,
+          to: s.to,
+          rooms: s.rooms
+            .map((r) => ({ type: r.type.trim(), price: Number(r.price) }))
+            .filter((r) => r.type && r.price > 0),
+        }))
+        .filter((s) => s.rooms.length > 0),
       featured: f.featured,
       recommended: f.recommended,
       discount: {
@@ -591,6 +611,26 @@ export function HotelFormDialog({
   function set<K extends keyof typeof form>(k: K, v: (typeof form)[K]) {
     setForm((f) => ({ ...f, [k]: v }));
     if (hotelRef.current) scheduleAutoSave();
+  }
+
+  // ---- seasonal-pricing (date range) helpers ----
+  function setSeason(i: number, patch: Partial<(typeof form.seasons)[number]>) {
+    set(
+      "seasons",
+      form.seasons.map((s, j) => (j === i ? { ...s, ...patch } : s)),
+    );
+  }
+  function setSeasonRoomPrice(i: number, type: string, price: number) {
+    set(
+      "seasons",
+      form.seasons.map((s, j) => {
+        if (j !== i) return s;
+        const rooms = s.rooms.some((r) => r.type === type)
+          ? s.rooms.map((r) => (r.type === type ? { ...r, price } : r))
+          : [...s.rooms, { type, price }];
+        return { ...s, rooms };
+      }),
+    );
   }
 
   // Stable callbacks for the heavy media widgets so they stay memoized and
@@ -984,6 +1024,100 @@ export function HotelFormDialog({
               >
                 <Plus className="size-4" />
                 {t("admin_add_room")}
+              </Button>
+            </div>
+          </Field>
+
+          {/* seasonal / date-range pricing */}
+          <Field label={t("admin_seasons")}>
+            <div className="space-y-2.5">
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {t("admin_seasons_hint")}
+              </p>
+              {form.seasons.map((s, i) => (
+                <div key={i} className="rounded-xl border bg-muted/30 p-3">
+                  <div className="flex items-end gap-2">
+                    <div className="grid flex-1 grid-cols-2 gap-2">
+                      <div className="grid gap-1">
+                        <label className="text-xs text-muted-foreground">
+                          {t("admin_season_from")}
+                        </label>
+                        <Input
+                          type="date"
+                          value={s.from}
+                          onChange={(e) => setSeason(i, { from: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-1">
+                        <label className="text-xs text-muted-foreground">
+                          {t("admin_season_to")}
+                        </label>
+                        <Input
+                          type="date"
+                          value={s.to}
+                          onChange={(e) => setSeason(i, { to: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-9 shrink-0 text-muted-foreground hover:text-destructive"
+                      title={t("admin_delete")}
+                      onClick={() =>
+                        set(
+                          "seasons",
+                          form.seasons.filter((_, j) => j !== i),
+                        )
+                      }
+                    >
+                      <X className="size-4" />
+                    </Button>
+                  </div>
+                  <div className="mt-2 space-y-1.5">
+                    {form.rooms
+                      .filter((r) => r.type.trim())
+                      .map((r) => (
+                        <div key={r.type} className="flex items-center gap-2">
+                          <span className="min-w-0 flex-1 truncate text-sm">
+                            {r.type}
+                          </span>
+                          <MoneyInput
+                            className="w-32"
+                            value={
+                              s.rooms.find((sr) => sr.type === r.type)?.price ??
+                              Number(r.price)
+                            }
+                            onChange={(n) => setSeasonRoomPrice(i, r.type, n)}
+                          />
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-1.5"
+                onClick={() =>
+                  set("seasons", [
+                    ...form.seasons,
+                    {
+                      from: "",
+                      to: "",
+                      rooms: form.rooms
+                        .filter((r) => r.type.trim())
+                        .map((r) => ({
+                          type: r.type.trim(),
+                          price: Number(r.price),
+                        })),
+                    },
+                  ])
+                }
+              >
+                <Plus className="size-4" />
+                {t("admin_add_season")}
               </Button>
             </div>
           </Field>

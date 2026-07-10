@@ -22,6 +22,14 @@ export interface RoomType {
   available?: number;
 }
 
+/** A date range with its own per-room nightly prices (seasonal pricing).
+    Dates are ISO "YYYY-MM-DD", so they compare and sort as plain strings. */
+export interface Season {
+  from: string;
+  to: string;
+  rooms: { type: string; price: number }[];
+}
+
 /** Standard room types with a name in every language. Owners usually type a
     standard name (Single, Suite, …) — in any language — and we translate it on
     display. Anything custom falls back to the exact text entered, so nothing
@@ -139,6 +147,9 @@ export interface Hotel {
   /** this hotel's own IQD-per-USD rate for the $ view; when unset (or 0) the
       site-wide default rate is used. Lets each owner price their own $ view. */
   iqdPerUsd?: number;
+  /** date-range price overrides: a room's price on a given check-in date is its
+      matching season's price, otherwise its base price. */
+  seasons?: Season[];
   createdAt?: number;
 }
 
@@ -191,6 +202,25 @@ export interface AdminRecord {
 /** the price a hotel is actually sold at right now */
 export function effectivePrice(h: Pick<Hotel, "price" | "discount">): number {
   return h.discount?.active ? h.discount.newPrice : h.price;
+}
+
+/** A room's nightly price for a given check-in date: the price from a season
+    that covers that date, otherwise the room's base price. `date` is ISO
+    "YYYY-MM-DD" (what an <input type="date"> yields), so the range check is a
+    plain string comparison. */
+export function roomPriceOn(
+  h: Pick<Hotel, "rooms" | "seasons">,
+  roomType: string,
+  date: string | undefined | null,
+): number {
+  const base = h.rooms?.find((r) => r.type === roomType)?.price ?? 0;
+  if (!date) return base;
+  const season = (h.seasons ?? []).find(
+    (s) => s.from && s.to && s.from <= date && date <= s.to,
+  );
+  if (!season) return base;
+  const sr = season.rooms?.find((r) => r.type === roomType);
+  return sr && sr.price > 0 ? sr.price : base;
 }
 
 /** Route an R2 public-dev image URL through our cached /api/img proxy (fast,

@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
-import { roomTypeLabel, type Hotel } from "@/lib/types";
+import { roomPriceOn, roomTypeLabel, type Hotel } from "@/lib/types";
 import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
 
@@ -66,9 +66,12 @@ export function BookingDialog({
   }, [open, initialRoomType]);
 
   const room = hotel.rooms.find((r) => r.type === roomType);
+  // price for the chosen check-in date — a season's price if one covers it,
+  // otherwise the room's base price
+  const roomPrice = room ? roomPriceOn(hotel, roomType, checkIn) : 0;
   const total = useMemo(
-    () => (room ? room.price * Math.max(1, Number(nights) || 1) : 0),
-    [room, nights],
+    () => roomPrice * Math.max(1, Number(nights) || 1),
+    [roomPrice, nights],
   );
 
   async function submit() {
@@ -91,7 +94,7 @@ export function BookingDialog({
           name: name.trim(),
           phone: phone.trim(),
           roomType,
-          roomPrice: room?.price ?? 0,
+          roomPrice,
           checkIn,
           nights: Number(nights) || 1,
         }),
@@ -116,7 +119,7 @@ export function BookingDialog({
         hotelId: hotel.id,
         hotel: hotel.name,
         roomType,
-        roomPrice: room?.price ?? 0,
+        roomPrice,
         checkIn,
         nights: Number(nights) || 1,
         name: name.trim(),
@@ -230,7 +233,7 @@ export function BookingDialog({
                         )}
                       </span>
                       <span className="whitespace-nowrap text-muted-foreground">
-                        {format(r.price, hotel.iqdPerUsd)}
+                        {format(roomPriceOn(hotel, r.type, checkIn), hotel.iqdPerUsd)}
                       </span>
                     </span>
                   </SelectItem>
