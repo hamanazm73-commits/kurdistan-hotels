@@ -38,20 +38,55 @@ export async function notifyBooking(b: Booking) {
 }
 
 /**
- * Best-effort booking email to the hotel's own address (via a Gmail sender).
- * No-op when GMAIL_USER / GMAIL_APP_PASSWORD or the recipient are unset, and
- * never throws — an email must never block a booking.
- * The app password comes from Google Account → Security → App passwords.
+ * Pick the outgoing-mail transport. When SMTP_HOST / SMTP_USER / SMTP_PASS are
+ * set (e.g. Zoho, so mail is sent from the business address
+ * info@hotelskurdistan.com) it uses those; otherwise it falls back to the Gmail
+ * sender. Returns null when neither is configured.
+ */
+function getMailer():
+  | { transporter: ReturnType<typeof nodemailer.createTransport>; from: string }
+  | null {
+  const host = process.env.SMTP_HOST;
+  const smtpUser = process.env.SMTP_USER;
+  const smtpPass = process.env.SMTP_PASS;
+  if (host && smtpUser && smtpPass) {
+    const port = Number(process.env.SMTP_PORT) || 465;
+    return {
+      transporter: nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465, // 465 = SSL, 587 = STARTTLS
+        auth: { user: smtpUser, pass: smtpPass },
+      }),
+      from: `"Kurdistan Hotels" <${smtpUser}>`,
+    };
+  }
+  const gUser = process.env.GMAIL_USER;
+  const gPass = process.env.GMAIL_APP_PASSWORD;
+  if (gUser && gPass) {
+    return {
+      transporter: nodemailer.createTransport({
+        service: "gmail",
+        auth: { user: gUser, pass: gPass },
+      }),
+      from: `"Kurdistan Hotels" <${gUser}>`,
+    };
+  }
+  return null;
+}
+
+/**
+ * Best-effort booking email to the hotel's own address. Sends from the business
+ * SMTP sender when configured, else Gmail. No-op when no sender or recipient is
+ * set, and never throws — an email must never block a booking.
  */
 export async function sendBookingEmail(b: Booking, to: string | undefined) {
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
+  const mailer = getMailer();
   // Log WHY an email is skipped so a missing sender/recipient is diagnosable
-  // from the Vercel logs (the sender vars are set once; `to` is the hotel's
-  // notifyEmail field, which each hotel must fill in).
-  if (!user || !pass || !to) {
+  // from the Vercel logs. `to` is the hotel's notifyEmail, which owners fill in.
+  if (!mailer || !to) {
     console.warn(
-      `[email] skipped — GMAIL_USER:${!!user} GMAIL_APP_PASSWORD:${!!pass} recipient:${to ? "set" : "missing"}`,
+      `[email] skipped — sender:${mailer ? "set" : "missing"} recipient:${to ? "set" : "missing"}`,
     );
     return;
   }
@@ -73,7 +108,7 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
   <div style="font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;padding:24px;">
     <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
       <div style="background:#1e3a5f;padding:24px;text-align:center;">
-        <img src="https://kurdistan-hotels.vercel.app/logo.png" alt="Kurdistan Hotels" width="240" style="width:240px;max-width:80%;height:auto;" />
+        <img src="https://hotelskurdistan.com/logo.png" alt="Kurdistan Hotels" width="240" style="width:240px;max-width:80%;height:auto;" />
         <div style="font-size:18px;font-weight:700;color:#f5c542;margin-top:16px;">حیجزی نوێ — New booking</div>
         <div style="color:#cbd5e1;font-size:15px;margin-top:4px;">${esc(b.hotel)}</div>
       </div>
@@ -103,12 +138,8 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
   </div>`;
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user, pass },
-    });
-    await transporter.sendMail({
-      from: `"Kurdistan Hotels" <${user}>`,
+    await mailer.transporter.sendMail({
+      from: mailer.from,
       to,
       subject: `حیجزی نوێ — ${b.hotel} (${money(total)})`,
       html,
@@ -157,10 +188,10 @@ export async function notifyFeedback(fb: Feedback) {
   }
 
   // 2) Email to the site owner
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
-  const to = process.env.OWNER_EMAIL || user;
-  if (!user || !pass || !to) return;
+  const mailer = getMailer();
+  const to =
+    process.env.OWNER_EMAIL || process.env.SMTP_USER || process.env.GMAIL_USER;
+  if (!mailer || !to) return;
 
   const html = `
   <div style="font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;padding:24px;">
@@ -182,12 +213,8 @@ export async function notifyFeedback(fb: Feedback) {
   </div>`;
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user, pass },
-    });
-    await transporter.sendMail({
-      from: `"Kurdistan Hotels" <${user}>`,
+    await mailer.transporter.sendMail({
+      from: mailer.from,
       to,
       subject: `فیدباکی نوێ — New feedback ${stars !== "—" ? `(${stars})` : ""}`,
       html,

@@ -8,7 +8,7 @@ import { FeedbackDialog } from "@/components/feedback-dialog";
 
 const PHONE = "0770 057 2004";
 const WHATSAPP = "9647700572004";
-const EMAIL = "info@kurdistan-hotels.com";
+const EMAIL = "info@hotelskurdistan.com";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
