@@ -48,7 +48,7 @@ import {
   seedHotels,
   getHotelMedia,
 } from "@/lib/hotels-db";
-import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, propertyKind, ROOM_TYPES, type Hotel, type HotelInput, type PropertyKind, type RoomType } from "@/lib/types";
+import { effectivePrice, FARM_ROOM_TYPE, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, propertyKind, ROOM_TYPES, type Hotel, type HotelInput, type PropertyKind, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
 
 type FormRoom = { type: string; price: number; available?: number };
@@ -77,6 +77,16 @@ function minRoomPrice(rooms: FormRoom[]): number {
     .map((r) => Number(r.price))
     .filter((p) => Number.isFinite(p) && p > 0);
   return prices.length ? Math.min(...prices) : 0;
+}
+
+/** The price a listing must have before it can be saved: a hotel's cheapest
+    room, or a farm's own nightly price (a farm has no rooms). */
+function headlinePrice(f: {
+  kind: PropertyKind;
+  price: number;
+  rooms: FormRoom[];
+}): number {
+  return f.kind === "farm" ? Number(f.price) || 0 : minRoomPrice(f.rooms);
 }
 
 /** Build a {ckb,kmr,en,ar} map, skipping empty values (Firestore-safe). */
@@ -112,7 +122,12 @@ const empty = {
   image:
     "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
   images: [] as string[],
-  available: 10,
+  // only used by farms — a hotel's availability is summed from its rooms
+  available: 1,
+  bedrooms: 0,
+  bathrooms: 0,
+  areaSqm: 0,
+  guests: 0,
   features: "Wi-Fi, Restaurant, Parking",
   description: "",
   address: "",
@@ -441,6 +456,10 @@ export function HotelFormDialog({
       image: h.image,
       images: h.images ?? [],
       available: h.available,
+      bedrooms: h.bedrooms ?? 0,
+      bathrooms: h.bathrooms ?? 0,
+      areaSqm: h.areaSqm ?? 0,
+      guests: h.guests ?? 0,
       features: h.features.join(", "),
       description: h.description ?? "",
       address: h.address ?? "",
@@ -490,27 +509,43 @@ export function HotelFormDialog({
   const mediaReadyRef = useRef(false);
 
   function buildData(f: typeof form): HotelInput {
-    const rooms: RoomType[] = f.rooms
-      .map((r) => {
-        const room: RoomType = { type: r.type.trim(), price: Number(r.price) };
-        if (r.available !== undefined && !Number.isNaN(Number(r.available)))
-          room.available = Math.max(0, Number(r.available));
-        return room;
-      })
-      .filter((r) => r.type);
-    // total availability is simply the sum of the per-room availabilities
-    const available = rooms.reduce(
-      (s, r) =>
-        s + (typeof r.available === "number" ? Math.max(0, r.available) : 0),
-      0,
-    );
+    // A farm is rented whole: no room types, and its price + availability are
+    // set directly on the listing instead of being derived from rooms.
+    const isFarm = f.kind === "farm";
+    const rooms: RoomType[] = isFarm
+      ? []
+      : f.rooms
+          .map((r) => {
+            const room: RoomType = {
+              type: r.type.trim(),
+              price: Number(r.price),
+            };
+            if (r.available !== undefined && !Number.isNaN(Number(r.available)))
+              room.available = Math.max(0, Number(r.available));
+            return room;
+          })
+          .filter((r) => r.type);
+    const available = isFarm
+      ? Math.max(0, Number(f.available) || 0)
+      : // total availability is simply the sum of the per-room availabilities
+        rooms.reduce(
+          (s, r) =>
+            s + (typeof r.available === "number" ? Math.max(0, r.available) : 0),
+          0,
+        );
     return {
       kind: f.kind,
       name: f.name.trim(),
       nameI18n: i18nObj(f.nameCkb, f.nameKmr, f.nameEn, f.nameAr),
       city: f.city,
-      // headline price is derived from the cheapest room, not set separately
-      price: minRoomPrice(f.rooms) || Number(f.price) || 0,
+      // a hotel's headline price is the cheapest room; a farm sets it directly
+      price: isFarm
+        ? Number(f.price) || 0
+        : minRoomPrice(f.rooms) || Number(f.price) || 0,
+      bedrooms: Math.max(0, Number(f.bedrooms) || 0),
+      bathrooms: Math.max(0, Number(f.bathrooms) || 0),
+      areaSqm: Math.max(0, Number(f.areaSqm) || 0),
+      guests: Math.max(0, Number(f.guests) || 0),
       rating: Number(f.rating),
       image: f.image.trim(),
       images: f.images.filter(Boolean),
@@ -529,20 +564,23 @@ export function HotelFormDialog({
       // form holds the per-100-USD figure; store it back as IQD per 1 USD
       iqdPerUsd: (Number(f.iqdPerUsd) || 0) / 100,
       rooms,
-      seasons: f.seasons
-        .filter((s) => s.from && s.to)
-        .map((s) => {
-          // store the earlier date as `from` regardless of entry order
-          const [from, to] = s.from <= s.to ? [s.from, s.to] : [s.to, s.from];
-          return {
-            from,
-            to,
-            rooms: s.rooms
-              .map((r) => ({ type: r.type.trim(), price: Number(r.price) }))
-              .filter((r) => r.type && r.price > 0),
-          };
-        })
-        .filter((s) => s.rooms.length > 0),
+      // seasonal prices are per room type, so they don't apply to a farm
+      seasons: isFarm
+        ? []
+        : f.seasons
+            .filter((s) => s.from && s.to)
+            .map((s) => {
+              // store the earlier date as `from` regardless of entry order
+              const [from, to] = s.from <= s.to ? [s.from, s.to] : [s.to, s.from];
+              return {
+                from,
+                to,
+                rooms: s.rooms
+                  .map((r) => ({ type: r.type.trim(), price: Number(r.price) }))
+                  .filter((r) => r.type && r.price > 0),
+              };
+            })
+            .filter((s) => s.rooms.length > 0),
       featured: f.featured,
       recommended: f.recommended,
       discount: {
@@ -562,8 +600,8 @@ export function HotelFormDialog({
       return;
     }
     const f = formRef.current;
-    // don't auto-save while there's no name or no priced room (mid-edit)
-    if (!f.name.trim() || minRoomPrice(f.rooms) <= 0) return;
+    // don't auto-save while there's no name or no price yet (mid-edit)
+    if (!f.name.trim() || headlinePrice(f) <= 0) return;
     setAutoSaveStatus("saving");
     try {
       await updateHotel(h.id, buildData(f));
@@ -659,7 +697,7 @@ export function HotelFormDialog({
   );
 
   async function save() {
-    if (!form.name.trim() || minRoomPrice(form.rooms) <= 0) {
+    if (!form.name.trim() || headlinePrice(form) <= 0) {
       toast.error(t("book_required"));
       return;
     }
@@ -675,6 +713,9 @@ export function HotelFormDialog({
       setSaving(false);
     }
   }
+
+  // a farm is rented whole — no room types, no per-room seasonal prices
+  const isFarm = form.kind === "farm";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -950,12 +991,84 @@ export function HotelFormDialog({
             />
           </Field>
 
+          {isFarm ? (
+            <>
+              {/* a farm is rented whole: one nightly price + how many are free */}
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={t("admin_price_night")}>
+                  <MoneyInput
+                    value={form.price}
+                    onChange={(n) => set("price", n)}
+                  />
+                </Field>
+                <Field label={t("admin_units")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.available}
+                    onChange={(e) =>
+                      set("available", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field label={t("farm_bedrooms")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.bedrooms}
+                    onChange={(e) =>
+                      set("bedrooms", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+                <Field label={t("farm_bathrooms")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.bathrooms}
+                    onChange={(e) =>
+                      set("bathrooms", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+                <Field label={t("farm_area")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.areaSqm}
+                    onChange={(e) =>
+                      set("areaSqm", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+                <Field label={t("farm_guests")}>
+                  <Input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    value={form.guests}
+                    onChange={(e) =>
+                      set("guests", Math.max(0, Number(e.target.value) || 0))
+                    }
+                  />
+                </Field>
+              </div>
+            </>
+          ) : (
+            <>
           {/* rooms editor */}
           <Field label={t("admin_rooms")}>
             <div className="space-y-2">
               {/* standard names so the type shows in every language on the site */}
               <datalist id="room-type-suggestions">
-                {ROOM_TYPES.map((rt) => (
+                {ROOM_TYPES.filter((rt) => rt.id !== FARM_ROOM_TYPE).map((rt) => (
                   <option key={rt.id} value={rt.labels[lang]} />
                 ))}
               </datalist>
@@ -1148,6 +1261,8 @@ export function HotelFormDialog({
               </Button>
             </div>
           </Field>
+            </>
+          )}
 
           {!restricted && (
             <>

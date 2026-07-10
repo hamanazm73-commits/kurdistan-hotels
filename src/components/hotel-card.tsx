@@ -3,7 +3,16 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { MapPin, Star, BedDouble, Pencil } from "lucide-react";
+import {
+  MapPin,
+  Star,
+  BedDouble,
+  Pencil,
+  Bath,
+  Maximize2,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -22,6 +31,7 @@ import {
   mediaSrc,
   totalAvailable,
   roomTypeLabel,
+  propertyKind,
   type Hotel,
 } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
@@ -74,6 +84,26 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
   const trackedRooms = (hotel.rooms ?? []).filter(
     (r) => typeof r.available === "number",
   );
+
+  // A farm has no room types — describe the place itself instead.
+  const isFarm = propertyKind(hotel) === "farm";
+  const farmAttrs: { Icon: LucideIcon; text: string }[] = [];
+  if (isFarm) {
+    if (hotel.bedrooms)
+      farmAttrs.push({
+        Icon: BedDouble,
+        text: `${hotel.bedrooms} ${t("farm_bedrooms")}`,
+      });
+    if (hotel.bathrooms)
+      farmAttrs.push({
+        Icon: Bath,
+        text: `${hotel.bathrooms} ${t("farm_bathrooms")}`,
+      });
+    if (hotel.areaSqm)
+      farmAttrs.push({ Icon: Maximize2, text: `${hotel.areaSqm} m²` });
+    if (hotel.guests)
+      farmAttrs.push({ Icon: Users, text: `${hotel.guests} ${t("farm_guests")}` });
+  }
 
   return (
     <motion.div
@@ -194,8 +224,28 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             ))}
           </div>
 
-          {/* rooms available — per type when tracked, else the total */}
-          {trackedRooms.length > 0 ? (
+          {/* farm: bedrooms/bathrooms/area/guests. hotel: rooms available */}
+          {isFarm ? (
+            <div className="flex flex-wrap gap-1.5">
+              {farmAttrs.map(({ Icon, text }) => (
+                <span
+                  key={text}
+                  className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground"
+                >
+                  <Icon className="size-3" />
+                  {text}
+                </span>
+              ))}
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold",
+                  availTone(rooms),
+                )}
+              >
+                {rooms <= 0 ? t("room_full") : t("farm_units", { n: rooms })}
+              </span>
+            </div>
+          ) : trackedRooms.length > 0 ? (
             <div className="flex flex-wrap gap-1.5">
               {trackedRooms.map((r) => (
                 <span
