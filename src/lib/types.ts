@@ -47,12 +47,7 @@ export const ROOM_TYPES: { id: string; labels: Record<Lang, string> }[] = [
   { id: "king", labels: { en: "King", ckb: "کینگ", ar: "كينج", kmr: "King" } },
   { id: "queen", labels: { en: "Queen", ckb: "کوین", ar: "كوين", kmr: "Queen" } },
   { id: "vip", labels: { en: "VIP", ckb: "VIP", ar: "VIP", kmr: "VIP" } },
-  // used as the "room type" of a farm booking — a farm is rented whole
-  { id: "farm", labels: { en: "Farm", ckb: "مەزرەعە", ar: "مزرعة", kmr: "Zevî" } },
 ];
-
-/** The room type stored on a booking when the whole farm is rented. */
-export const FARM_ROOM_TYPE = "farm";
 
 /** Match a stored room-type string to a standard type by its id or any of its
     language names (case-insensitive), so a type typed in one language still
@@ -112,27 +107,8 @@ export function paymentColor(type: string): string {
   return PAYMENT_TYPES.find((p) => p.id === type)?.color ?? "#6B7280";
 }
 
-/** What kind of place a listing is. Farms/resorts are booked exactly like
-    hotels, so they reuse the same booking, pricing and admin flow. */
-export type PropertyKind = "hotel" | "farm";
-
-/** Listings saved before farms existed have no `kind` — treat them as hotels. */
-export function propertyKind(h: Pick<Hotel, "kind">): PropertyKind {
-  return h.kind ?? "hotel";
-}
-
 export interface Hotel {
   id: string;
-  /** "hotel" (default) or "farm" — a farm/resort rented out for tourism */
-  kind?: PropertyKind;
-  /** farm-only: a farm is rented whole, so it has no room types and is
-      described by these instead. */
-  bedrooms?: number;
-  bathrooms?: number;
-  /** area in square metres */
-  areaSqm?: number;
-  /** how many guests it sleeps */
-  guests?: number;
   name: string;
   city: string;
   /** base nightly price (used when there is no discount) */

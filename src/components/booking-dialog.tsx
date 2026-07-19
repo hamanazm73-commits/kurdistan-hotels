@@ -24,16 +24,7 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
-import {
-  effectivePrice,
-  FARM_ROOM_TYPE,
-  propertyKind,
-  roomPriceOn,
-  roomTypeLabel,
-  seasonFor,
-  totalAvailable,
-  type Hotel,
-} from "@/lib/types";
+import { roomPriceOn, roomTypeLabel, seasonFor, type Hotel } from "@/lib/types";
 import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
 
@@ -78,16 +69,10 @@ export function BookingDialog({
     if (open && initialRoomType) setRoomType(initialRoomType);
   }, [open, initialRoomType]);
 
-  // A farm is rented whole: no room types, one nightly price, no seasons.
-  const isFarm = propertyKind(hotel) === "farm";
-  const room = isFarm ? undefined : hotel.rooms.find((r) => r.type === roomType);
+  const room = hotel.rooms.find((r) => r.type === roomType);
   // price for the chosen check-in date — a season's price if one covers it,
-  // otherwise the room's base price (or the farm's own nightly price)
-  const roomPrice = isFarm
-    ? effectivePrice(hotel)
-    : room
-      ? roomPriceOn(hotel, roomType, checkIn)
-      : 0;
+  // otherwise the room's base price
+  const roomPrice = room ? roomPriceOn(hotel, roomType, checkIn) : 0;
   const total = useMemo(
     () => roomPrice * Math.max(1, Number(nights) || 1),
     [roomPrice, nights],
@@ -107,15 +92,12 @@ export function BookingDialog({
       : activeSeason.from
     : "";
 
-  // a farm books as one unit, so it needs no room selection
-  const bookedType = isFarm ? FARM_ROOM_TYPE : roomType;
-
   async function submit() {
-    if (!name.trim() || !phone.trim() || !checkIn || !bookedType) {
+    if (!name.trim() || !phone.trim() || !checkIn || !roomType) {
       toast.error(t("book_required"));
       return;
     }
-    if (isFarm ? totalAvailable(hotel) <= 0 : room && room.available === 0) {
+    if (room && room.available === 0) {
       toast.error(t("book_room_full"));
       return;
     }
@@ -129,7 +111,7 @@ export function BookingDialog({
           hotelId: hotel.id,
           name: name.trim(),
           phone: phone.trim(),
-          roomType: bookedType,
+          roomType,
           roomPrice,
           checkIn,
           nights: Number(nights) || 1,
@@ -154,7 +136,7 @@ export function BookingDialog({
         docId: data.id,
         hotelId: hotel.id,
         hotel: hotel.name,
-        roomType: bookedType,
+        roomType,
         roomPrice,
         checkIn,
         nights: Number(nights) || 1,
@@ -228,8 +210,6 @@ export function BookingDialog({
               />
             </div>
           </div>
-          {/* a farm has no room types — it is booked as a whole */}
-          {!isFarm && (
           <div className="grid gap-2">
             <Label>{t("book_roomtype")}</Label>
             <Select
@@ -279,7 +259,6 @@ export function BookingDialog({
               </SelectContent>
             </Select>
           </div>
-          )}
 
           {showSeasonNote && (
             <div className="flex items-start gap-2 rounded-lg border border-gold/40 bg-gold/10 px-3 py-2 text-xs leading-relaxed">

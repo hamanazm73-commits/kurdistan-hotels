@@ -184,7 +184,6 @@ export default function AdminPage() {
         <Tabs defaultValue="hotels">
           <TabsList>
             <TabsTrigger value="hotels">{t("admin_hotels")}</TabsTrigger>
-            <TabsTrigger value="tourism">{t("admin_tourism")}</TabsTrigger>
             <TabsTrigger value="bookings">{t("admin_bookings")}</TabsTrigger>
             <TabsTrigger value="feedback">{t("admin_feedback")}</TabsTrigger>
             {isOwner && (
@@ -192,12 +191,8 @@ export default function AdminPage() {
             )}
           </TabsList>
 
-          {/* hotels and farms live in their own tabs so they never mix */}
           <TabsContent value="hotels" className="mt-6">
-            <HotelsPanel kind="hotel" />
-          </TabsContent>
-          <TabsContent value="tourism" className="mt-6">
-            <HotelsPanel kind="farm" />
+            <HotelsPanel />
           </TabsContent>
           <TabsContent value="bookings" className="mt-6">
             <BookingsPanel />

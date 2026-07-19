@@ -15,9 +15,6 @@ import {
   ChevronRight,
   Maximize2,
   CreditCard,
-  Bath,
-  Users,
-  type LucideIcon,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -36,8 +33,6 @@ import {
   paymentLabel,
   paymentColor,
   roomTypeLabel,
-  propertyKind,
-  totalAvailable,
   type Hotel,
 } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
@@ -147,27 +142,6 @@ export function HotelDetailClient({
   const gallery = [hotel.image, ...galleryImages].filter(Boolean).map(mediaSrc);
   const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const description = pickLang(hotel.description, hotel.descriptionI18n, lang);
-
-  // A farm is rented whole — describe the place instead of listing room types.
-  const isFarm = propertyKind(hotel) === "farm";
-  const farmUnits = totalAvailable(hotel);
-  const farmAttrs: { Icon: LucideIcon; text: string }[] = [];
-  if (isFarm) {
-    if (hotel.bedrooms)
-      farmAttrs.push({
-        Icon: BedDouble,
-        text: `${hotel.bedrooms} ${t("farm_bedrooms")}`,
-      });
-    if (hotel.bathrooms)
-      farmAttrs.push({
-        Icon: Bath,
-        text: `${hotel.bathrooms} ${t("farm_bathrooms")}`,
-      });
-    if (hotel.areaSqm)
-      farmAttrs.push({ Icon: Maximize2, text: `${hotel.areaSqm} m²` });
-    if (hotel.guests)
-      farmAttrs.push({ Icon: Users, text: `${hotel.guests} ${t("farm_guests")}` });
-  }
 
   return (
     <>
@@ -317,49 +291,6 @@ export function HotelDetailClient({
             )}
 
             <section className="mt-7">
-              {isFarm ? (
-                <>
-                  <h2 className="mb-1 text-lg font-bold">{t("detail_farm")}</h2>
-                  <p className="mb-3 text-sm text-muted-foreground">
-                    {t("detail_farm_sub")}
-                  </p>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {farmAttrs.map(({ Icon, text }) => (
-                      <div
-                        key={text}
-                        className="flex items-center gap-2 rounded-lg border bg-card px-3 py-3 text-sm font-medium"
-                      >
-                        <Icon className="size-4 shrink-0 text-muted-foreground" />
-                        {text}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    disabled={farmUnits <= 0}
-                    onClick={() => {
-                      setBookingRoom("");
-                      setBookingOpen(true);
-                    }}
-                    className="group mt-3 flex w-full items-center justify-between gap-3 rounded-lg border bg-card px-4 py-3 text-start transition hover:border-primary hover:bg-accent/40 hover:shadow-sm active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60"
-                  >
-                    <span className="font-medium">
-                      {farmUnits <= 0 ? t("room_full") : t("book_now")}
-                    </span>
-                    <span className="flex shrink-0 items-center gap-1.5 font-bold text-primary">
-                      <span>
-                        {format(effectivePrice(hotel), hotel.iqdPerUsd)}
-                        <span className="text-xs font-normal text-muted-foreground">
-                          {" "}
-                          {t("per_night")}
-                        </span>
-                      </span>
-                      <ChevronLeft className="size-4 shrink-0 opacity-40 transition group-hover:opacity-100 ltr:rotate-180" />
-                    </span>
-                  </button>
-                </>
-              ) : (
-                <>
               <h2 className="mb-1 text-lg font-bold">{t("detail_rooms")}</h2>
               <p className="mb-3 text-sm text-muted-foreground">
                 {t("detail_pick_room")}
@@ -409,8 +340,6 @@ export function HotelDetailClient({
                   </button>
                 ))}
               </div>
-                </>
-              )}
             </section>
 
             <BookingDialog
