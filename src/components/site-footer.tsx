@@ -82,7 +82,7 @@ export function SiteFooter() {
             {CITIES.map((c) => (
               <li key={c}>
                 <Link
-                  href="/#hotels"
+                  href={`/hotels-in/${c.toLowerCase()}`}
                   className="inline-flex items-center gap-1 rounded-full bg-primary-foreground/10 px-3 py-1 text-xs text-primary-foreground/80 transition-colors hover:bg-gold hover:text-gold-foreground"
                 >
                   <MapPin className="size-3" />

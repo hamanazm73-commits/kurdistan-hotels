@@ -21,3 +21,21 @@ export const getHotelById = cache(async (id: string): Promise<Hotel | null> => {
     return null;
   }
 });
+
+/**
+ * All public (non-hidden) hotels, for server-rendered listing pages like the
+ * per-city landing pages (good for SEO). Cached per request. Returns [] when
+ * Admin creds are missing so those pages just render empty rather than error.
+ */
+export const getPublicHotels = cache(async (): Promise<Hotel[]> => {
+  const db = getAdminDb();
+  if (!db) return [];
+  try {
+    const snap = await db.collection("hotels").get();
+    return snap.docs
+      .map((d) => ({ id: d.id, ...(d.data() ?? {}) }) as Hotel)
+      .filter((h) => !h.hidden);
+  } catch {
+    return [];
+  }
+});
