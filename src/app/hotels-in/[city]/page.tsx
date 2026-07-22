@@ -138,6 +138,20 @@ export default async function CityHotelsPage({
     },
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: `Hotels in ${seo.en}`,
+        item: `${SITE}/hotels-in/${slug}`,
+      },
+    ],
+  };
+
   return (
     <>
       <script
@@ -146,8 +160,24 @@ export default async function CityHotelsPage({
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
         }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <SiteHeader />
       <main className="mx-auto max-w-7xl px-6 py-12">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground"
+        >
+          <Link href="/" className="hover:text-primary">
+            سەرەتا
+          </Link>
+          <span aria-hidden>›</span>
+          <span className="text-foreground">هۆتێلی {seo.ckb}</span>
+        </nav>
         {/* Server-rendered heading + intro so the key terms are in the crawled
             HTML in every language, regardless of the visitor's chosen one. */}
         <header className="mb-8 border-b pb-6">

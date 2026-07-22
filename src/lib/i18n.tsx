@@ -80,6 +80,9 @@ const ckb: Dict = {
   hotels_eyebrow: "بگەڕێ و حجز بکە",
   hotels_title: "هۆتێلە هەڵبژێردراوەکان",
   hotels_sub: "لە باشترین هۆتێلەکانی کوردستان بگەڕێ و بە چەند کلیکێک حجز بکە.",
+  cities_eyebrow: "بەپێی شار",
+  cities_title: "هۆتێل لە شارەکانی کوردستان",
+  cities_sub: "شارەکەت هەڵبژێرە و باشترین هۆتێلەکانی ببینە.",
 
   badge_featured: "تایبەت",
   badge_recommended: "پێشنیارکراو",
@@ -333,6 +336,9 @@ const en: Dict = {
   hotels_eyebrow: "Find & Book",
   hotels_title: "Handpicked Hotels",
   hotels_sub: "Browse the finest stays across Kurdistan and book in a few clicks.",
+  cities_eyebrow: "By city",
+  cities_title: "Hotels across Kurdistan",
+  cities_sub: "Pick a city and see its best hotels.",
 
   badge_featured: "Featured",
   badge_recommended: "Recommended",
@@ -586,6 +592,9 @@ const ar: Dict = {
   hotels_eyebrow: "ابحث واحجز",
   hotels_title: "فنادق مختارة",
   hotels_sub: "تصفّح أفضل فنادق كردستان واحجز بنقرات قليلة.",
+  cities_eyebrow: "حسب المدينة",
+  cities_title: "فنادق في مدن كردستان",
+  cities_sub: "اختر مدينة وشاهد أفضل فنادقها.",
 
   badge_featured: "مميز",
   badge_recommended: "منصوح بيه",
@@ -839,6 +848,9 @@ const kmr: Dict = {
   hotels_eyebrow: "Bigere û Rezerve",
   hotels_title: "Otêlên Hilbijartî",
   hotels_sub: "Li otêlên herî baş ên Kurdistanê bigere û bi çend klîkan rezerve bike.",
+  cities_eyebrow: "Li gorî bajêr",
+  cities_title: "Otêl li bajarên Kurdistanê",
+  cities_sub: "Bajarê xwe hilbijêre û otêlên wê yên herî baş bibîne.",
 
   badge_featured: "Taybet",
   badge_recommended: "Pêşniyarkirî",
