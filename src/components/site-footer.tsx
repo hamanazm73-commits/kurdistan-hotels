@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Building2, Mail, Phone, MapPin, MessageSquare } from "lucide-react";
+import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
 import { FeedbackDialog } from "@/components/feedback-dialog";
+import { BrandMark } from "@/components/brand-mark";
 
 const PHONE = "0770 057 2004";
 const WHATSAPP = "9647700572004";
@@ -30,9 +31,7 @@ export function SiteFooter() {
         {/* brand */}
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 text-lg font-bold">
-            <span className="grid size-9 place-items-center rounded-xl bg-gold text-gold-foreground shadow-md">
-              <Building2 className="size-5" />
-            </span>
+            <BrandMark className="size-9" />
             {t("brand")}
           </div>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-primary-foreground/70">

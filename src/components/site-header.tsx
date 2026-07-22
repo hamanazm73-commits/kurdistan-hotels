@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Building2, LayoutDashboard, LogIn, LogOut, Menu } from "lucide-react";
+import { LayoutDashboard, LogIn, LogOut, Menu } from "lucide-react";
+import { BrandMark } from "./brand-mark";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -46,9 +47,7 @@ export function SiteHeader() {
         className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6"
       >
         <Link href="/" className="flex min-w-0 items-center gap-2 font-bold">
-          <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-gold text-gold-foreground shadow-md sm:size-9">
-            <Building2 className="size-4 sm:size-5" />
-          </span>
+          <BrandMark className="size-8 sm:size-9" />
           <span className="whitespace-nowrap text-base tracking-tight sm:text-lg">
             {t("brand")}
           </span>
