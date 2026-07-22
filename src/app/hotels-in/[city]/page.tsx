@@ -15,7 +15,14 @@ export const revalidate = 3600;
     common alternate spellings people actually type into Google. */
 const CITY_SEO: Record<
   string,
-  { city: string; ckb: string; en: string; ar: string; aka: string[] }
+  {
+    city: string;
+    ckb: string;
+    en: string;
+    ar: string;
+    aka: string[];
+    intro: { ckb: string; en: string };
+  }
 > = {
   erbil: {
     city: "Erbil",
@@ -23,6 +30,10 @@ const CITY_SEO: Record<
     en: "Erbil",
     ar: "أربيل",
     aka: ["Hawler", "Hewler", "Arbil"],
+    intro: {
+      ckb: "هەولێر پایتەختی هەرێمی کوردستانە و یەکێکە لە کۆنترین شارە ئاوەدانەکانی جیهان، بە قەڵا مێژووییەکەیەوە کە لە لیستی یونیسکۆدایە. هۆتێلەکانی هەولێر لە نزیک قەڵا، بازاڕی قەیسەری و ناوەندی شار هەمەچەشنن — لە هۆتێلی پێنج ئەستێرە تا نرخی گونجاو بۆ کار و گەشت.",
+      en: "Erbil, the capital of the Kurdistan Region, is one of the oldest continuously inhabited cities on earth, crowned by its UNESCO-listed Citadel. Hotels in Erbil range from five-star towers to great-value stays, most within reach of the Citadel, the Qaysari Bazaar and the city centre.",
+    },
   },
   sulaymaniyah: {
     city: "Sulaymaniyah",
@@ -30,6 +41,10 @@ const CITY_SEO: Record<
     en: "Sulaymaniyah",
     ar: "السليمانية",
     aka: ["Slemani", "Sulaimani", "Suli"],
+    intro: {
+      ckb: "سلێمانی ناوەندی ڕۆشنبیری و هونەری کوردستانە، بە بازاڕە جۆشوخرۆشەکان و دیمەنی شاخاوییەوە. هۆتێلەکانی سلێمانی لە نزیک ناوەندی شار، پارک و بازاڕەکانن و گونجاون بۆ گەشتیاری و کار.",
+      en: "Sulaymaniyah is the cultural and artistic heart of Kurdistan, known for its lively bazaars and surrounding mountains. Hotels in Sulaymaniyah sit close to the city centre, parks and markets — a comfortable base for both tourism and business.",
+    },
   },
   duhok: {
     city: "Duhok",
@@ -37,6 +52,10 @@ const CITY_SEO: Record<
     en: "Duhok",
     ar: "دهوك",
     aka: ["Dohuk", "Dahuk"],
+    intro: {
+      ckb: "دهۆک شارێکی جوانی نێوان شاخەکانە لە باکووری کوردستان، نزیک لە بەنداوی دهۆک و دیمەنی سروشتی سەرنجڕاکێش. هۆتێلەکانی دهۆک شوێنێکی باشن بۆ گەشتیارانی سروشت و بنەماڵەکان.",
+      en: "Duhok is a scenic city nestled between mountains in northern Kurdistan, close to the Duhok Dam and striking natural landscapes. Hotels in Duhok make a great base for nature travellers and families.",
+    },
   },
   halabja: {
     city: "Halabja",
@@ -44,6 +63,10 @@ const CITY_SEO: Record<
     en: "Halabja",
     ar: "حلبجة",
     aka: [],
+    intro: {
+      ckb: "هەڵەبجە شارێکی مێژوویی گرنگە لە ڕۆژهەڵاتی کوردستان، دەوردراو بە شاخ و سروشتی جوان. مانەوە لە هۆتێلەکانی هەڵەبجە دەرگایەکە بۆ ناسینی مێژوو و کولتووری ناوچەکە.",
+      en: "Halabja is a historically significant town in eastern Kurdistan, surrounded by mountains and beautiful countryside. Staying in Halabja's hotels is a gateway to the region's history and culture.",
+    },
   },
   kirkuk: {
     city: "Kirkuk",
@@ -51,6 +74,10 @@ const CITY_SEO: Record<
     en: "Kirkuk",
     ar: "كركوك",
     aka: ["Kerkuk"],
+    intro: {
+      ckb: "کەرکووک شارێکی مێژوویی و فرەپێکهاتەیە و ناوەندێکی گرنگی بازرگانییە. هۆتێلەکانی کەرکووک لە نزیک ناوەندی شار و شوێنە بازرگانییەکانن و گونجاون بۆ کار و گەشت.",
+      en: "Kirkuk is a historic, diverse city and an important commercial hub. Hotels in Kirkuk are conveniently located near the city centre and business districts — well suited to work and travel.",
+    },
   },
   dukan: {
     city: "Dukan",
@@ -58,6 +85,10 @@ const CITY_SEO: Record<
     en: "Dukan",
     ar: "دوكان",
     aka: ["Dokan"],
+    intro: {
+      ckb: "دووکان یەکێکە لە جوانترین شوێنە گەشتیارییەکانی کوردستان، بە دەریاچەی دووکان و دیمەنی شاخاوییەوە ناسراوە. هۆتێل و شوێنەکانی مانەوەی دووکان ئارامی و پشوودانێکی جوان لەتەنیشت ئاو پێشکەش دەکەن.",
+      en: "Dukan is one of Kurdistan's most beautiful getaways, famous for Lake Dukan and its mountain scenery. Dukan's hotels and stays offer a relaxing lakeside escape away from the city.",
+    },
   },
 };
 
@@ -199,6 +230,20 @@ export default async function CityHotelsPage({
         </header>
 
         <CityHotelList city={seo.city} initialHotels={cityHotels} />
+
+        {/* unique per-city content — real, distinct text so each page ranks on
+            its own rather than looking thin/duplicated to search engines */}
+        <section className="mt-14 border-t pt-8">
+          <h2 className="mb-3 text-xl font-bold">
+            دەربارەی مانەوە لە {seo.ckb} — About staying in {seo.en}
+          </h2>
+          <p className="max-w-3xl leading-relaxed text-muted-foreground">
+            {seo.intro.ckb}
+          </p>
+          <p className="mt-3 max-w-3xl leading-relaxed text-muted-foreground">
+            {seo.intro.en}
+          </p>
+        </section>
 
         {/* internal links to the other city pages — strengthens crawling and
             lets visitors jump between cities */}
