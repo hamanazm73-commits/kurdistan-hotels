@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -168,6 +169,27 @@ export default async function CityHotelsPage({
         </header>
 
         <CityHotelList city={seo.city} initialHotels={cityHotels} />
+
+        {/* internal links to the other city pages — strengthens crawling and
+            lets visitors jump between cities */}
+        <nav className="mt-14 border-t pt-8">
+          <h2 className="mb-4 text-lg font-bold">
+            هۆتێل لە شارەکانی تر — Hotels in other cities
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {Object.entries(CITY_SEO)
+              .filter(([s]) => s !== slug)
+              .map(([s, o]) => (
+                <Link
+                  key={s}
+                  href={`/hotels-in/${s}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-1.5 text-sm transition-colors hover:border-gold hover:text-gold"
+                >
+                  هۆتێلی {o.ckb} · {o.en}
+                </Link>
+              ))}
+          </div>
+        </nav>
       </main>
       <SiteFooter />
     </>
