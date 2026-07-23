@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getPublicHotels } from "@/lib/hotels-server";
-import { CityHotelList } from "./city-hotel-list";
+import { CityPageBody, type CityIntro } from "./city-page-body";
 
 const SITE = "https://hotelskurdistan.com";
 
@@ -21,7 +20,7 @@ const CITY_SEO: Record<
     en: string;
     ar: string;
     aka: string[];
-    intro: { ckb: string; en: string };
+    intro: CityIntro;
   }
 > = {
   erbil: {
@@ -33,6 +32,7 @@ const CITY_SEO: Record<
     intro: {
       ckb: "هەولێر پایتەختی هەرێمی کوردستانە و یەکێکە لە کۆنترین شارە ئاوەدانەکانی جیهان، بە قەڵا مێژووییەکەیەوە کە لە لیستی یونیسکۆدایە. هۆتێلەکانی هەولێر لە نزیک قەڵا، بازاڕی قەیسەری و ناوەندی شار هەمەچەشنن — لە هۆتێلی پێنج ئەستێرە تا نرخی گونجاو بۆ کار و گەشت.",
       en: "Erbil, the capital of the Kurdistan Region, is one of the oldest continuously inhabited cities on earth, crowned by its UNESCO-listed Citadel. Hotels in Erbil range from five-star towers to great-value stays, most within reach of the Citadel, the Qaysari Bazaar and the city centre.",
+      ar: "أربيل عاصمة إقليم كردستان وواحدة من أقدم المدن المأهولة في العالم، تتوّجها قلعتها المدرجة في اليونسكو. فنادق أربيل متنوّعة — من الفخمة إلى الاقتصادية — وأغلبها قريب من القلعة وقيصرية ومركز المدينة.",
     },
   },
   sulaymaniyah: {
@@ -44,6 +44,7 @@ const CITY_SEO: Record<
     intro: {
       ckb: "سلێمانی ناوەندی ڕۆشنبیری و هونەری کوردستانە، بە بازاڕە جۆشوخرۆشەکان و دیمەنی شاخاوییەوە. هۆتێلەکانی سلێمانی لە نزیک ناوەندی شار، پارک و بازاڕەکانن و گونجاون بۆ گەشتیاری و کار.",
       en: "Sulaymaniyah is the cultural and artistic heart of Kurdistan, known for its lively bazaars and surrounding mountains. Hotels in Sulaymaniyah sit close to the city centre, parks and markets — a comfortable base for both tourism and business.",
+      ar: "السليمانية قلب كردستان الثقافي والفني، تشتهر بأسواقها النابضة وجبالها المحيطة. فنادق السليمانية قريبة من مركز المدينة والحدائق والأسواق — قاعدة مريحة للسياحة والعمل معاً.",
     },
   },
   duhok: {
@@ -55,6 +56,7 @@ const CITY_SEO: Record<
     intro: {
       ckb: "دهۆک شارێکی جوانی نێوان شاخەکانە لە باکووری کوردستان، نزیک لە بەنداوی دهۆک و دیمەنی سروشتی سەرنجڕاکێش. هۆتێلەکانی دهۆک شوێنێکی باشن بۆ گەشتیارانی سروشت و بنەماڵەکان.",
       en: "Duhok is a scenic city nestled between mountains in northern Kurdistan, close to the Duhok Dam and striking natural landscapes. Hotels in Duhok make a great base for nature travellers and families.",
+      ar: "دهوك مدينة جميلة بين الجبال في شمال كردستان، قرب سد دهوك والمناظر الطبيعية الخلابة. فنادق دهوك قاعدة رائعة لمحبّي الطبيعة والعائلات.",
     },
   },
   halabja: {
@@ -66,6 +68,7 @@ const CITY_SEO: Record<
     intro: {
       ckb: "هەڵەبجە شارێکی مێژوویی گرنگە لە ڕۆژهەڵاتی کوردستان، دەوردراو بە شاخ و سروشتی جوان. مانەوە لە هۆتێلەکانی هەڵەبجە دەرگایەکە بۆ ناسینی مێژوو و کولتووری ناوچەکە.",
       en: "Halabja is a historically significant town in eastern Kurdistan, surrounded by mountains and beautiful countryside. Staying in Halabja's hotels is a gateway to the region's history and culture.",
+      ar: "حلبجة مدينة تاريخية مهمة في شرق كردستان، محاطة بالجبال والريف الجميل. الإقامة في فنادق حلبجة بوابة لتاريخ المنطقة وثقافتها.",
     },
   },
   kirkuk: {
@@ -77,6 +80,7 @@ const CITY_SEO: Record<
     intro: {
       ckb: "کەرکووک شارێکی مێژوویی و فرەپێکهاتەیە و ناوەندێکی گرنگی بازرگانییە. هۆتێلەکانی کەرکووک لە نزیک ناوەندی شار و شوێنە بازرگانییەکانن و گونجاون بۆ کار و گەشت.",
       en: "Kirkuk is a historic, diverse city and an important commercial hub. Hotels in Kirkuk are conveniently located near the city centre and business districts — well suited to work and travel.",
+      ar: "كركوك مدينة تاريخية متنوّعة ومركز تجاري مهم. فنادق كركوك قريبة من مركز المدينة والمناطق التجارية — مناسبة للعمل والسفر.",
     },
   },
   dukan: {
@@ -88,6 +92,7 @@ const CITY_SEO: Record<
     intro: {
       ckb: "دووکان یەکێکە لە جوانترین شوێنە گەشتیارییەکانی کوردستان، بە دەریاچەی دووکان و دیمەنی شاخاوییەوە ناسراوە. هۆتێل و شوێنەکانی مانەوەی دووکان ئارامی و پشوودانێکی جوان لەتەنیشت ئاو پێشکەش دەکەن.",
       en: "Dukan is one of Kurdistan's most beautiful getaways, famous for Lake Dukan and its mountain scenery. Dukan's hotels and stays offer a relaxing lakeside escape away from the city.",
+      ar: "دوكان من أجمل وجهات كردستان، تشتهر ببحيرة دوكان ومناظرها الجبلية. فنادق دوكان تمنحك استراحة هادئة على ضفاف البحيرة بعيداً عن المدينة.",
     },
   },
 };
@@ -147,7 +152,10 @@ export default async function CityHotelsPage({
     (h) => h.city?.toLowerCase() === seo.city.toLowerCase(),
   );
 
-  const aka = seo.aka.length ? ` · ${seo.aka.join(" / ")}` : "";
+  // other cities, for the "hotels in other cities" links (localized in the body)
+  const others = Object.entries(CITY_SEO)
+    .filter(([s]) => s !== slug)
+    .map(([s, o]) => ({ slug: s, cityValue: o.city }));
 
   // schema.org CollectionPage listing this city's hotels for richer results
   const jsonLd = {
@@ -198,74 +206,13 @@ export default async function CityHotelsPage({
         }}
       />
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-6 py-12">
-        <nav
-          aria-label="Breadcrumb"
-          className="mb-5 flex items-center gap-1.5 text-sm text-muted-foreground"
-        >
-          <Link href="/" className="hover:text-primary">
-            سەرەتا
-          </Link>
-          <span aria-hidden>›</span>
-          <span className="text-foreground">هۆتێلی {seo.ckb}</span>
-        </nav>
-        {/* Server-rendered heading + intro so the key terms are in the crawled
-            HTML in every language, regardless of the visitor's chosen one. */}
-        <header className="mb-8 border-b pb-6">
-          <p className="text-sm font-semibold uppercase tracking-wide text-gold">
-            {seo.ckb}
-          </p>
-          <h1 className="mt-1 text-3xl font-extrabold sm:text-4xl">
-            هۆتێلەکانی {seo.ckb}
-            <span className="block text-xl font-bold text-muted-foreground sm:text-2xl">
-              Hotels in {seo.en}
-              {aka}
-            </span>
-          </h1>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            باشترین هۆتێلەکانی {seo.ckb} لە کوردستان — نرخی ڕوون، وێنەی
-            ڕاستەقینە، و حجزی خێرا. Book the best hotels in {seo.en}
-            {aka}, Kurdistan Region of Iraq.
-          </p>
-        </header>
-
-        <CityHotelList city={seo.city} initialHotels={cityHotels} />
-
-        {/* unique per-city content — real, distinct text so each page ranks on
-            its own rather than looking thin/duplicated to search engines */}
-        <section className="mt-14 border-t pt-8">
-          <h2 className="mb-3 text-xl font-bold">
-            دەربارەی مانەوە لە {seo.ckb} — About staying in {seo.en}
-          </h2>
-          <p className="max-w-3xl leading-relaxed text-muted-foreground">
-            {seo.intro.ckb}
-          </p>
-          <p className="mt-3 max-w-3xl leading-relaxed text-muted-foreground">
-            {seo.intro.en}
-          </p>
-        </section>
-
-        {/* internal links to the other city pages — strengthens crawling and
-            lets visitors jump between cities */}
-        <nav className="mt-14 border-t pt-8">
-          <h2 className="mb-4 text-lg font-bold">
-            هۆتێل لە شارەکانی تر — Hotels in other cities
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {Object.entries(CITY_SEO)
-              .filter(([s]) => s !== slug)
-              .map(([s, o]) => (
-                <Link
-                  key={s}
-                  href={`/hotels-in/${s}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-1.5 text-sm transition-colors hover:border-gold hover:text-gold"
-                >
-                  هۆتێلی {o.ckb} · {o.en}
-                </Link>
-              ))}
-          </div>
-        </nav>
-      </main>
+      <CityPageBody
+        slug={slug}
+        cityValue={seo.city}
+        intro={seo.intro}
+        others={others}
+        initialHotels={cityHotels}
+      />
       <SiteFooter />
     </>
   );
