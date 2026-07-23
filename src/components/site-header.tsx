@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, LogIn, LogOut, Menu, Heart } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogIn,
+  LogOut,
+  Menu,
+  Heart,
+  Map as MapIcon,
+} from "lucide-react";
 import { BrandMark } from "./brand-mark";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,6 +72,14 @@ export function SiteHeader() {
             render={<Link href="/#hotels" />}
           >
             {t("nav_hotels")}
+          </Button>
+          <Button
+            variant="ghost"
+            nativeButton={false}
+            render={<Link href="/map" />}
+          >
+            <MapIcon className="size-4" />
+            {t("nav_map")}
           </Button>
           <Button
             variant="ghost"
@@ -166,6 +181,15 @@ export function SiteHeader() {
                   render={<Link href="/#hotels" />}
                 >
                   {t("nav_hotels")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  nativeButton={false}
+                  render={<Link href="/map" />}
+                >
+                  <MapIcon className="size-4" />
+                  {t("nav_map")}
                 </Button>
                 <Button
                   variant="ghost"
