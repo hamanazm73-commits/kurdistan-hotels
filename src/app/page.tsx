@@ -5,6 +5,7 @@ import { HotelsSection } from "@/components/hotels-section";
 import { BrowseByCity } from "@/components/browse-by-city";
 import { TrustSection } from "@/components/trust-section";
 import { FaqSection } from "@/components/faq-section";
+import { SeoAbout } from "@/components/seo-about";
 import { FAQ_ITEMS } from "@/lib/site-content";
 
 // FAQ structured data (in the default site language, matching what the page
@@ -35,6 +36,7 @@ export default function HomePage() {
         <BrowseByCity />
         <TrustSection />
         <FaqSection />
+        <SeoAbout />
       </main>
       <SiteFooter />
     </>

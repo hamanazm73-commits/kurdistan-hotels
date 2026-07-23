@@ -3,6 +3,60 @@ import type { Lang } from "./types";
 /** A short string in every supported language. */
 type L = Record<Lang, string>;
 
+/* ---------------- Multilingual "about" (server-rendered SEO) ----------------
+   Rendered once, in all four languages at the same time, so search engines
+   crawl real Kurdish / Arabic / English / Kurmanji text (the rest of the site
+   swaps language on the client, so only one language would otherwise appear in
+   the HTML). This is what lets the site be found by searches like
+   "فنادق كردستان", "hotels in Kurdistan" or "otêlên Kurdistanê". */
+
+export interface SeoAboutBlock {
+  lang: Lang;
+  dir: "rtl" | "ltr";
+  /** short language label shown to readers */
+  label: string;
+  heading: string;
+  body: string;
+}
+
+export const SEO_ABOUT_HEADING: L = {
+  ckb: "دەربارەی هۆتێلەکانی کوردستان",
+  en: "About Kurdistan Hotels",
+  ar: "حول فنادق كردستان",
+  kmr: "Derbarê Otêlên Kurdistanê",
+};
+
+export const SEO_ABOUT: SeoAboutBlock[] = [
+  {
+    lang: "ckb",
+    dir: "rtl",
+    label: "کوردی",
+    heading: "هۆتێلەکانی کوردستان",
+    body: "هۆتێلەکانی کوردستان پلاتفۆرمێکە بۆ دۆزینەوە و حیجزکردنی هۆتێل لە هەموو هەرێمی کوردستان — هەولێر، سلێمانی، دهۆک، دووکان، هەڵەبجە و کەرکووک. بە ئاسانی هۆتێل بدۆزەرەوە، نرخەکان بەراورد بکە و ڕاستەوخۆ لەگەڵ هۆتێلەکە حیجز بکە.",
+  },
+  {
+    lang: "ar",
+    dir: "rtl",
+    label: "عربي",
+    heading: "فنادق كردستان",
+    body: "فنادق كردستان منصّة للبحث عن الفنادق وحجزها في جميع أنحاء إقليم كردستان — أربيل (هەولێر)، السليمانية، دهوك، دوكان، حلبجة وكركوك. ابحث عن فندق، قارن الأسعار واحجز مباشرة مع الفندق دون رسوم إضافية.",
+  },
+  {
+    lang: "en",
+    dir: "ltr",
+    label: "English",
+    heading: "Hotels in Kurdistan",
+    body: "Kurdistan Hotels helps you find and book hotels across the Kurdistan Region — Erbil (Hawler), Sulaymaniyah (Slemani), Duhok, Dukan, Halabja and Kirkuk. Search for a hotel, compare prices and book directly with the hotel, with no extra fees.",
+  },
+  {
+    lang: "kmr",
+    dir: "ltr",
+    label: "Kurmancî",
+    heading: "Otêlên Kurdistanê",
+    body: "Otêlên Kurdistanê alîkariya te dike ku li seranserê Herêma Kurdistanê otêlan bibînî û rezerve bikî — Hewlêr, Silêmanî, Dihok, Dûkan, Helebce û Kerkûk. Otêlekê bigere, bihayan bide ber hev û rasterast bi otêlê re rezerve bike.",
+  },
+];
+
 /* ---------------- "Why book with us" trust section ---------------- */
 
 export const TRUST_EYEBROW: L = {

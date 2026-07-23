@@ -18,11 +18,11 @@ const arabic = Noto_Naskh_Arabic({
 export const metadata: Metadata = {
   metadataBase: new URL("https://hotelskurdistan.com"),
   title: {
-    default: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
+    default: "هۆتێلەکانی کوردستان · فنادق كردستان · Kurdistan Hotels",
     template: "%s — Kurdistan Hotels",
   },
   description:
-    "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
+    "هۆتێلەکانی کوردستان — حیجزی هۆتێل لە هەولێر، سلێمانی، دهۆک، دووکان، هەڵەبجە و کەرکووک. فنادق كردستان · Find and book hotels across Kurdistan — compare prices and book directly.",
   keywords: [
     // brand + common variant spellings people actually type
     "Kurdistan hotels",
