@@ -50,6 +50,7 @@ import {
 } from "@/lib/hotels-db";
 import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, ROOM_TYPES, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
+import { parseLatLng } from "@/lib/geo";
 
 type FormRoom = { type: string; price: number; available?: number };
 
@@ -119,6 +120,8 @@ const empty = {
   notifyEmail: "",
   video: "",
   mapUrl: "",
+  // raw text the owner pastes; parsed into lat/lng on save
+  coords: "",
   payments: [] as { type: string; url: string }[],
   iqdPerUsd: 0,
   rooms: defaultRooms(),
@@ -446,6 +449,10 @@ export function HotelFormDialog({
       notifyEmail: h.notifyEmail ?? "",
       video: h.video ?? "",
       mapUrl: h.mapUrl ?? "",
+      coords:
+        typeof h.lat === "number" && typeof h.lng === "number"
+          ? `${h.lat}, ${h.lng}`
+          : "",
       payments: (h.payments ?? []).map((p) => ({ type: p.type, url: p.url })),
       // shown/edited per 100 USD (Kurdistan convention); stored as per 1 USD
       iqdPerUsd: Math.round((h.iqdPerUsd ?? 0) * 100),
@@ -520,6 +527,11 @@ export function HotelFormDialog({
       notifyEmail: f.notifyEmail.trim(),
       video: f.video.trim(),
       mapUrl: f.mapUrl.trim(),
+      // exact map position, when the owner pasted usable coordinates
+      ...(() => {
+        const c = parseLatLng(f.coords);
+        return c ? { lat: c.lat, lng: c.lng } : {};
+      })(),
       payments: f.payments
         .map((p) => ({ type: p.type, url: p.url.trim() }))
         .filter((p) => p.url),
@@ -830,6 +842,29 @@ export function HotelFormDialog({
               value={form.mapUrl}
               onChange={(e) => set("mapUrl", e.target.value)}
             />
+          </Field>
+
+          {/* exact pin on the map page; falls back to the city centre */}
+          <Field label={t("admin_coords")}>
+            <Input
+              dir="ltr"
+              placeholder="36.1911, 44.0092"
+              value={form.coords}
+              onChange={(e) => set("coords", e.target.value)}
+            />
+            {form.coords.trim() &&
+              (parseLatLng(form.coords) ? (
+                <p className="text-xs font-medium text-emerald-600">
+                  ✓ {t("admin_coords_ok")}
+                </p>
+              ) : (
+                <p className="text-xs font-medium text-destructive">
+                  {t("admin_coords_bad")}
+                </p>
+              ))}
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {t("admin_coords_hint")}
+            </p>
           </Field>
 
           <Field label={t("admin_video")}>

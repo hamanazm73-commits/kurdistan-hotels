@@ -140,6 +140,10 @@ export interface Hotel {
   video?: string;
   /** Google Maps link / place URL for the hotel */
   mapUrl?: string;
+  /** exact position for the map page; when unset the hotel is placed near its
+      city centre instead */
+  lat?: number;
+  lng?: number;
   /** when true, the hotel is hidden from the public site (still shown in admin) */
   hidden?: boolean;
   /** online-payment options; guests pay the hotel directly via these links */
