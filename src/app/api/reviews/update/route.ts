@@ -45,11 +45,9 @@ async function resolveScope(
   }
   const r: Record<string, unknown> =
     (await db.collection("roles").doc(email).get()).data() ?? {};
+  // Only the owner / platform admins may moderate reviews — never hotel owners.
   if (r.enabled === true && (r.role === "admin" || r.role === "owner")) {
     return { isAdmin: true, ownHotelId: null };
-  }
-  if (r.enabled === true && r.role === "hotel") {
-    return { isAdmin: false, ownHotelId: r.hotelId ? String(r.hotelId) : null };
   }
   return null;
 }

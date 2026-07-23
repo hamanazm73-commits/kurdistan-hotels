@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { notifyNewReview } from "@/lib/telegram";
 
 export const runtime = "nodejs";
 
@@ -65,7 +66,7 @@ export async function POST(req: Request) {
   const db = getAdminDb();
   if (!db) return NextResponse.json({ error: "no_db" }, { status: 500 });
   try {
-    await db.collection("reviews").add({
+    const ref = await db.collection("reviews").add({
       hotelId: parsed.data.hotelId,
       name: parsed.data.name.trim(),
       rating: parsed.data.rating,
@@ -73,6 +74,23 @@ export async function POST(req: Request) {
       status: "pending",
       createdAt: Date.now(),
     });
+
+    // Notify the site owner on Telegram so they can approve/reject with one
+    // tap. Best-effort: a failure here must never break the submission.
+    try {
+      const hs = await db.collection("hotels").doc(parsed.data.hotelId).get();
+      const hotelName = (hs.data()?.name as string) || parsed.data.hotelId;
+      await notifyNewReview({
+        id: ref.id,
+        hotelName,
+        name: parsed.data.name.trim(),
+        rating: parsed.data.rating,
+        comment: parsed.data.comment.trim(),
+      });
+    } catch {
+      /* ignore notification errors */
+    }
+
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "write_failed" }, { status: 500 });

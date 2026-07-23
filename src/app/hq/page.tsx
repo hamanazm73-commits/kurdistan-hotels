@@ -114,16 +114,12 @@ export default function AdminPage() {
             <TabsList>
               <TabsTrigger value="hotel">{t("admin_my_hotel")}</TabsTrigger>
               <TabsTrigger value="bookings">{t("admin_bookings")}</TabsTrigger>
-              <TabsTrigger value="reviews">{t("admin_reviews")}</TabsTrigger>
             </TabsList>
             <TabsContent value="hotel" className="mt-6">
               <HotelsPanel ownerHotelId={hotelId ?? undefined} />
             </TabsContent>
             <TabsContent value="bookings" className="mt-6">
               <BookingsPanel hotelId={hotelId ?? undefined} />
-            </TabsContent>
-            <TabsContent value="reviews" className="mt-6">
-              <ReviewsPanel />
             </TabsContent>
           </Tabs>
         </main>
