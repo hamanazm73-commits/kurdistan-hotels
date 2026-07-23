@@ -198,6 +198,40 @@ export function reviewSummary(
   return { average: Math.round((sum / count) * 10) / 10, count };
 }
 
+/**
+ * A blog article, written by the site owner in the dashboard. Posts bring in
+ * search traffic (travel guides, city tips) and are written in ONE language —
+ * the owner picks it — so nothing has to be translated four times.
+ */
+export interface BlogPost {
+  id: string;
+  /** URL part, e.g. "best-hotels-in-erbil" */
+  slug: string;
+  title: string;
+  /** short summary shown in the list and used as the meta description */
+  excerpt?: string;
+  /** body text: blank lines separate paragraphs, "## " a heading, "- " a bullet */
+  content: string;
+  coverImage?: string;
+  lang: Lang;
+  /** drafts stay out of the public blog and the sitemap */
+  published: boolean;
+  createdAt?: number;
+  updatedAt?: number;
+}
+
+export type BlogPostInput = Omit<BlogPost, "id">;
+
+/** Turn a title into a clean URL slug (keeps Arabic/Kurdish letters). */
+export function slugify(title: string): string {
+  return title
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
 /** A visitor's feedback about the site (not tied to a booking). */
 export interface Feedback {
   /** optional name the visitor gave */

@@ -48,6 +48,7 @@ export function SiteFooter() {
             {[
               { href: "/", label: t("nav_home") },
               { href: "/#hotels", label: t("nav_hotels") },
+              { href: "/blog", label: t("nav_blog") },
               { href: "/login", label: t("nav_login") },
             ].map((l) => (
               <li key={l.href}>

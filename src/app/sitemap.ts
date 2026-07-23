@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { getPublishedPosts } from "@/lib/posts-server";
 
 const BASE = "https://hotelskurdistan.com";
 
@@ -27,8 +28,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 0.9,
     })),
+    { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE}/map`, lastModified: now, changeFrequency: "weekly", priority: 0.5 },
     { url: `${BASE}/bookings`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
   ];
+
+  // published blog posts
+  try {
+    for (const p of await getPublishedPosts()) {
+      routes.push({
+        url: `${BASE}/blog/${p.slug}`,
+        lastModified: new Date(p.updatedAt ?? p.createdAt ?? Date.now()),
+        changeFrequency: "monthly",
+        priority: 0.6,
+      });
+    }
+  } catch {
+    /* no admin creds — skip posts */
+  }
 
   // add every public hotel page so search engines can index them
   try {

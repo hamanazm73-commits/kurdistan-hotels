@@ -19,6 +19,8 @@ import { db, auth } from "./firebase";
 import { SAMPLE_HOTELS } from "./sample-data";
 import type {
   AdminRecord,
+  BlogPost,
+  BlogPostInput,
   Booking,
   BookingStatus,
   Feedback,
@@ -86,6 +88,46 @@ export async function listFeedback(): Promise<(Feedback & { id: string })[]> {
   if (!res.ok) throw new Error("failed");
   const data = (await res.json()) as { items?: (Feedback & { id: string })[] };
   return data.items ?? [];
+}
+
+/* ---------------- blog posts (dashboard) ---------------- */
+
+async function authHeaders(): Promise<HeadersInit> {
+  const idToken = (await auth?.currentUser?.getIdToken()) ?? "";
+  return { Authorization: `Bearer ${idToken}` };
+}
+
+/** Every post, drafts included — for the dashboard list. */
+export async function listPosts(): Promise<BlogPost[]> {
+  const res = await fetch("/api/posts", { headers: await authHeaders() });
+  if (!res.ok) throw new Error("failed");
+  const data = (await res.json()) as { items?: BlogPost[] };
+  return data.items ?? [];
+}
+
+/** Create (no id) or update (with id) a post. */
+export async function savePost(
+  post: BlogPostInput & { id?: string },
+): Promise<string> {
+  const res = await fetch("/api/posts", {
+    method: "POST",
+    headers: { ...(await authHeaders()), "Content-Type": "application/json" },
+    body: JSON.stringify(post),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    id?: string;
+    error?: string;
+  };
+  if (!res.ok) throw new Error(data.error || "failed");
+  return data.id ?? "";
+}
+
+export async function deletePost(id: string) {
+  const res = await fetch(`/api/posts?id=${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error("failed");
 }
 
 /** Delete one feedback entry (signed-in only, via the Admin-SDK API). */
