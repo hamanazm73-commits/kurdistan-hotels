@@ -30,8 +30,16 @@ export function CityPageBody({
 }) {
   const { t, tCity, lang } = useI18n();
   const name = tCity(cityValue);
-  const introText =
-    lang === "ar" ? intro.ar : lang === "ckb" ? intro.ckb : intro.en;
+  // Which intro to *show* (Kurmanji falls back to English).
+  const introLang = lang === "ar" ? "ar" : lang === "ckb" ? "ckb" : "en";
+  // Every language stays in the HTML so search engines can match Arabic /
+  // Kurdish / English queries; only the visitor's language is shown.
+  const intros = [
+    { lang: "ckb", dir: "rtl", text: intro.ckb },
+    { lang: "ar", dir: "rtl", text: intro.ar },
+    { lang: "en", dir: "ltr", text: intro.en },
+  ] as const;
+  const hasIntro = !!(intro.ckb || intro.ar || intro.en);
   const count = initialHotels.length;
   void slug;
 
@@ -78,15 +86,23 @@ export function CityPageBody({
 
       <CityHotelList city={cityValue} initialHotels={initialHotels} />
 
-      {/* about — real, distinct text so each city page stands on its own */}
-      {introText && (
+      {/* about — real, distinct text so each city page stands on its own.
+          All languages ship in the HTML (SEO); only the active one shows. */}
+      {hasIntro && (
         <section className="mt-14 rounded-2xl border bg-muted/30 p-6 sm:p-8">
           <h2 className="mb-3 text-xl font-bold">
             {t("city_about", { city: name })}
           </h2>
-          <p className="max-w-3xl leading-relaxed text-muted-foreground">
-            {introText}
-          </p>
+          {intros.map((it) => (
+            <p
+              key={it.lang}
+              dir={it.dir}
+              hidden={it.lang !== introLang}
+              className="max-w-3xl leading-relaxed text-muted-foreground"
+            >
+              {it.text}
+            </p>
+          ))}
         </section>
       )}
 

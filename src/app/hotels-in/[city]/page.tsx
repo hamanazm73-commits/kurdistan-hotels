@@ -111,8 +111,8 @@ export async function generateMetadata({
   if (!seo) return { title: "Hotels in Kurdistan" };
 
   const aka = seo.aka.length ? ` (${seo.aka.join(" / ")})` : "";
-  const title = `Hotels in ${seo.en}${aka} — هۆتێلەکانی ${seo.ckb}`;
-  const description = `Find and book the best hotels in ${seo.en}${aka}, Kurdistan. Clear prices, real photos and fast booking on Kurdistan Hotels. باشترین هۆتێلەکانی ${seo.ckb}.`;
+  const title = `Hotels in ${seo.en}${aka} · فنادق ${seo.ar} · هۆتێلەکانی ${seo.ckb}`;
+  const description = `Find and book the best hotels in ${seo.en}${aka}, Kurdistan. فنادق ${seo.ar}: احجز أفضل الفنادق بأسعار واضحة. باشترین هۆتێلەکانی ${seo.ckb}.`;
 
   return {
     title,
