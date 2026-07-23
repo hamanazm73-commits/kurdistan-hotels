@@ -3,6 +3,45 @@ import { cache } from "react";
 import { getAdminDb } from "./firebase-admin";
 import type { Hotel } from "./types";
 
+export interface ApprovedReview {
+  name: string;
+  rating: number;
+  comment: string;
+  createdAt: number;
+}
+
+/**
+ * Approved reviews for a hotel, read on the server for structured data
+ * (aggregateRating → star rich snippets in Google). Cached per request.
+ * Returns [] when Admin creds are missing so pages render without ratings.
+ */
+export const getApprovedReviews = cache(
+  async (hotelId: string): Promise<ApprovedReview[]> => {
+    const db = getAdminDb();
+    if (!db) return [];
+    try {
+      const snap = await db
+        .collection("reviews")
+        .where("hotelId", "==", hotelId)
+        .where("status", "==", "approved")
+        .get();
+      return snap.docs
+        .map((d) => {
+          const r = d.data();
+          return {
+            name: String(r.name ?? ""),
+            rating: Number(r.rating ?? 0),
+            comment: String(r.comment ?? ""),
+            createdAt: Number(r.createdAt ?? 0),
+          };
+        })
+        .sort((a, b) => b.createdAt - a.createdAt);
+    } catch {
+      return [];
+    }
+  },
+);
+
 /**
  * Fetch a single hotel by id on the server (for per-page SEO metadata,
  * structured data, and a server-rendered first paint on the detail page).

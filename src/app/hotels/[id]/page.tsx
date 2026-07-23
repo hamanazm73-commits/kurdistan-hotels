@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
-import { getHotelById } from "@/lib/hotels-server";
-import { effectivePrice, mapsUrl, type Hotel } from "@/lib/types";
+import { getHotelById, getApprovedReviews } from "@/lib/hotels-server";
+import {
+  effectivePrice,
+  mapsUrl,
+  reviewSummary,
+  type Hotel,
+} from "@/lib/types";
 import { HotelDetailClient } from "./hotel-detail-client";
 
 const SITE = "https://hotelskurdistan.com";
@@ -77,8 +82,13 @@ export default async function HotelPage({
   const { id } = await params;
   const hotel = await getHotelById(id);
 
+  // Approved guest reviews feed the aggregateRating so Google can show ⭐ stars
+  // in search results (rich snippets). Only included when reviews exist —
+  // an empty aggregateRating is invalid and Google would flag it.
+  const reviews = hotel ? await getApprovedReviews(id) : [];
+  const { average, count } = reviewSummary(reviews);
+
   // schema.org Hotel — helps Google show a richer result for each hotel.
-  // Ratings/reviews are intentionally omitted (no verified review data yet).
   const jsonLd = hotel
     ? {
         "@context": "https://schema.org",
@@ -98,6 +108,35 @@ export default async function HotelPage({
           addressRegion: "Kurdistan Region",
           addressCountry: "IQ",
         },
+        ...(count > 0
+          ? {
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: average,
+                reviewCount: count,
+                bestRating: 5,
+                worstRating: 1,
+              },
+              review: reviews.slice(0, 5).map((r) => ({
+                "@type": "Review",
+                author: { "@type": "Person", name: r.name },
+                reviewRating: {
+                  "@type": "Rating",
+                  ratingValue: r.rating,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+                ...(r.comment ? { reviewBody: r.comment } : {}),
+                ...(r.createdAt
+                  ? {
+                      datePublished: new Date(r.createdAt)
+                        .toISOString()
+                        .slice(0, 10),
+                    }
+                  : {}),
+              })),
+            }
+          : {}),
       }
     : null;
 
