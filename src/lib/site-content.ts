@@ -114,16 +114,16 @@ export const TRUST_ITEMS: TrustItem[] = [
   {
     icon: "headset",
     title: {
-      ckb: "پشتگیری بە کوردی",
+      ckb: "پشتگیری خۆماڵی",
       en: "Local support",
       ar: "دعم محلي",
       kmr: "Piştgiriya herêmî",
     },
     desc: {
-      ckb: "پەیوەندی ڕاستەوخۆ بە هۆتێل بە کوردی و لە ڕێگەی واتساپەوە.",
-      en: "Reach the hotel directly in Kurdish, over WhatsApp.",
-      ar: "تواصل مع الفندق مباشرة بالكردية عبر واتساب.",
-      kmr: "Bi Kurdî rasterast bi otêlê re, bi rêya WhatsApp.",
+      ckb: "پەیوەندی ڕاستەوخۆ لەگەڵ هۆتێل لە ڕێگەی واتساپەوە.",
+      en: "Reach the hotel directly over WhatsApp.",
+      ar: "تواصل مع الفندق مباشرة عبر واتساب.",
+      kmr: "Rasterast bi rêya WhatsApp bi otêlê re têkilî dayne.",
     },
   },
   {
