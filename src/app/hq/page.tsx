@@ -16,6 +16,7 @@ import { useHotels } from "@/lib/use-hotels";
 import { HotelsPanel } from "@/components/admin/hotels-panel";
 import { BookingsPanel } from "@/components/admin/bookings-panel";
 import { FeedbackPanel } from "@/components/admin/feedback-panel";
+import { ReviewsPanel } from "@/components/admin/reviews-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 import { ExchangeRateCard } from "@/components/admin/exchange-rate";
 
@@ -113,12 +114,16 @@ export default function AdminPage() {
             <TabsList>
               <TabsTrigger value="hotel">{t("admin_my_hotel")}</TabsTrigger>
               <TabsTrigger value="bookings">{t("admin_bookings")}</TabsTrigger>
+              <TabsTrigger value="reviews">{t("admin_reviews")}</TabsTrigger>
             </TabsList>
             <TabsContent value="hotel" className="mt-6">
               <HotelsPanel ownerHotelId={hotelId ?? undefined} />
             </TabsContent>
             <TabsContent value="bookings" className="mt-6">
               <BookingsPanel hotelId={hotelId ?? undefined} />
+            </TabsContent>
+            <TabsContent value="reviews" className="mt-6">
+              <ReviewsPanel />
             </TabsContent>
           </Tabs>
         </main>
@@ -185,6 +190,7 @@ export default function AdminPage() {
           <TabsList>
             <TabsTrigger value="hotels">{t("admin_hotels")}</TabsTrigger>
             <TabsTrigger value="bookings">{t("admin_bookings")}</TabsTrigger>
+            <TabsTrigger value="reviews">{t("admin_reviews")}</TabsTrigger>
             <TabsTrigger value="feedback">{t("admin_feedback")}</TabsTrigger>
             {isOwner && (
               <TabsTrigger value="admins">{t("admin_admins")}</TabsTrigger>
@@ -196,6 +202,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="bookings" className="mt-6">
             <BookingsPanel />
+          </TabsContent>
+          <TabsContent value="reviews" className="mt-6">
+            <ReviewsPanel />
           </TabsContent>
           <TabsContent value="feedback" className="mt-6">
             <FeedbackPanel />

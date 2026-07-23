@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
+import { HotelReviews } from "@/components/hotel-reviews";
 import { useHotels } from "@/lib/use-hotels";
 import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
 import { useI18n } from "@/lib/i18n";
@@ -378,6 +379,8 @@ export function HotelDetailClient({
                 </div>
               </section>
             )}
+
+            <HotelReviews hotelId={hotel.id} />
           </div>
 
           {/* right: sticky booking card */}

@@ -174,6 +174,30 @@ export interface Booking {
   createdAt?: number;
 }
 
+export type ReviewStatus = "pending" | "approved" | "rejected";
+
+/** A guest's rating + comment on a hotel. New reviews are "pending" until an
+    owner/admin approves them, so spam never shows publicly. */
+export interface Review {
+  hotelId: string;
+  name: string;
+  /** 1–5 stars */
+  rating: number;
+  comment: string;
+  status?: ReviewStatus;
+  createdAt?: number;
+}
+
+/** Average rating (rounded to 1 decimal) + count from a list of reviews. */
+export function reviewSummary(
+  reviews: { rating: number }[],
+): { average: number; count: number } {
+  const count = reviews.length;
+  if (!count) return { average: 0, count: 0 };
+  const sum = reviews.reduce((s, r) => s + (Number(r.rating) || 0), 0);
+  return { average: Math.round((sum / count) * 10) / 10, count };
+}
+
 /** A visitor's feedback about the site (not tied to a booking). */
 export interface Feedback {
   /** optional name the visitor gave */
