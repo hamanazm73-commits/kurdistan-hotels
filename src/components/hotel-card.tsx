@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { MapPin, Star, BedDouble, Pencil } from "lucide-react";
+import { MapPin, Star, BedDouble, Pencil, Heart } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -26,6 +26,7 @@ import {
 } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
+import { useFavorites } from "@/lib/favorites";
 import { cn } from "@/lib/utils";
 import { BookingDialog } from "./booking-dialog";
 
@@ -59,6 +60,8 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
   const { t, tCity, tFeature, lang } = useI18n();
   const { format } = useCurrency();
   const { role, hotelId } = useAuth();
+  const favorites = useFavorites();
+  const isFav = favorites.has(hotel.id);
   // owner/admin can edit any hotel; a hotel owner only their own
   const canEdit =
     role === "owner" ||
@@ -136,7 +139,27 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             )}
           </div>
 
-          <div className="absolute end-3 top-3 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-sm font-bold text-white shadow-lg backdrop-blur-sm">
+          {/* favourite heart — saved on the visitor's device, no login needed */}
+          <button
+            type="button"
+            aria-label={t(isFav ? "fav_remove" : "fav_add")}
+            title={t(isFav ? "fav_remove" : "fav_add")}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              favorites.toggle(hotel.id);
+            }}
+            className="absolute end-3 top-3 z-10 inline-flex size-9 items-center justify-center rounded-full bg-black/45 text-white shadow-lg backdrop-blur-sm transition hover:bg-black/60 active:scale-90"
+          >
+            <Heart
+              className={cn(
+                "size-[18px] transition",
+                isFav ? "fill-red-500 text-red-500" : "text-white",
+              )}
+            />
+          </button>
+
+          <div className="absolute bottom-3 end-3 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-sm font-bold text-white shadow-lg backdrop-blur-sm">
             <Star
               className="star-shine size-3.5 fill-gold text-gold"
               style={{ animationDelay: `${(index % 6) * 0.5}s` }}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, LogIn, LogOut, Menu } from "lucide-react";
+import { LayoutDashboard, LogIn, LogOut, Menu, Heart } from "lucide-react";
 import { BrandMark } from "./brand-mark";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,11 +17,13 @@ import { CurrencySwitcher } from "./currency-switcher";
 import { LogoutButton } from "./logout-button";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
+import { useFavorites } from "@/lib/favorites";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
   const { t } = useI18n();
   const { user, role } = useAuth();
+  const { count: favCount } = useFavorites();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -63,6 +65,21 @@ export function SiteHeader() {
             render={<Link href="/#hotels" />}
           >
             {t("nav_hotels")}
+          </Button>
+          <Button
+            variant="ghost"
+            nativeButton={false}
+            render={<Link href="/favorites" />}
+          >
+            <Heart
+              className={cn("size-4", favCount > 0 && "fill-red-500 text-red-500")}
+            />
+            {t("nav_favorites")}
+            {favCount > 0 && (
+              <span className="ms-0.5 rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">
+                {favCount}
+              </span>
+            )}
           </Button>
           <Button
             variant="ghost"
@@ -149,6 +166,25 @@ export function SiteHeader() {
                   render={<Link href="/#hotels" />}
                 >
                   {t("nav_hotels")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start"
+                  nativeButton={false}
+                  render={<Link href="/favorites" />}
+                >
+                  <Heart
+                    className={cn(
+                      "size-4",
+                      favCount > 0 && "fill-red-500 text-red-500",
+                    )}
+                  />
+                  {t("nav_favorites")}
+                  {favCount > 0 && (
+                    <span className="ms-auto rounded-full bg-red-500 px-1.5 text-xs font-bold text-white">
+                      {favCount}
+                    </span>
+                  )}
                 </Button>
                 <Button
                   variant="ghost"
