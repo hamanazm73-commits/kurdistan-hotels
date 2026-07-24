@@ -84,6 +84,8 @@ const ckb: Dict = {
   admin_coords: "شوێن لەسەر نەخشە (کۆردینات)",
   admin_coords_ok: "کۆردیناتەکە دۆزرایەوە — هۆتێلەکە لە شوێنی خۆی دەردەکەوێت",
   admin_coords_bad: "کۆردینات نەدۆزرایەوە — تکایە وەک ٣٦.١٩١١, ٤٤.٠٠٩٢ بینووسە",
+  admin_coords_pick:
+    "کرتە لەسەر نەخشەکە بکە (یان پینەکە ڕابکێشە) بۆ دانانی شوێنی وردی هۆتێلەکە.",
   admin_coords_hint:
     "لە گووگڵ ماپس، کرتەی ڕاست (یان دووردرێژ) لەسەر شوێنی هۆتێلەکە بکە — ژمارەکان دەردەکەون، کۆپیان بکە و لێرە دایبنێ. بەتاڵ بیهێڵەرەوە = لە ناوەندی شارەکە دەردەکەوێت.",
   nav_blog: "بلاگ",
@@ -397,6 +399,8 @@ const en: Dict = {
   admin_coords: "Location on the map (coordinates)",
   admin_coords_ok: "Coordinates found — the hotel will show at its exact spot",
   admin_coords_bad: "No coordinates found — write them like 36.1911, 44.0092",
+  admin_coords_pick:
+    "Click the map (or drag the pin) to set the hotel's exact spot.",
   admin_coords_hint:
     "In Google Maps, right-click (or long-press) the hotel's spot — the numbers appear; copy and paste them here. Leave empty to show it at the city centre.",
   nav_blog: "Blog",
@@ -710,6 +714,8 @@ const ar: Dict = {
   admin_coords: "الموقع على الخريطة (إحداثيات)",
   admin_coords_ok: "انلقت الإحداثيات — الفندق راح يظهر بمكانه بالضبط",
   admin_coords_bad: "ماكو إحداثيات — اكتبها مثل 36.1911, 44.0092",
+  admin_coords_pick:
+    "انقر على الخريطة (أو اسحب الدبوس) لتحديد موقع الفندق بدقة.",
   admin_coords_hint:
     "بخرائط جوجل، دوس كلك يمين (أو ضغطة طويلة) على مكان الفندق — تطلع الأرقام؛ انسخها والصقها هنا. اتركه فارغ حتى يظهر بمركز المدينة.",
   nav_blog: "المدونة",
@@ -1023,6 +1029,8 @@ const kmr: Dict = {
   admin_coords: "Cih li ser nexşeyê (koordînat)",
   admin_coords_ok: "Koordînat hatin dîtin — otêl li cihê xwe yê rast dixuye",
   admin_coords_bad: "Koordînat nehatin dîtin — wek 36.1911, 44.0092 binivîse",
+  admin_coords_pick:
+    "Li ser nexşeyê bitikîne (an pîskê bikişîne) da cihê rast ê otêlê destnîşan bike.",
   admin_coords_hint:
     "Li Google Maps, li ser cihê otêlê rast-klîk (an pêlek dirêj) bike — hejmar xuya dibin; wan kopî bike û li vir deyne. Vala bihêle da ku li navenda bajêr xuya bibe.",
   nav_blog: "Blog",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import {
   Plus,
@@ -50,7 +51,18 @@ import {
 } from "@/lib/hotels-db";
 import { effectivePrice, formatPrice, mediaSrc, PAYMENT_TYPES, paymentColor, paymentLabel, ROOM_TYPES, type Hotel, type HotelInput, type RoomType } from "@/lib/types";
 import { CITIES } from "@/lib/sample-data";
-import { parseLatLng } from "@/lib/geo";
+import { parseLatLng, CITY_COORDS, KURDISTAN_CENTER } from "@/lib/geo";
+
+// Leaflet touches `window`, so load the location picker on the client only.
+const LocationPicker = dynamic(
+  () => import("./location-picker").then((m) => m.LocationPicker),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-64 w-full animate-pulse rounded-lg border bg-muted" />
+    ),
+  },
+);
 
 type FormRoom = { type: string; price: number; available?: number };
 
@@ -862,6 +874,17 @@ export function HotelFormDialog({
                   {t("admin_coords_bad")}
                 </p>
               ))}
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {t("admin_coords_pick")}
+            </p>
+            <LocationPicker
+              lat={parseLatLng(form.coords)?.lat ?? null}
+              lng={parseLatLng(form.coords)?.lng ?? null}
+              center={CITY_COORDS[form.city] ?? KURDISTAN_CENTER}
+              onPick={(la, ln) =>
+                set("coords", `${la.toFixed(6)}, ${ln.toFixed(6)}`)
+              }
+            />
             <p className="text-xs leading-relaxed text-muted-foreground">
               {t("admin_coords_hint")}
             </p>
