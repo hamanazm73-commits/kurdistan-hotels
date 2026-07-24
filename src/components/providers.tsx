@@ -5,6 +5,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { CurrencyProvider } from "@/lib/currency";
 import { AuthProvider } from "@/lib/auth";
 import { Toaster } from "@/components/ui/sonner";
+import { LanguageWelcome } from "@/components/language-welcome";
 import type { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -19,6 +20,7 @@ export function Providers({ children }: { children: ReactNode }) {
         <CurrencyProvider>
           <AuthProvider>
             {children}
+            <LanguageWelcome />
             <Toaster richColors position="top-center" closeButton />
           </AuthProvider>
         </CurrencyProvider>
