@@ -1,7 +1,16 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, useInView, type Variants } from "motion/react";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useInView,
+  useMotionValue,
+  useSpring,
+  useReducedMotion,
+  type Variants,
+} from "motion/react";
 import { MapPin, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
@@ -85,6 +94,30 @@ export function Hero() {
   const bgY = useTransform(scrollY, [0, 700], [0, -90]);
   const contentOpacity = useTransform(scrollY, [0, 450], [1, 0.55]);
 
+  // 3D-tilt: the background image leans toward the pointer and shifts with a
+  // little parallax, so the scene feels like it has depth ("you're there").
+  // Mouse-only — on touch it stays neutral and the scroll parallax carries it.
+  const reduceMotion = useReducedMotion();
+  const px = useMotionValue(0); // -0.5 … 0.5 from center
+  const py = useMotionValue(0);
+  const sx = useSpring(px, { stiffness: 120, damping: 18 });
+  const sy = useSpring(py, { stiffness: 120, damping: 18 });
+  const rotateY = useTransform(sx, [-0.5, 0.5], [-7, 7]);
+  const rotateX = useTransform(sy, [-0.5, 0.5], [7, -7]);
+  const tiltX = useTransform(sx, [-0.5, 0.5], [32, -32]);
+  const tiltY = useTransform(sy, [-0.5, 0.5], [32, -32]);
+
+  function onPointer(e: React.MouseEvent<HTMLElement>) {
+    if (reduceMotion) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    px.set((e.clientX - r.left) / r.width - 0.5);
+    py.set((e.clientY - r.top) / r.height - 0.5);
+  }
+  function resetPointer() {
+    px.set(0);
+    py.set(0);
+  }
+
   // real figures, computed from the hotels shown on the site (excludes hidden)
   const visible = hotels.filter((h) => !h.hidden);
   // total rooms on the site: sum tracked room counts per hotel, and when a
@@ -108,19 +141,32 @@ export function Hero() {
   ];
 
   return (
-    <section className="relative flex min-h-[90vh] flex-col justify-center overflow-hidden">
-      {/* Parallax background */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 scale-[1.22] origin-center">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80"
-          srcSet="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=768&q=72 768w, https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&q=78 1280w, https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80 1920w"
-          sizes="100vw"
-          alt=""
-          aria-hidden="true"
-          className="size-full object-cover"
-          fetchPriority="high"
-        />
+    <section
+      onMouseMove={onPointer}
+      onMouseLeave={resetPointer}
+      className="relative flex min-h-[90vh] flex-col justify-center overflow-hidden"
+    >
+      {/* Parallax + 3D-tilt background. Perspective is a CSS property on the
+          parent so the inner element's rotateX/rotateY read as real depth. */}
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0 [perspective:1200px]"
+      >
+        <motion.div
+          style={{ rotateX, rotateY, x: tiltX, y: tiltY, scale: 1.22 }}
+          className="size-full origin-center will-change-transform"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80"
+            srcSet="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=768&q=72 768w, https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1280&q=78 1280w, https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80 1920w"
+            sizes="100vw"
+            alt=""
+            aria-hidden="true"
+            className="size-full object-cover"
+            fetchPriority="high"
+          />
+        </motion.div>
       </motion.div>
 
       {/* Overlays */}
