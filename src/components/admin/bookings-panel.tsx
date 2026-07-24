@@ -191,13 +191,15 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     return unsub;
   }, [hotelId]);
 
-  // A stable key + city for each booking's hotel (by id, else by name).
-  const cityByHotel = useMemo(() => {
+  // Resolve each booking to its CURRENT hotel (by id, else by the stored
+  // name), so a renamed hotel shows its new name and city everywhere — not the
+  // name captured when the booking was made.
+  const hotelInfoOf = useMemo(() => {
     const byId = new Map(hotels.map((h) => [h.id, h] as const));
     const byName = new Map(hotels.map((h) => [h.name, h] as const));
-    return (b: Booking) => {
+    return (b: Booking): { name: string; city: string | null } => {
       const h = (b.hotelId && byId.get(b.hotelId)) || byName.get(b.hotel);
-      return h?.city ?? null;
+      return { name: h?.name ?? b.hotel, city: h?.city ?? null };
     };
   }, [hotels]);
 
@@ -206,20 +208,23 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     const seen = new Map<string, { key: string; name: string; city: string | null }>();
     for (const b of rows) {
       const key = hotelKeyOf(b);
-      if (!seen.has(key)) seen.set(key, { key, name: b.hotel, city: cityByHotel(b) });
+      if (!seen.has(key)) {
+        const info = hotelInfoOf(b);
+        seen.set(key, { key, name: info.name, city: info.city });
+      }
     }
     return [...seen.values()];
-  }, [rows, cityByHotel]);
+  }, [rows, hotelInfoOf]);
 
   // Distinct cities present in the bookings, for the city filter dropdown.
   const bookingCities = useMemo(() => {
     const set = new Set<string>();
     for (const b of rows) {
-      const c = cityByHotel(b);
+      const c = hotelInfoOf(b).city;
       if (c) set.add(c);
     }
     return [...set];
-  }, [rows, cityByHotel]);
+  }, [rows, hotelInfoOf]);
 
   // Distinct room types present in the bookings, for the room filter dropdown.
   const bookingRoomTypes = useMemo(() => {
@@ -240,7 +245,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     const fromTs = fromDate ? new Date(`${fromDate}T00:00:00`).getTime() : null;
     const windowMs = range === "week" ? 7 * DAY_MS : range === "month" ? 30 * DAY_MS : Infinity;
     return rows.filter((b) => {
-      if (cityFilter !== "all" && cityByHotel(b) !== cityFilter) return false;
+      if (cityFilter !== "all" && hotelInfoOf(b).city !== cityFilter) return false;
       if (hotelKey !== "all" && hotelKeyOf(b) !== hotelKey) return false;
       if (roomFilter !== "all" && b.roomType !== roomFilter) return false;
       const c = b.createdAt;
@@ -248,7 +253,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
       if (fromTs !== null) return c >= fromTs;
       return windowMs === Infinity || now - c <= windowMs;
     });
-  }, [rows, range, fromDate, now, cityFilter, hotelKey, roomFilter, cityByHotel]);
+  }, [rows, range, fromDate, now, cityFilter, hotelKey, roomFilter, hotelInfoOf]);
 
   if (loading)
     return (
@@ -423,11 +428,13 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <p className="truncate font-bold">{b.name}</p>
-                <p className="truncate text-sm font-medium">{b.hotel}</p>
-                {cityByHotel(b) && (
+                <p className="truncate text-sm font-medium">
+                  {hotelInfoOf(b).name}
+                </p>
+                {hotelInfoOf(b).city && (
                   <p className="flex items-center gap-1 text-xs text-muted-foreground">
                     <MapPin className="size-3 shrink-0" />
-                    {tCity(cityByHotel(b)!)}
+                    {tCity(hotelInfoOf(b).city!)}
                   </p>
                 )}
                 <div className="mt-1.5">
@@ -506,11 +513,11 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
             {filtered.map((b) => (
               <TableRow key={b.id}>
                 <TableCell className="font-medium">
-                  {b.hotel}
-                  {cityByHotel(b) && (
+                  {hotelInfoOf(b).name}
+                  {hotelInfoOf(b).city && (
                     <span className="mt-0.5 flex items-center gap-1 text-xs font-normal text-muted-foreground">
                       <MapPin className="size-3 shrink-0" />
-                      {tCity(cityByHotel(b)!)}
+                      {tCity(hotelInfoOf(b).city!)}
                     </span>
                   )}
                 </TableCell>
