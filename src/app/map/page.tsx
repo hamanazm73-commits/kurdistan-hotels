@@ -46,15 +46,13 @@ export default function MapPage() {
           lng: coords[1],
           name: pickLang(h.name, h.nameI18n, lang),
           cityLabel: tCity(h.city),
-          priceLabel: showPrice
-            ? format(effectivePrice(h), h.iqdPerUsd)
-            : t("price_on_request"),
+          priceLabel: showPrice ? format(effectivePrice(h), h.iqdPerUsd) : "",
           image: mediaSrc(h.image) || FALLBACK_IMG,
           rating: h.rating,
         } satisfies MapPoint;
       })
       .filter((p): p is MapPoint => p !== null);
-  }, [hotels, lang, tCity, format, showPrice, t]);
+  }, [hotels, lang, tCity, format, showPrice]);
 
   return (
     <>

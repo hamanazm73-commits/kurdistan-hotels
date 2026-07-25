@@ -250,29 +250,25 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
           )}
 
           <div className="mt-auto flex items-end justify-between gap-2 pt-2">
-            <div>
-              {showPrice ? (
-                <>
-                  <div className="flex items-baseline gap-2">
-                    {hasDiscount && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
-                      </span>
-                    )}
-                    <span className="text-2xl font-extrabold text-gold">
-                      {format(price, hotel.iqdPerUsd)}
+            {showPrice ? (
+              <div>
+                <div className="flex items-baseline gap-2">
+                  {hasDiscount && (
+                    <span className="text-sm text-muted-foreground line-through">
+                      {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
                     </span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {t("per_night")}
+                  )}
+                  <span className="text-2xl font-extrabold text-gold">
+                    {format(price, hotel.iqdPerUsd)}
                   </span>
-                </>
-              ) : (
-                <span className="text-sm font-medium text-muted-foreground">
-                  {t("price_on_request")}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {t("per_night")}
                 </span>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div />
+            )}
             <div className="flex items-center gap-2">
               {hotel.phone && (
                 <a

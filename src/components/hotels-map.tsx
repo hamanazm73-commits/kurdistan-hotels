@@ -59,7 +59,7 @@ export function HotelsMap({ points }: { points: MapPoint[] }) {
           <img src="${esc(p.image)}" alt="" style="width:100%;height:96px;object-fit:cover;border-radius:8px;display:block;margin-bottom:6px;" onerror="this.style.display='none'"/>
           <div style="font-weight:700;font-size:14px;line-height:1.3;">${esc(p.name)}</div>
           <div style="color:#64748b;font-size:12px;margin-top:2px;">📍 ${esc(p.cityLabel)} · ⭐ ${p.rating.toFixed(1)}</div>
-          <div style="color:#15304A;font-weight:800;font-size:14px;margin-top:4px;">${esc(p.priceLabel)}</div>
+          ${p.priceLabel ? `<div style="color:#15304A;font-weight:800;font-size:14px;margin-top:4px;">${esc(p.priceLabel)}</div>` : ""}
         </a>`,
       );
       markers.push(m);

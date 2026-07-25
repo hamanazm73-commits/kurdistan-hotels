@@ -332,21 +332,15 @@ export function HotelDetailClient({
                       )}
                     </span>
                     <span className="flex shrink-0 items-center gap-1.5 font-bold text-primary">
-                      <span>
-                        {showPrice ? (
-                          <>
-                            {format(r.price, hotel.iqdPerUsd)}
-                            <span className="text-xs font-normal text-muted-foreground">
-                              {" "}
-                              {t("per_night")}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-sm font-normal text-muted-foreground">
-                            {t("price_on_request")}
+                      {showPrice && (
+                        <span>
+                          {format(r.price, hotel.iqdPerUsd)}
+                          <span className="text-xs font-normal text-muted-foreground">
+                            {" "}
+                            {t("per_night")}
                           </span>
-                        )}
-                      </span>
+                        </span>
+                      )}
                       <ChevronLeft className="size-4 shrink-0 opacity-40 transition group-hover:opacity-100 ltr:rotate-180" />
                     </span>
                   </button>
@@ -397,27 +391,21 @@ export function HotelDetailClient({
           {/* right: sticky booking card */}
           <div>
             <Card className="sticky top-20 p-5">
-              <div className="flex items-baseline gap-2">
-                {showPrice ? (
-                  <>
-                    {hasDiscount && (
-                      <span className="text-base text-muted-foreground line-through">
-                        {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
-                      </span>
-                    )}
-                    <span className="text-3xl font-extrabold text-primary">
-                      {format(price, hotel.iqdPerUsd)}
+              {showPrice && (
+                <div className="flex items-baseline gap-2">
+                  {hasDiscount && (
+                    <span className="text-base text-muted-foreground line-through">
+                      {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
                     </span>
-                    <span className="text-sm text-muted-foreground">
-                      {t("per_night")}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-lg font-bold text-primary">
-                    {t("price_on_request")}
+                  )}
+                  <span className="text-3xl font-extrabold text-primary">
+                    {format(price, hotel.iqdPerUsd)}
                   </span>
-                )}
-              </div>
+                  <span className="text-sm text-muted-foreground">
+                    {t("per_night")}
+                  </span>
+                </div>
+              )}
               <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                 <BedDouble className="size-4" />
                 {t("rooms_left", { n: hotel.available })}
