@@ -143,6 +143,9 @@ const ckb: Dict = {
     "ئێمە هێشتا لە قۆناغی زیادکردنی هۆتێلی زیاترداین — حیجزکردن بەم زووانە دەکرێتەوە.",
   book_soon: "بەم زووانە",
   book_soon_toast: "حیجزکردن هێشتا نەکراوەتەوە — بەم زووانە! 🔜",
+  soon_list_cta: "هۆتێلەکەت زیاد بکە",
+  soon_list_msg:
+    "سڵاو، دەمەوێت هۆتێلەکەم زیاد بکەم لە hotelskurdistan.com",
   admin_coming_soon: "دۆخی «بەم زووانە»",
   admin_coming_soon_hint:
     "کاتێک چالاکە، بانەرێک لە سایتەکە دەردەکەوێت و حیجزکردن ناچالاک دەبێت. کاتێک ئامادە بوویت بۆ وەرگرتنی حیجز، بیکوژێنەوە.",
@@ -468,6 +471,9 @@ const en: Dict = {
     "We're still adding hotels — booking opens soon.",
   book_soon: "Coming soon",
   book_soon_toast: "Booking isn't open yet — coming soon! 🔜",
+  soon_list_cta: "List your hotel",
+  soon_list_msg:
+    "Hi, I'd like to list my hotel on hotelskurdistan.com",
   admin_coming_soon: "Coming-soon mode",
   admin_coming_soon_hint:
     "When on, a banner shows on the site and booking is disabled. Turn it off when you're ready to accept bookings.",
@@ -793,6 +799,9 @@ const ar: Dict = {
     "ما زلنا نضيف المزيد من الفنادق — الحجز يُفتح قريباً.",
   book_soon: "قريباً",
   book_soon_toast: "الحجز لم يُفتح بعد — قريباً! 🔜",
+  soon_list_cta: "أضف فندقك",
+  soon_list_msg:
+    "مرحباً، أريد إضافة فندقي على hotelskurdistan.com",
   admin_coming_soon: "وضع «قريباً»",
   admin_coming_soon_hint:
     "عند التفعيل، يظهر شعار في الموقع ويُعطَّل الحجز. أطفئه عندما تكون جاهزاً لاستقبال الحجوزات.",
@@ -1118,6 +1127,9 @@ const kmr: Dict = {
     "Em hîn otêlan zêde dikin — rezervasyon di demeke nêz de vedibe.",
   book_soon: "Di demeke nêz de",
   book_soon_toast: "Rezervasyon hîn venebûye — di demeke nêz de! 🔜",
+  soon_list_cta: "Otêla xwe zêde bike",
+  soon_list_msg:
+    "Silav, ez dixwazim otêla xwe li hotelskurdistan.com zêde bikim",
   admin_coming_soon: "Moda 'di demeke nêz de'",
   admin_coming_soon_hint:
     "Gava vekirî be, banerek li malperê xuya dibe û rezervasyon neçalak dibe. Gava amade bî ku rezervasyonan bipejirînî, wê bigire.",

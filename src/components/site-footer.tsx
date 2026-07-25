@@ -6,10 +6,11 @@ import { useI18n } from "@/lib/i18n";
 import { CITIES } from "@/lib/sample-data";
 import { FeedbackDialog } from "@/components/feedback-dialog";
 import { BrandMark } from "@/components/brand-mark";
+import { CONTACT } from "@/lib/contact";
 
-const PHONE = "0770 057 2004";
-const WHATSAPP = "9647700572004";
-const EMAIL = "info@hotelskurdistan.com";
+const PHONE = CONTACT.phone;
+const WHATSAPP = CONTACT.whatsapp;
+const EMAIL = CONTACT.email;
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (

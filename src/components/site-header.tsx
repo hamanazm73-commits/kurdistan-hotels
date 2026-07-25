@@ -42,8 +42,9 @@ export function SiteHeader() {
 
   return (
     <header
+      style={{ top: "var(--soon-banner-h, 0px)" }}
       className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
+        "sticky z-50 w-full transition-all duration-300",
         scrolled
           ? "border-b bg-background/80 backdrop-blur-xl shadow-sm"
           : "bg-transparent",
