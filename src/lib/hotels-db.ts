@@ -259,6 +259,10 @@ export interface AppSettings {
   /** market exchange rate: how many IQD per 1 USD. Owner-set and updated as the
       Kurdistan market moves — forex APIs only carry the official rate. */
   iqdPerUsd?: number;
+  /** "Coming soon" mode: shows a site-wide notice and disables booking while
+      the owner is still adding hotels. Turned off from the dashboard when
+      ready. Absent is treated as ON (the site starts in setup). */
+  comingSoon?: boolean;
 }
 
 export async function getSettings(): Promise<AppSettings> {
@@ -274,6 +278,14 @@ export async function setIqdPerUsd(iqdPerUsd: number) {
   return setDoc(
     doc(requireDb(), "settings", "config"),
     { iqdPerUsd },
+    { merge: true },
+  );
+}
+
+export async function setComingSoon(comingSoon: boolean) {
+  return setDoc(
+    doc(requireDb(), "settings", "config"),
+    { comingSoon },
     { merge: true },
   );
 }

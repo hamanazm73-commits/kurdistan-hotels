@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
+import { useSiteConfig } from "@/lib/site-config";
 import { roomPriceOn, roomTypeLabel, seasonFor, type Hotel } from "@/lib/types";
 import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ export function BookingDialog({
 }) {
   const { t, lang } = useI18n();
   const { format } = useCurrency();
+  const { comingSoon } = useSiteConfig();
   const controlled = openProp !== undefined;
   const [openState, setOpenState] = useState(false);
   const open = controlled ? openProp : openState;
@@ -93,6 +95,10 @@ export function BookingDialog({
     : "";
 
   async function submit() {
+    if (comingSoon) {
+      toast(t("book_soon_toast"));
+      return;
+    }
     if (!name.trim() || !phone.trim() || !checkIn || !roomType) {
       toast.error(t("book_required"));
       return;
@@ -155,6 +161,16 @@ export function BookingDialog({
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // While the site is in "coming soon" mode, the built-in trigger becomes a
+  // disabled note instead of opening the booking form.
+  if (trigger && comingSoon) {
+    return (
+      <Button className="shrink-0" disabled variant="secondary">
+        {t("book_soon")}
+      </Button>
+    );
   }
 
   return (

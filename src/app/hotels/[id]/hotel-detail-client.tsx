@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
 import { HotelReviews } from "@/components/hotel-reviews";
 import { useHotels } from "@/lib/use-hotels";
+import { useSiteConfig } from "@/lib/site-config";
 import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
 import { useI18n } from "@/lib/i18n";
 import {
@@ -73,6 +74,7 @@ export function HotelDetailClient({
 }) {
   const { t, tCity, tFeature, lang } = useI18n();
   const { format } = useCurrency();
+  const { comingSoon } = useSiteConfig();
   const { hotels, loading } = useHotels();
   // Prefer the live doc once it arrives; until then use the server-provided
   // hotel so the first paint already has content (good for SEO and speed).
@@ -301,7 +303,7 @@ export function HotelDetailClient({
                   <button
                     type="button"
                     key={r.type}
-                    disabled={r.available === 0}
+                    disabled={r.available === 0 || comingSoon}
                     onClick={() => {
                       setBookingRoom(r.type);
                       setBookingOpen(true);

@@ -4,8 +4,10 @@ import { ThemeProvider } from "next-themes";
 import { I18nProvider } from "@/lib/i18n";
 import { CurrencyProvider } from "@/lib/currency";
 import { AuthProvider } from "@/lib/auth";
+import { SiteConfigProvider } from "@/lib/site-config";
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageWelcome } from "@/components/language-welcome";
+import { ComingSoonBanner } from "@/components/coming-soon-banner";
 import type { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -17,13 +19,16 @@ export function Providers({ children }: { children: ReactNode }) {
       disableTransitionOnChange
     >
       <I18nProvider>
-        <CurrencyProvider>
-          <AuthProvider>
-            {children}
-            <LanguageWelcome />
-            <Toaster richColors position="top-center" closeButton />
-          </AuthProvider>
-        </CurrencyProvider>
+        <SiteConfigProvider>
+          <CurrencyProvider>
+            <AuthProvider>
+              <ComingSoonBanner />
+              {children}
+              <LanguageWelcome />
+              <Toaster richColors position="top-center" closeButton />
+            </AuthProvider>
+          </CurrencyProvider>
+        </SiteConfigProvider>
       </I18nProvider>
     </ThemeProvider>
   );

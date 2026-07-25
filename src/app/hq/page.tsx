@@ -20,6 +20,7 @@ import { BlogPanel } from "@/components/admin/blog-panel";
 import { ReviewsPanel } from "@/components/admin/reviews-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 import { ExchangeRateCard } from "@/components/admin/exchange-rate";
+import { ComingSoonCard } from "@/components/admin/coming-soon-card";
 
 export default function AdminPage() {
   const { t } = useI18n();
@@ -180,8 +181,9 @@ export default function AdminPage() {
         transition={{ duration: 0.4 }}
         className="mx-auto max-w-6xl px-6 py-8"
       >
-        <div className="mb-6">
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <ExchangeRateCard />
+          <ComingSoonCard />
         </div>
         <Tabs defaultValue="hotels">
           <TabsList>

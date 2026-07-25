@@ -138,6 +138,16 @@ const ckb: Dict = {
   per_night: "/ شەو",
   rooms_left: "{n} ژوور ماوە",
   book_now: "حیجزکردن",
+  soon_banner_title: "بەم زووانە!",
+  soon_banner_text:
+    "ئێمە هێشتا لە قۆناغی زیادکردنی هۆتێلی زیاترداین — حیجزکردن بەم زووانە دەکرێتەوە.",
+  book_soon: "بەم زووانە",
+  book_soon_toast: "حیجزکردن هێشتا نەکراوەتەوە — بەم زووانە! 🔜",
+  admin_coming_soon: "دۆخی «بەم زووانە»",
+  admin_coming_soon_hint:
+    "کاتێک چالاکە، بانەرێک لە سایتەکە دەردەکەوێت و حیجزکردن ناچالاک دەبێت. کاتێک ئامادە بوویت بۆ وەرگرتنی حیجز، بیکوژێنەوە.",
+  admin_coming_soon_on: "چالاکە — حیجزکردن ناچالاکە",
+  admin_coming_soon_off: "ناچالاکە — حیجزکردن کراوەیە",
   view_details: "وردەکاری",
   from: "لە",
 
@@ -453,6 +463,16 @@ const en: Dict = {
   per_night: "/ night",
   rooms_left: "{n} rooms left",
   book_now: "Book now",
+  soon_banner_title: "Coming soon!",
+  soon_banner_text:
+    "We're still adding hotels — booking opens soon.",
+  book_soon: "Coming soon",
+  book_soon_toast: "Booking isn't open yet — coming soon! 🔜",
+  admin_coming_soon: "Coming-soon mode",
+  admin_coming_soon_hint:
+    "When on, a banner shows on the site and booking is disabled. Turn it off when you're ready to accept bookings.",
+  admin_coming_soon_on: "On — booking is disabled",
+  admin_coming_soon_off: "Off — booking is open",
   view_details: "Details",
   from: "from",
 
@@ -768,6 +788,16 @@ const ar: Dict = {
   per_night: "/ ليلة",
   rooms_left: "باقي {n} غرف",
   book_now: "احجز",
+  soon_banner_title: "قريباً!",
+  soon_banner_text:
+    "ما زلنا نضيف المزيد من الفنادق — الحجز يُفتح قريباً.",
+  book_soon: "قريباً",
+  book_soon_toast: "الحجز لم يُفتح بعد — قريباً! 🔜",
+  admin_coming_soon: "وضع «قريباً»",
+  admin_coming_soon_hint:
+    "عند التفعيل، يظهر شعار في الموقع ويُعطَّل الحجز. أطفئه عندما تكون جاهزاً لاستقبال الحجوزات.",
+  admin_coming_soon_on: "مُفعّل — الحجز معطّل",
+  admin_coming_soon_off: "مُطفأ — الحجز مفتوح",
   view_details: "التفاصيل",
   from: "من",
 
@@ -1083,6 +1113,16 @@ const kmr: Dict = {
   per_night: "/ şev",
   rooms_left: "{n} ode mane",
   book_now: "Rezervasyon bike",
+  soon_banner_title: "Di demeke nêz de!",
+  soon_banner_text:
+    "Em hîn otêlan zêde dikin — rezervasyon di demeke nêz de vedibe.",
+  book_soon: "Di demeke nêz de",
+  book_soon_toast: "Rezervasyon hîn venebûye — di demeke nêz de! 🔜",
+  admin_coming_soon: "Moda 'di demeke nêz de'",
+  admin_coming_soon_hint:
+    "Gava vekirî be, banerek li malperê xuya dibe û rezervasyon neçalak dibe. Gava amade bî ku rezervasyonan bipejirînî, wê bigire.",
+  admin_coming_soon_on: "Vekirî — rezervasyon neçalak e",
+  admin_coming_soon_off: "Girtî — rezervasyon vekirî ye",
   view_details: "Hûrgulî",
   from: "ji",
 
