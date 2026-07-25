@@ -303,3 +303,94 @@ export const OWNER_PERKS: OwnerPerk[] = [
     },
   },
 ];
+
+/* ---------------- "List your hotel" landing page ---------------- */
+
+export const OWNER_PERKS_HEADING: L = {
+  ckb: "بۆچی هۆتێلەکەت لای ئێمە زیاد بکەیت؟",
+  en: "Why list your hotel with us?",
+  ar: "لماذا تضيف فندقك معنا؟",
+  kmr: "Çima otêla xwe li cem me zêde bikî?",
+};
+
+export const OWNER_STEPS_HEADING: L = {
+  ckb: "چۆن کار دەکات؟",
+  en: "How it works",
+  ar: "كيف تعمل؟",
+  kmr: "Çawa dixebite?",
+};
+
+export interface OwnerStep {
+  icon: "message" | "layout" | "calendar";
+  title: L;
+  desc: L;
+}
+
+export const OWNER_STEPS: OwnerStep[] = [
+  {
+    icon: "message",
+    title: {
+      ckb: "١. پەیوەندیمان پێوە بکە",
+      en: "1. Get in touch",
+      ar: "١. تواصل معنا",
+      kmr: "1. Bi me re têkilî deyne",
+    },
+    desc: {
+      ckb: "لە ڕێگەی واتساپ یان تەلەفۆنەوە پەیوەندیمان پێوە بکە و بمانگەیەنە کە هۆتێلێکت هەیە.",
+      en: "Message or call us on WhatsApp and tell us about your hotel.",
+      ar: "راسلنا أو اتصل بنا عبر واتساب وأخبرنا عن فندقك.",
+      kmr: "Bi WhatsApp an telefonê bi me re têkilî deyne û behsa otêla xwe bike.",
+    },
+  },
+  {
+    icon: "layout",
+    title: {
+      ckb: "٢. پەڕەی هۆتێلەکەت ئامادە دەکەین",
+      en: "2. We build your page",
+      ar: "٢. نجهّز صفحة فندقك",
+      kmr: "2. Em rûpela te amade dikin",
+    },
+    desc: {
+      ckb: "وێنە، ژوورەکان و نرخەکان دادەنێین، و پانێلێکی سادەت پێدەدەین بۆ نوێکردنەوەی نرخ و ژوورە بەردەستەکان.",
+      en: "We add your photos, rooms and prices, and give you a simple dashboard to update rates and availability.",
+      ar: "نضيف صورك وغرفك وأسعارك، ونمنحك لوحة تحكم بسيطة لتحديث الأسعار والتوفر.",
+      kmr: "Em wêne, ode û bihayan zêde dikin, û panelek hêsan didin te ji bo nûkirina biha û hebûnê.",
+    },
+  },
+  {
+    icon: "calendar",
+    title: {
+      ckb: "٣. حجز ڕاستەوخۆ وەربگرە",
+      en: "3. Receive bookings",
+      ar: "٣. استقبل الحجوزات",
+      kmr: "3. Rezervasyonan werbigire",
+    },
+    desc: {
+      ckb: "میوانەکان هۆتێلەکەت دەبینن و ڕاستەوخۆ حجز دەکەن. پارەکە ڕاستەوخۆ بۆ خۆت دێت — بەبێ کرێی زیادە.",
+      en: "Guests find your hotel and book directly. The money comes straight to you — no commission.",
+      ar: "يجد الضيوف فندقك ويحجزون مباشرة. تصلك الأموال مباشرة — بلا عمولة.",
+      kmr: "Mêvan otêla te dibînin û rasterast rezerve dikin. Drav rasterast tê te — bêyî kombersiyon.",
+    },
+  },
+];
+
+export const OWNER_CONTACT_HEADING: L = {
+  ckb: "ئامادەیت دەست پێ بکەیت؟",
+  en: "Ready to get started?",
+  ar: "هل أنت مستعد للبدء؟",
+  kmr: "Amade yî ku dest pê bikî?",
+};
+
+export const OWNER_CONTACT_SUB: L = {
+  ckb: "پەیوەندیمان پێوە بکە — لە هەمان ڕۆژدا دەکرێت هۆتێلەکەت لەسەر سایت بێت.",
+  en: "Contact us — your hotel can be live on the site the same day.",
+  ar: "تواصل معنا — يمكن أن يظهر فندقك على الموقع في نفس اليوم.",
+  kmr: "Bi me re têkilî deyne — otêla te dikare heman rojê li ser malperê be.",
+};
+
+export const OWNER_WHATSAPP_CTA: L = {
+  ckb: "پەیوەندی بە واتساپ",
+  en: "Contact on WhatsApp",
+  ar: "تواصل عبر واتساب",
+  kmr: "Bi WhatsApp têkilî deyne",
+};

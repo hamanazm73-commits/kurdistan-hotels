@@ -28,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily" as const,
       priority: 0.9,
     })),
+    { url: `${BASE}/list-your-hotel`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE}/map`, lastModified: now, changeFrequency: "weekly", priority: 0.5 },
     { url: `${BASE}/bookings`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
