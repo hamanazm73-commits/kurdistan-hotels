@@ -34,14 +34,14 @@ export function ListHotelCta() {
       transition={{ delay: 0.9, type: "spring", stiffness: 200, damping: 18 }}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className="fixed bottom-5 end-5 z-40 flex items-center gap-2 rounded-full bg-gold p-1.5 text-gold-foreground shadow-lg shadow-black/25 ring-1 ring-black/5 sm:pe-4"
+      className="fixed bottom-5 end-5 z-40 flex max-w-[calc(100vw-2.5rem)] items-center gap-2 rounded-full bg-gold p-1.5 pe-4 text-gold-foreground shadow-lg shadow-black/25 ring-1 ring-black/5"
     >
       {/* WhatsApp badge with a gentle attention pulse */}
       <span className="relative grid size-9 shrink-0 place-items-center rounded-full bg-[#25D366] text-white">
         <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#25D366] opacity-40" />
         <WhatsAppIcon className="relative size-5" />
       </span>
-      <span className="hidden text-sm font-bold sm:inline">
+      <span className="truncate text-xs font-bold leading-tight sm:text-sm">
         {t("soon_list_cta")}
       </span>
     </motion.a>
