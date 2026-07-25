@@ -8,6 +8,7 @@ import { SiteConfigProvider } from "@/lib/site-config";
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageWelcome } from "@/components/language-welcome";
 import { ComingSoonBanner } from "@/components/coming-soon-banner";
+import { ListHotelCta } from "@/components/list-hotel-cta";
 import type { ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
             <AuthProvider>
               <ComingSoonBanner />
               {children}
+              <ListHotelCta />
               <LanguageWelcome />
               <Toaster richColors position="top-center" closeButton />
             </AuthProvider>
