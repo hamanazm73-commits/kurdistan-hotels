@@ -15,6 +15,7 @@ import { HotelCard } from "./hotel-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n, CITY_KEYS } from "@/lib/i18n";
+import { useSiteConfig } from "@/lib/site-config";
 import { CITIES } from "@/lib/sample-data";
 import { effectivePrice } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ const SORT_LABEL: Record<Sort, string> = {
 export function HotelsSection() {
   const { t, tCity } = useI18n();
   const { hotels, loading } = useHotels();
+  const { hidePrices } = useSiteConfig();
 
   const [search, setSearch] = useState("");
   const [city, setCity] = useState<string>("all");
@@ -147,10 +149,16 @@ export function HotelsSection() {
                 <SelectItem value="recommended">
                   {t("sort_recommended")}
                 </SelectItem>
-                <SelectItem value="price_low">{t("sort_price_low")}</SelectItem>
-                <SelectItem value="price_high">
-                  {t("sort_price_high")}
-                </SelectItem>
+                {!hidePrices && (
+                  <>
+                    <SelectItem value="price_low">
+                      {t("sort_price_low")}
+                    </SelectItem>
+                    <SelectItem value="price_high">
+                      {t("sort_price_high")}
+                    </SelectItem>
+                  </>
+                )}
                 <SelectItem value="rating">{t("sort_rating")}</SelectItem>
               </SelectContent>
             </Select>

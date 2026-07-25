@@ -151,6 +151,12 @@ const ckb: Dict = {
     "کاتێک چالاکە، بانەرێک لە سایتەکە دەردەکەوێت و حیجزکردن ناچالاک دەبێت. کاتێک ئامادە بوویت بۆ وەرگرتنی حیجز، بیکوژێنەوە.",
   admin_coming_soon_on: "چالاکە — حیجزکردن ناچالاکە",
   admin_coming_soon_off: "ناچالاکە — حیجزکردن کراوەیە",
+  price_on_request: "پەیوەندی بۆ نرخ",
+  admin_hide_prices: "شاردنەوەی نرخەکان",
+  admin_hide_prices_hint:
+    "کاتێک چالاکە، نرخی هۆتێلەکان بۆ میوان دەرناکەون — لە جیاتی نرخ «پەیوەندی بۆ نرخ» پیشان دەدرێت.",
+  admin_hide_prices_on: "چالاکە — نرخەکان شاراوەن",
+  admin_hide_prices_off: "ناچالاکە — نرخەکان دیارن",
   view_details: "وردەکاری",
   from: "لە",
 
@@ -479,6 +485,12 @@ const en: Dict = {
     "When on, a banner shows on the site and booking is disabled. Turn it off when you're ready to accept bookings.",
   admin_coming_soon_on: "On — booking is disabled",
   admin_coming_soon_off: "Off — booking is open",
+  price_on_request: "Contact for price",
+  admin_hide_prices: "Hide prices",
+  admin_hide_prices_hint:
+    "When on, hotel prices are hidden from guests — 'Contact for price' shows instead.",
+  admin_hide_prices_on: "On — prices are hidden",
+  admin_hide_prices_off: "Off — prices are shown",
   view_details: "Details",
   from: "from",
 
@@ -807,6 +819,12 @@ const ar: Dict = {
     "عند التفعيل، يظهر شعار في الموقع ويُعطَّل الحجز. أطفئه عندما تكون جاهزاً لاستقبال الحجوزات.",
   admin_coming_soon_on: "مُفعّل — الحجز معطّل",
   admin_coming_soon_off: "مُطفأ — الحجز مفتوح",
+  price_on_request: "تواصل لمعرفة السعر",
+  admin_hide_prices: "إخفاء الأسعار",
+  admin_hide_prices_hint:
+    "عند التفعيل، تُخفى أسعار الفنادق عن الضيوف — ويظهر بدلاً منها «تواصل لمعرفة السعر».",
+  admin_hide_prices_on: "مُفعّل — الأسعار مخفية",
+  admin_hide_prices_off: "مُطفأ — الأسعار ظاهرة",
   view_details: "التفاصيل",
   from: "من",
 
@@ -1135,6 +1153,12 @@ const kmr: Dict = {
     "Gava vekirî be, banerek li malperê xuya dibe û rezervasyon neçalak dibe. Gava amade bî ku rezervasyonan bipejirînî, wê bigire.",
   admin_coming_soon_on: "Vekirî — rezervasyon neçalak e",
   admin_coming_soon_off: "Girtî — rezervasyon vekirî ye",
+  price_on_request: "Ji bo bihayê têkilî deyne",
+  admin_hide_prices: "Bihayan veşêre",
+  admin_hide_prices_hint:
+    "Gava vekirî be, bihayên otêlan ji mêvanan têne veşartin — li şûna wê 'Ji bo bihayê têkilî deyne' xuya dibe.",
+  admin_hide_prices_on: "Vekirî — biha veşartî ne",
+  admin_hide_prices_off: "Girtî — biha têne nîşandan",
   view_details: "Hûrgulî",
   from: "ji",
 

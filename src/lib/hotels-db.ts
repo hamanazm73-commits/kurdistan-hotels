@@ -263,6 +263,9 @@ export interface AppSettings {
       the owner is still adding hotels. Turned off from the dashboard when
       ready. Absent is treated as ON (the site starts in setup). */
   comingSoon?: boolean;
+  /** Hide every guest-facing price (cards, detail page, map). The owner turns
+      this on while prices aren't final; absent is treated as OFF (prices show). */
+  hidePrices?: boolean;
 }
 
 export async function getSettings(): Promise<AppSettings> {
@@ -286,6 +289,14 @@ export async function setComingSoon(comingSoon: boolean) {
   return setDoc(
     doc(requireDb(), "settings", "config"),
     { comingSoon },
+    { merge: true },
+  );
+}
+
+export async function setHidePrices(hidePrices: boolean) {
+  return setDoc(
+    doc(requireDb(), "settings", "config"),
+    { hidePrices },
     { merge: true },
   );
 }

@@ -27,6 +27,7 @@ import {
 import { useCurrency } from "@/lib/currency";
 import { useAuth } from "@/lib/auth";
 import { useFavorites } from "@/lib/favorites";
+import { useSiteConfig } from "@/lib/site-config";
 import { cn } from "@/lib/utils";
 import { BookingDialog } from "./booking-dialog";
 
@@ -60,6 +61,8 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
   const { t, tCity, tFeature, lang } = useI18n();
   const { format } = useCurrency();
   const { role, hotelId } = useAuth();
+  const { hidePrices, ready } = useSiteConfig();
+  const showPrice = ready && !hidePrices;
   const favorites = useFavorites();
   const isFav = favorites.has(hotel.id);
   // owner/admin can edit any hotel; a hotel owner only their own
@@ -248,19 +251,27 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
 
           <div className="mt-auto flex items-end justify-between gap-2 pt-2">
             <div>
-              <div className="flex items-baseline gap-2">
-                {hasDiscount && (
-                  <span className="text-sm text-muted-foreground line-through">
-                    {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
+              {showPrice ? (
+                <>
+                  <div className="flex items-baseline gap-2">
+                    {hasDiscount && (
+                      <span className="text-sm text-muted-foreground line-through">
+                        {format(hotel.discount.oldPrice, hotel.iqdPerUsd)}
+                      </span>
+                    )}
+                    <span className="text-2xl font-extrabold text-gold">
+                      {format(price, hotel.iqdPerUsd)}
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {t("per_night")}
                   </span>
-                )}
-                <span className="text-2xl font-extrabold text-gold">
-                  {format(price, hotel.iqdPerUsd)}
+                </>
+              ) : (
+                <span className="text-sm font-medium text-muted-foreground">
+                  {t("price_on_request")}
                 </span>
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {t("per_night")}
-              </span>
+              )}
             </div>
             <div className="flex items-center gap-2">
               {hotel.phone && (

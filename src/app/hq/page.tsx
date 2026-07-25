@@ -21,6 +21,7 @@ import { ReviewsPanel } from "@/components/admin/reviews-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 import { ExchangeRateCard } from "@/components/admin/exchange-rate";
 import { ComingSoonCard } from "@/components/admin/coming-soon-card";
+import { HidePricesCard } from "@/components/admin/hide-prices-card";
 
 export default function AdminPage() {
   const { t } = useI18n();
@@ -184,6 +185,7 @@ export default function AdminPage() {
         <div className="mb-6 grid gap-3 sm:grid-cols-2">
           <ExchangeRateCard />
           <ComingSoonCard />
+          <HidePricesCard />
         </div>
         <Tabs defaultValue="hotels">
           <TabsList>

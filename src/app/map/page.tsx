@@ -8,6 +8,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
+import { useSiteConfig } from "@/lib/site-config";
 import { hotelLatLng } from "@/lib/geo";
 import { effectivePrice, pickLang, mediaSrc } from "@/lib/types";
 import type { MapPoint } from "@/components/hotels-map";
@@ -30,6 +31,8 @@ export default function MapPage() {
   const { t, tCity, lang } = useI18n();
   const { hotels } = useHotels();
   const { format } = useCurrency();
+  const { hidePrices, ready } = useSiteConfig();
+  const showPrice = ready && !hidePrices;
 
   const points = useMemo<MapPoint[]>(() => {
     return hotels
@@ -43,13 +46,15 @@ export default function MapPage() {
           lng: coords[1],
           name: pickLang(h.name, h.nameI18n, lang),
           cityLabel: tCity(h.city),
-          priceLabel: format(effectivePrice(h), h.iqdPerUsd),
+          priceLabel: showPrice
+            ? format(effectivePrice(h), h.iqdPerUsd)
+            : t("price_on_request"),
           image: mediaSrc(h.image) || FALLBACK_IMG,
           rating: h.rating,
         } satisfies MapPoint;
       })
       .filter((p): p is MapPoint => p !== null);
-  }, [hotels, lang, tCity, format]);
+  }, [hotels, lang, tCity, format, showPrice, t]);
 
   return (
     <>
