@@ -236,3 +236,70 @@ export const FAQ_ITEMS: FaqItem[] = [
     },
   },
 ];
+
+/* ---------------- "For hotel owners" call-to-action ---------------- */
+
+export const OWNER_EYEBROW: L = {
+  ckb: "بۆ خاوەن هۆتێلەکان",
+  en: "For hotel owners",
+  ar: "لأصحاب الفنادق",
+  kmr: "Ji bo xwedanên otêlan",
+};
+
+export const OWNER_HEADING: L = {
+  ckb: "هۆتێلەکەت لێرە زیاد بکە",
+  en: "List your hotel with us",
+  ar: "أضف فندقك معنا",
+  kmr: "Otêla xwe li vir zêde bike",
+};
+
+export const OWNER_SUB: L = {
+  ckb: "بەخۆڕاییە و کاتی زۆری ناوێت — تەنها پەیوەندیمان پێوە بکە و ئێمە پەڕەی هۆتێلەکەت بۆ ئامادە دەکەین.",
+  en: "It's free and quick — just message us and we'll set up your hotel's page.",
+  ar: "مجاني وسريع — راسلنا وسنجهّز صفحة فندقك.",
+  kmr: "Belaş û bilez e — tenê ji me re binivîse, em ê rûpela otêla te amade bikin.",
+};
+
+export interface OwnerPerk {
+  icon: "wallet" | "layout" | "search" | "message";
+  text: L;
+}
+
+export const OWNER_PERKS: OwnerPerk[] = [
+  {
+    icon: "wallet",
+    text: {
+      ckb: "پارە ڕاستەوخۆ بۆ خۆت — بەبێ کرێی زیادە",
+      en: "Money straight to you — no commission",
+      ar: "الأموال مباشرة إليك — بلا عمولة",
+      kmr: "Drav rasterast ji te re — bêyî kombersiyon",
+    },
+  },
+  {
+    icon: "layout",
+    text: {
+      ckb: "پانێلی سادەی خۆت بۆ نرخ و ژوورەکان",
+      en: "Your own simple dashboard for prices & rooms",
+      ar: "لوحة تحكّم بسيطة لأسعارك وغرفك",
+      kmr: "Panela te ya hêsan ji bo biha û odeyan",
+    },
+  },
+  {
+    icon: "search",
+    text: {
+      ckb: "دەرکەوتن لە گووگڵ بە چوار زمان",
+      en: "Found on Google in four languages",
+      ar: "الظهور في جوجل بأربع لغات",
+      kmr: "Li Google bi çar zimanan tê dîtin",
+    },
+  },
+  {
+    icon: "message",
+    text: {
+      ckb: "پەیوەندی ڕاستەوخۆی میوان بە واتساپ",
+      en: "Guests reach you directly on WhatsApp",
+      ar: "يتواصل الضيوف معك مباشرة عبر واتساب",
+      kmr: "Mêvan rasterast bi WhatsApp digihîjin te",
+    },
+  },
+];

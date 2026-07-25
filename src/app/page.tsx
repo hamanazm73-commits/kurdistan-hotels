@@ -4,6 +4,7 @@ import { Hero } from "@/components/hero";
 import { HotelsSection } from "@/components/hotels-section";
 import { BrowseByCity } from "@/components/browse-by-city";
 import { TrustSection } from "@/components/trust-section";
+import { OwnerCta } from "@/components/owner-cta";
 import { FaqSection } from "@/components/faq-section";
 import { SeoAbout } from "@/components/seo-about";
 import { FAQ_ITEMS } from "@/lib/site-content";
@@ -35,6 +36,7 @@ export default function HomePage() {
         <HotelsSection />
         <BrowseByCity />
         <TrustSection />
+        <OwnerCta />
         <FaqSection />
         <SeoAbout />
       </main>
