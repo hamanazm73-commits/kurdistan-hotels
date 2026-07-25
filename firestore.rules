@@ -84,5 +84,14 @@ service cloud.firestore {
       allow list: if isOwner();
       allow create, update, delete: if isOwner();
     }
+
+    // Hotel owner one-tap login links and their throwaway account mapping.
+    // Written and read only via the Admin SDK (server) — never by clients.
+    match /accessLinks/{token} {
+      allow read, write: if false;
+    }
+    match /hotelAccess/{hotelId} {
+      allow read, write: if false;
+    }
   }
 }

@@ -156,6 +156,22 @@ const ckb: Dict = {
     "کاتێک چالاکە، نرخی هۆتێلەکان بۆ میوان دەرناکەون (هیچ لە جیاتیان پیشان نادرێت).",
   admin_hide_prices_on: "چالاکە — نرخەکان شاراوەن",
   admin_hide_prices_off: "ناچالاکە — نرخەکان دیارن",
+  admin_access_links: "لینکی چوونەژوورەوەی هۆتێل",
+  admin_access_links_hint:
+    "بۆ هەر هۆتێلێک لینکێک دروست بکە و بە واتساپ بۆ خاوەن هۆتێلەکە بینێرە. کاتێک لینکەکە دەکاتەوە، خۆکارانە دەچێتە داشبۆردی هۆتێلەکەی — بەبێ ئیمەیڵ و پاسۆرد.",
+  admin_access_pick_hotel: "هۆتێل هەڵبژێرە",
+  admin_access_generate: "دروستکردنی لینک",
+  admin_access_copy: "کۆپی",
+  admin_access_copied: "لینک کۆپی کرا",
+  admin_access_send_wa: "ناردن بە واتساپ",
+  admin_access_regenerate: "لینکی نوێ",
+  admin_access_regenerate_hint:
+    "«لینکی نوێ» لینکی کۆن ناچالاک دەکات — تەنها کاتێک بەکاری بهێنە کە دەتەوێت دەستگەیشتنی کۆن ڕەت بکەیتەوە.",
+  admin_access_wa_msg: "لینکی چوونەژوورەوەی داشبۆردی هۆتێلەکەت ({hotel}):",
+  access_signing_in: "چوونەژوورەوە...",
+  access_failed: "لینکەکە کار ناکات",
+  access_failed_hint:
+    "لینکەکە بەسەرچووە یان نادروستە. لە خاوەنی سایتەکە داوای لینکێکی نوێ بکە.",
   view_details: "وردەکاری",
   from: "لە",
 
@@ -489,6 +505,22 @@ const en: Dict = {
     "When on, hotel prices are hidden from guests (nothing is shown in their place).",
   admin_hide_prices_on: "On — prices are hidden",
   admin_hide_prices_off: "Off — prices are shown",
+  admin_access_links: "Hotel login links",
+  admin_access_links_hint:
+    "Create a link for each hotel and send it to the owner on WhatsApp. Opening it signs them straight into their hotel's dashboard — no email or password.",
+  admin_access_pick_hotel: "Choose a hotel",
+  admin_access_generate: "Create link",
+  admin_access_copy: "Copy",
+  admin_access_copied: "Link copied",
+  admin_access_send_wa: "Send on WhatsApp",
+  admin_access_regenerate: "New link",
+  admin_access_regenerate_hint:
+    "'New link' disables the old one — use it only when you want to revoke previous access.",
+  admin_access_wa_msg: "Login link for your hotel's dashboard ({hotel}):",
+  access_signing_in: "Signing you in...",
+  access_failed: "This link doesn't work",
+  access_failed_hint:
+    "The link is invalid or expired. Ask the site owner for a new one.",
   view_details: "Details",
   from: "from",
 
@@ -822,6 +854,22 @@ const ar: Dict = {
     "عند التفعيل، تُخفى أسعار الفنادق عن الضيوف (لا يظهر شيء بدلاً منها).",
   admin_hide_prices_on: "مُفعّل — الأسعار مخفية",
   admin_hide_prices_off: "مُطفأ — الأسعار ظاهرة",
+  admin_access_links: "روابط دخول الفنادق",
+  admin_access_links_hint:
+    "أنشئ رابطًا لكل فندق وأرسله لصاحب الفندق عبر واتساب. عند فتحه يدخل مباشرة إلى لوحة تحكم فندقه — بدون بريد إلكتروني أو كلمة مرور.",
+  admin_access_pick_hotel: "اختر فندقًا",
+  admin_access_generate: "إنشاء رابط",
+  admin_access_copy: "نسخ",
+  admin_access_copied: "تم نسخ الرابط",
+  admin_access_send_wa: "إرسال عبر واتساب",
+  admin_access_regenerate: "رابط جديد",
+  admin_access_regenerate_hint:
+    "«رابط جديد» يُعطّل الرابط القديم — استخدمه فقط عندما تريد إلغاء الوصول السابق.",
+  admin_access_wa_msg: "رابط الدخول إلى لوحة تحكم فندقك ({hotel}):",
+  access_signing_in: "جارٍ تسجيل دخولك...",
+  access_failed: "هذا الرابط لا يعمل",
+  access_failed_hint:
+    "الرابط غير صالح أو منتهي الصلاحية. اطلب رابطًا جديدًا من صاحب الموقع.",
   view_details: "التفاصيل",
   from: "من",
 
@@ -1155,6 +1203,22 @@ const kmr: Dict = {
     "Gava vekirî be, bihayên otêlan ji mêvanan têne veşartin (li şûna wan tiştek nayê nîşandan).",
   admin_hide_prices_on: "Vekirî — biha veşartî ne",
   admin_hide_prices_off: "Girtî — biha têne nîşandan",
+  admin_access_links: "Lînkên têketina otêlan",
+  admin_access_links_hint:
+    "Ji bo her otêlekê lînkekê çêbike û bi WhatsApp ji xwedanê otêlê re bişîne. Gava vedike, rasterast dikeve panela otêla xwe — bêyî e-name û şîfre.",
+  admin_access_pick_hotel: "Otêlekê hilbijêre",
+  admin_access_generate: "Lînk çêbike",
+  admin_access_copy: "Kopî",
+  admin_access_copied: "Lînk hat kopîkirin",
+  admin_access_send_wa: "Bi WhatsApp bişîne",
+  admin_access_regenerate: "Lînka nû",
+  admin_access_regenerate_hint:
+    "'Lînka nû' ya kevn neçalak dike — tenê gava bikar bîne ku dixwazî gihîştina berê betal bikî.",
+  admin_access_wa_msg: "Lînka têketina panela otêla te ({hotel}):",
+  access_signing_in: "Têdikevî...",
+  access_failed: "Ev lînk naxebite",
+  access_failed_hint:
+    "Lînk nederbasdar e an bêwext e. Ji xwedanê malperê lînkeke nû bixwaze.",
   view_details: "Hûrgulî",
   from: "ji",
 

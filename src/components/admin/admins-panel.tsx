@@ -27,6 +27,7 @@ import {
   removeAdmin,
 } from "@/lib/hotels-db";
 import type { AdminRecord } from "@/lib/types";
+import { HotelAccessLinks } from "./hotel-access-links";
 
 export function AdminsPanel() {
   const { t, tCity } = useI18n();
@@ -43,7 +44,13 @@ export function AdminsPanel() {
   const hotelCity = (hotelId?: string) =>
     hotelId ? hotels.find((h) => h.id === hotelId)?.city : undefined;
 
-  const otherAdmins = admins.filter((a) => a.email !== OWNER_EMAIL);
+  // hide the synthetic accounts behind one-tap login links — they're managed
+  // from the "hotel login links" card, not this by-email list
+  const otherAdmins = admins.filter(
+    (a) =>
+      a.email !== OWNER_EMAIL &&
+      !a.email.endsWith("@link.hotelskurdistan.com"),
+  );
   // cities that actually have a hotel owner, in the canonical order
   const cityOptions = CITIES.filter((c) =>
     otherAdmins.some((a) => a.role === "hotel" && hotelCity(a.hotelId) === c),
@@ -103,6 +110,9 @@ export function AdminsPanel() {
         </div>
         <p className="text-sm text-muted-foreground">{t("admin_owner_only")}</p>
       </Card>
+
+      {/* the easy way: a one-tap login link per hotel — no email/password */}
+      <HotelAccessLinks />
 
       <Card className="grid gap-3 p-5">
         <div className="grid gap-3 sm:grid-cols-2">

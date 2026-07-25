@@ -97,6 +97,37 @@ async function authHeaders(): Promise<HeadersInit> {
   return { Authorization: `Bearer ${idToken}` };
 }
 
+/* ---------------- hotel owner login links ---------------- */
+
+/** The current one-tap login link for a hotel owner, or null if none yet. */
+export async function getHotelAccessLink(hotelId: string): Promise<string | null> {
+  const res = await fetch(
+    `/api/hotel-access?hotelId=${encodeURIComponent(hotelId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) throw new Error("failed");
+  const data = (await res.json()) as { url?: string | null };
+  return data.url ?? null;
+}
+
+/** Create (or regenerate) a hotel owner's one-tap login link. */
+export async function createHotelAccessLink(
+  hotelId: string,
+  regenerate = false,
+): Promise<string> {
+  const res = await fetch("/api/hotel-access", {
+    method: "POST",
+    headers: { ...(await authHeaders()), "Content-Type": "application/json" },
+    body: JSON.stringify({ hotelId, regenerate }),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    url?: string;
+    error?: string;
+  };
+  if (!res.ok || !data.url) throw new Error(data.error || "failed");
+  return data.url;
+}
+
 /** Every post, drafts included — for the dashboard list. */
 export async function listPosts(): Promise<BlogPost[]> {
   const res = await fetch("/api/posts", { headers: await authHeaders() });
