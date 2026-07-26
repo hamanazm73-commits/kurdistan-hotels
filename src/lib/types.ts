@@ -154,6 +154,8 @@ export interface Hotel {
   /** date-range price overrides: a room's price on a given check-in date is its
       matching season's price, otherwise its base price. */
   seasons?: Season[];
+  /** how many times this hotel's detail page has been viewed */
+  views?: number;
   createdAt?: number;
 }
 

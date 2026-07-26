@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { MapPin, Star, BedDouble, Pencil, Heart } from "lucide-react";
+import { MapPin, Star, BedDouble, Pencil, Heart, Eye } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -196,17 +196,28 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                 {name}
               </h3>
             </Link>
-            <a
-              href={mapsUrl(hotel)}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={t("view_on_map")}
-              onClick={(e) => e.stopPropagation()}
-              className="mt-1 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary hover:underline"
-            >
-              <MapPin className="size-3.5" />
-              {tCity(hotel.city)}
-            </a>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
+              <a
+                href={mapsUrl(hotel)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={t("view_on_map")}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 transition-colors hover:text-primary hover:underline"
+              >
+                <MapPin className="size-3.5" />
+                {tCity(hotel.city)}
+              </a>
+              {typeof hotel.views === "number" && hotel.views > 0 && (
+                <span
+                  className="inline-flex items-center gap-1 text-xs"
+                  title={t("views_label")}
+                >
+                  <Eye className="size-3.5" />
+                  {t("views_count", { n: hotel.views })}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-1.5">

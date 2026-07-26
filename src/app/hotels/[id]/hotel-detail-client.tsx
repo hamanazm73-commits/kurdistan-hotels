@@ -95,6 +95,23 @@ export function HotelDetailClient({
       alive = false;
     };
   }, [id]);
+
+  // Count a view once per browser session per hotel (a refresh won't re-count).
+  useEffect(() => {
+    if (!id) return;
+    const key = `viewed:${id}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+    } catch {
+      return;
+    }
+    fetch("/api/views", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ hotelId: id }),
+    }).catch(() => {});
+  }, [id]);
   // Booking dialog opened by tapping a room row (preselects that room).
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingRoom, setBookingRoom] = useState("");
