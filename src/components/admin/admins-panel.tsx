@@ -46,11 +46,10 @@ export function AdminsPanel() {
 
   // hide the synthetic accounts behind one-tap login links — they're managed
   // from the "hotel login links" card, not this by-email list
-  const otherAdmins = admins.filter(
-    (a) =>
-      a.email !== OWNER_EMAIL &&
-      !a.email.endsWith("@link.hotelskurdistan.com"),
-  );
+  const otherAdmins = admins.filter((a) => {
+    const em = a.email ?? "";
+    return em !== OWNER_EMAIL && !em.endsWith("@link.hotelskurdistan.com");
+  });
   // cities that actually have a hotel owner, in the canonical order
   const cityOptions = CITIES.filter((c) =>
     otherAdmins.some((a) => a.role === "hotel" && hotelCity(a.hotelId) === c),

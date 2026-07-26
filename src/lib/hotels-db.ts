@@ -336,7 +336,13 @@ export async function setHidePrices(hidePrices: boolean) {
 
 export async function listAdmins(): Promise<AdminRecord[]> {
   const snap = await getDocs(collection(requireDb(), "roles"));
-  return snap.docs.map((d) => d.data() as AdminRecord);
+  // Roles are keyed by email; some docs (e.g. one-tap login accounts) may not
+  // repeat the email in their data — backfill it from the id so callers can
+  // always rely on `email` being present.
+  return snap.docs.map((d) => {
+    const data = d.data() as AdminRecord;
+    return { ...data, email: data.email ?? d.id };
+  });
 }
 
 export async function addAdmin(
