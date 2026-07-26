@@ -6,7 +6,6 @@ import { motion } from "motion/react";
 import {
   ArrowLeft,
   MapPin,
-  Star,
   Phone,
   BedDouble,
   Check,
@@ -23,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
 import { HotelReviews } from "@/components/hotel-reviews";
+import { StarRating } from "@/components/star-rating";
 import { useHotels } from "@/lib/use-hotels";
 import { useSiteConfig } from "@/lib/site-config";
 import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
@@ -253,10 +253,7 @@ export function HotelDetailClient({
                 <MapPin className="size-4" />
                 {tCity(hotel.city)}
               </a>
-              <span className="flex items-center gap-1 font-semibold">
-                <Star className="star-shine size-5 fill-gold text-gold" />
-                {hotel.rating.toFixed(1)}
-              </span>
+              <StarRating value={hotel.rating} size={20} showValue />
             </div>
 
             {description && (

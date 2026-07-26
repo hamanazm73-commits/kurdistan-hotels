@@ -14,6 +14,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { StarRating } from "./star-rating";
 import { useI18n } from "@/lib/i18n";
 import {
   effectivePrice,
@@ -180,9 +181,9 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             />
           </button>
 
-          <div className="absolute bottom-3 end-3 flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-sm font-bold text-white shadow-lg backdrop-blur-sm">
+          <div className="absolute bottom-3 end-3 flex items-center gap-1 rounded-full bg-gold px-2.5 py-1 text-sm font-extrabold text-gold-foreground shadow-lg ring-1 ring-black/10">
             <Star
-              className="star-shine size-3.5 fill-gold text-gold"
+              className="star-shine size-3.5 fill-current"
               style={{ animationDelay: `${(index % 6) * 0.5}s` }}
             />
             {hotel.rating.toFixed(1)}
@@ -214,7 +215,8 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                 {name}
               </h3>
             </Link>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
+            <StarRating value={hotel.rating} size={18} showValue className="mt-2" />
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
               <a
                 href={mapsUrl(hotel)}
                 target="_blank"
