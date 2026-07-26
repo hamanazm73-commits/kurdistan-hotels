@@ -156,6 +156,8 @@ export interface Hotel {
   seasons?: Season[];
   /** how many times this hotel's detail page has been viewed */
   views?: number;
+  /** epoch ms of the most recent booking — used for the "last booked" note */
+  lastBookedAt?: number;
   createdAt?: number;
 }
 

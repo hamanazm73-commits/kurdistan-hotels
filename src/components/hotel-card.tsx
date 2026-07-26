@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { MapPin, Star, BedDouble, Pencil, Heart, Eye } from "lucide-react";
+import { MapPin, Star, BedDouble, Pencil, Heart, Eye, Flame } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -50,6 +50,23 @@ function availTone(n: number): string {
       : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300";
 }
 
+const DAY_MS = 86_400_000;
+
+/** A short "X ago" label for a recent booking, or null when there's none in
+    the last two weeks (so stale bookings don't show a misleading note). */
+function lastBookedLabel(
+  ts: number | undefined,
+  t: (k: string, v?: Record<string, string | number>) => string,
+): string | null {
+  if (!ts) return null;
+  const diff = Date.now() - ts;
+  if (diff < 0 || diff > 14 * DAY_MS) return null;
+  const hours = Math.floor(diff / 3_600_000);
+  if (hours < 1) return t("ago_now");
+  if (hours < 24) return t("ago_hours", { n: hours });
+  return t("ago_days", { n: Math.floor(hours / 24) });
+}
+
 function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string {
   let digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) digits = "964" + digits.slice(1);
@@ -80,6 +97,7 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
   const trackedRooms = (hotel.rooms ?? []).filter(
     (r) => typeof r.available === "number",
   );
+  const lastBooked = lastBookedLabel(hotel.lastBookedAt, t);
 
   return (
     <motion.div
@@ -218,6 +236,12 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                 </span>
               )}
             </div>
+            {lastBooked && (
+              <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <Flame className="size-3.5" />
+                {t("book_last")} {lastBooked}
+              </span>
+            )}
           </div>
 
           <div className="flex flex-wrap gap-1.5">

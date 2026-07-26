@@ -72,6 +72,15 @@ export async function POST(req: Request) {
       createdAt: Date.now(),
     });
 
+    // stamp the hotel so cards can show a "last booked …" note (best-effort)
+    if (hotelId) {
+      adminDb
+        .collection("hotels")
+        .doc(hotelId)
+        .update({ lastBookedAt: Date.now() })
+        .catch(() => {});
+    }
+
     await notifyBooking(parsed.data);
     await sendBookingEmail(parsed.data, notifyEmail);
     // id lets the guest's device follow this booking's live status

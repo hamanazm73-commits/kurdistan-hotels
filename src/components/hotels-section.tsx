@@ -21,13 +21,14 @@ import { effectivePrice } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { SectionIntro } from "./section-intro";
 
-type Sort = "recommended" | "price_low" | "price_high" | "rating";
+type Sort = "recommended" | "price_low" | "price_high" | "rating" | "views";
 
 const SORT_LABEL: Record<Sort, string> = {
   recommended: "sort_recommended",
   price_low: "sort_price_low",
   price_high: "sort_price_high",
   rating: "sort_rating",
+  views: "sort_views",
 };
 
 export function HotelsSection() {
@@ -65,6 +66,8 @@ export function HotelsSection() {
           return effectivePrice(b) - effectivePrice(a);
         case "rating":
           return b.rating - a.rating;
+        case "views":
+          return (b.views ?? 0) - (a.views ?? 0);
         default: {
           const score = (x: typeof a) =>
             (x.featured ? 2 : 0) + (x.recommended ? 1 : 0);
@@ -160,6 +163,7 @@ export function HotelsSection() {
                   </>
                 )}
                 <SelectItem value="rating">{t("sort_rating")}</SelectItem>
+                <SelectItem value="views">{t("sort_views")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
