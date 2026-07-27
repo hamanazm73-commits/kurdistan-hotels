@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search, ArrowDownUp } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Search, ArrowDownUp, Wallet, BedDouble } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,11 +17,20 @@ import { useHotels } from "@/lib/use-hotels";
 import { useI18n, CITY_KEYS } from "@/lib/i18n";
 import { useSiteConfig } from "@/lib/site-config";
 import { CITIES } from "@/lib/sample-data";
-import { effectivePrice } from "@/lib/types";
+import {
+  effectivePrice,
+  sameRoomType,
+  roomTypeId,
+  roomTypeLabel,
+} from "@/lib/types";
+import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import { SectionIntro } from "./section-intro";
 
 type Sort = "recommended" | "price_low" | "price_high" | "rating" | "views";
+
+/** Nightly-price ceilings offered in the filter, in IQD. */
+const PRICE_STEPS = [50_000, 100_000, 150_000, 250_000, 400_000];
 
 const SORT_LABEL: Record<Sort, string> = {
   recommended: "sort_recommended",
@@ -32,7 +41,8 @@ const SORT_LABEL: Record<Sort, string> = {
 };
 
 export function HotelsSection() {
-  const { t, tCity } = useI18n();
+  const { t, tCity, lang } = useI18n();
+  const { format } = useCurrency();
   const { hotels, loading } = useHotels();
   const { hidePrices } = useSiteConfig();
 
@@ -40,6 +50,21 @@ export function HotelsSection() {
   const [city, setCity] = useState<string>("all");
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [sort, setSort] = useState<Sort>("recommended");
+  const [maxPrice, setMaxPrice] = useState<string>("any");
+  const [roomType, setRoomType] = useState<string>("any");
+
+  // only offer rooms some hotel actually has, so the filter never returns nothing
+  const offeredRoomTypes = useMemo(() => {
+    const ids = new Set<string>();
+    for (const h of hotels) {
+      if (h.hidden) continue;
+      for (const r of h.rooms ?? []) {
+        const id = roomTypeId(r.type);
+        if (id) ids.add(id);
+      }
+    }
+    return [...ids];
+  }, [hotels]);
 
   const filtered = useMemo(() => {
     let list = hotels.filter((h) => {
@@ -55,7 +80,17 @@ export function HotelsSection() {
         ].some((v) => v?.toLowerCase().includes(q));
       const matchesCity = city === "all" || h.city === city;
       const matchesFeatured = !featuredOnly || h.featured;
-      return matchesSearch && matchesCity && matchesFeatured;
+      const matchesPrice = maxPrice === "any" || effectivePrice(h) <= +maxPrice;
+      const matchesRoom =
+        roomType === "any" ||
+        (h.rooms ?? []).some((r) => sameRoomType(r.type, roomType));
+      return (
+        matchesSearch &&
+        matchesCity &&
+        matchesFeatured &&
+        matchesPrice &&
+        matchesRoom
+      );
     });
 
     list = [...list].sort((a, b) => {
@@ -76,7 +111,25 @@ export function HotelsSection() {
       }
     });
     return list;
-  }, [hotels, search, city, featuredOnly, sort]);
+  }, [hotels, search, city, featuredOnly, sort, maxPrice, roomType]);
+
+  // A search that finds nothing is the visitor telling us what the site is
+  // missing. Report it once they've stopped typing, and only for a plain search
+  // — a filter can empty the list without the term being the problem.
+  useEffect(() => {
+    const q = search.trim();
+    if (q.length < 2 || filtered.length > 0) return;
+    if (city !== "all" || featuredOnly || maxPrice !== "any" || roomType !== "any")
+      return;
+    const timer = setTimeout(() => {
+      fetch("/api/search-miss", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q }),
+      }).catch(() => {});
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [search, filtered.length, city, featuredOnly, maxPrice, roomType]);
 
   // Median nightly price per city, from every visible hotel rather than the
   // filtered view — otherwise narrowing the list would shift the yardstick and
@@ -159,7 +212,57 @@ export function HotelsSection() {
             </FilterChip>
           ))}
 
-          <div className="ms-auto flex items-center gap-3">
+          <div className="ms-auto flex flex-wrap items-center gap-2">
+            {!hidePrices && (
+              <Select
+                value={maxPrice}
+                onValueChange={(v) => v && setMaxPrice(v)}
+              >
+                <SelectTrigger className="max-w-[52vw] sm:max-w-none">
+                  <Wallet className="size-4 shrink-0 text-muted-foreground" />
+                  <SelectValue>
+                    {(v: string | null) =>
+                      !v || v === "any"
+                        ? t("filter_price_any")
+                        : t("filter_price_under", { p: format(+v) })
+                    }
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">{t("filter_price_any")}</SelectItem>
+                  {PRICE_STEPS.map((p) => (
+                    <SelectItem key={p} value={String(p)}>
+                      {t("filter_price_under", { p: format(p) })}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            <Select
+              value={roomType}
+              onValueChange={(v) => v && setRoomType(v)}
+            >
+              <SelectTrigger className="max-w-[52vw] sm:max-w-none">
+                <BedDouble className="size-4 shrink-0 text-muted-foreground" />
+                <SelectValue>
+                  {(v: string | null) =>
+                    !v || v === "any"
+                      ? t("filter_room_any")
+                      : roomTypeLabel(v, lang)
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">{t("filter_room_any")}</SelectItem>
+                {offeredRoomTypes.map((id) => (
+                  <SelectItem key={id} value={id}>
+                    {roomTypeLabel(id, lang)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Select
               value={sort}
               onValueChange={(v) => v && setSort(v as Sort)}

@@ -62,6 +62,25 @@ const ROOM_TYPE_INDEX: Map<string, Record<Lang, string>> = (() => {
   return m;
 })();
 
+/** The standard id for a stored room-type string, whichever language the owner
+    typed it in, or null for a custom type. Lets filters compare two spellings
+    of the same room ("Suite", "سویت") as one thing. */
+export function roomTypeId(type: string): string | null {
+  if (!type) return null;
+  const key = type.trim().toLowerCase();
+  const hit = ROOM_TYPES.find(
+    (rt) =>
+      rt.id === key ||
+      Object.values(rt.labels).some((n) => n.trim().toLowerCase() === key),
+  );
+  return hit ? hit.id : null;
+}
+
+/** Whether a stored room-type string is the standard type `id`. */
+export function sameRoomType(type: string, id: string): boolean {
+  return roomTypeId(type) === id;
+}
+
 /** The room-type name to show in `lang`; falls back to the raw text for custom
     types the owner typed themselves. */
 export function roomTypeLabel(type: string, lang: Lang): string {
@@ -316,6 +335,16 @@ export function mediaSrc(url: string | undefined | null): string {
   if (!url) return "";
   const m = url.match(/^https:\/\/pub-[a-z0-9]+\.r2\.dev\/(.+)$/i);
   return m ? `/api/img/${m[1]}` : url;
+}
+
+/**
+ * Whether a src must bypass the image optimizer. Inline base64 (the fallback
+ * when a media doc has no hosted URL) and blob: previews have nothing for the
+ * optimizer to fetch, and it errors rather than passing them through.
+ */
+export function isRawSrc(src: string | undefined | null): boolean {
+  if (!src) return true;
+  return src.startsWith("data:") || src.startsWith("blob:");
 }
 
 export function formatPrice(price: number, lang: Lang): string {

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { History } from "lucide-react";
 import { useRecentlyViewed } from "@/lib/recently-viewed";
 import { useHotels } from "@/lib/use-hotels";
 import { useI18n } from "@/lib/i18n";
-import { pickLang, mediaSrc, type Hotel } from "@/lib/types";
+import { pickLang, mediaSrc, isRawSrc, type Hotel } from "@/lib/types";
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
@@ -40,14 +41,14 @@ export function RecentlyViewedRow() {
             href={`/hotels/${h.id}`}
             className="group w-40 shrink-0 snap-start"
           >
-            <div className="aspect-[4/3] overflow-hidden rounded-xl border bg-muted">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative aspect-[4/3] overflow-hidden rounded-xl border bg-muted">
+              <Image
                 src={mediaSrc(h.image) || FALLBACK_IMG}
                 alt={h.name}
-                loading="lazy"
-                decoding="async"
-                className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                fill
+                sizes="160px"
+                unoptimized={isRawSrc(mediaSrc(h.image))}
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
             <p className="mt-1.5 line-clamp-1 text-sm font-semibold group-hover:text-primary">

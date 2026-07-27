@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
 import {
@@ -35,6 +36,7 @@ import {
   mapsUrl,
   mediaSrc,
   totalAvailable,
+  isRawSrc,
   paymentLabel,
   paymentColor,
   roomTypeLabel,
@@ -56,6 +58,10 @@ const HotelFormDialog = dynamic(
 
 const FALLBACK_IMG =
   "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
+
+/** Three cards on a wide screen, two on a tablet, one on a phone — tells the
+    optimizer which width to actually serve instead of the full-size original. */
+const CARD_SIZES = "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
 
 /** Colour classes for an availability chip: green plenty, amber low, red none. */
 function availTone(n: number): string {
@@ -141,6 +147,7 @@ export function HotelCard({
   );
   const lastBooked = lastBookedLabel(hotel.lastBookedAt, t);
   const week = bookingsThisWeek(hotel.recentBookingsAt);
+  const cover = mediaSrc(hotel.image) || FALLBACK_IMG;
   const isNew = isNewListing(hotel.createdAt);
   // the cover counts too, so a hotel with no extra images still has one photo
   const photoCount = (hotel.images?.length ?? 0) + (hotel.image ? 1 : 0);
@@ -166,31 +173,25 @@ export function HotelCard({
         )}
       >
         <div className="relative aspect-[3/2] overflow-hidden bg-muted">
-          {/* blurred fill so any image shape shows whole & looks nice.
-              An <img> (not a CSS background) so it respects lazy-loading —
-              off-screen cards don't fetch their image until scrolled near. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          {/* blurred fill so any image shape shows whole & looks nice. Lazy by
+              default, so off-screen cards don't fetch until scrolled near. */}
+          <Image
             aria-hidden
             alt=""
-            src={mediaSrc(hotel.image) || FALLBACK_IMG}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 size-full scale-110 object-cover opacity-55 blur-xl"
+            src={cover}
+            fill
+            sizes={CARD_SIZES}
+            unoptimized={isRawSrc(cover)}
+            className="scale-110 object-cover opacity-55 blur-xl"
           />
           <Link href={`/hotels/${hotel.id}`} className="relative block size-full">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={mediaSrc(hotel.image) || FALLBACK_IMG}
+            <Image
+              src={cover}
               alt={hotel.name}
-              loading="lazy"
-              decoding="async"
-              className="size-full object-contain transition-transform duration-500 group-hover:scale-105"
-              onError={(e) => {
-                const img = e.currentTarget;
-                img.onerror = null;
-                img.src = FALLBACK_IMG;
-              }}
+              fill
+              sizes={CARD_SIZES}
+              unoptimized={isRawSrc(cover)}
+              className="object-contain transition-transform duration-500 group-hover:scale-105"
             />
           </Link>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
