@@ -158,6 +158,12 @@ export interface Hotel {
   views?: number;
   /** epoch ms of the most recent booking — used for the "last booked" note */
   lastBookedAt?: number;
+  /** how many approved guest reviews this hotel has. Denormalized by
+      syncHotelReviewStats so the listing doesn't query reviews per card. */
+  reviewCount?: number;
+  /** average of those approved reviews (1 decimal); 0 when there are none.
+      Distinct from `rating`, which the owner sets. */
+  reviewAvg?: number;
   createdAt?: number;
 }
 

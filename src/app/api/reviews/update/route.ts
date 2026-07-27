@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { syncHotelReviewStats } from "@/lib/review-stats";
 import type { Firestore } from "firebase-admin/firestore";
 
 export const runtime = "nodejs";
@@ -111,6 +112,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }
     await ref.update({ status });
+    // keep the hotel's public tally in step with what's approved
+    await syncHotelReviewStats(db, String(rv.hotelId ?? ""));
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "update_failed" }, { status: 500 });

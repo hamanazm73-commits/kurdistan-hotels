@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { syncHotelReviewStats } from "@/lib/review-stats";
 import {
   tgAnswerCallback,
   tgEditText,
@@ -90,7 +91,11 @@ export async function POST(req: Request) {
     const db = getAdminDb();
     if (db) {
       try {
-        await db.collection("reviews").doc(id).update({ status });
+        const ref = db.collection("reviews").doc(id);
+        const hotelId = String((await ref.get()).data()?.hotelId ?? "");
+        await ref.update({ status });
+        // keep the hotel's public tally in step with what's approved
+        await syncHotelReviewStats(db, hotelId);
       } catch {
         /* ignore — review may have been removed */
       }

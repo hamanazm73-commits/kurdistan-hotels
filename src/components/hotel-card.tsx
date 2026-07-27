@@ -3,7 +3,17 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { MapPin, BedDouble, Pencil, Heart, Eye, Flame } from "lucide-react";
+import {
+  MapPin,
+  BedDouble,
+  Pencil,
+  Heart,
+  Eye,
+  Flame,
+  Images,
+  Play,
+  MessageSquare,
+} from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -23,6 +33,8 @@ import {
   mapsUrl,
   mediaSrc,
   totalAvailable,
+  paymentLabel,
+  paymentColor,
   roomTypeLabel,
   type Hotel,
 } from "@/lib/types";
@@ -69,6 +81,13 @@ function lastBookedLabel(
   return t("ago_days", { n: Math.floor(hours / 24) });
 }
 
+/** Whether a hotel joined recently enough to still be worth flagging as new. */
+function isNewListing(createdAt: number | undefined): boolean {
+  if (!createdAt) return false;
+  const diff = Date.now() - createdAt;
+  return diff >= 0 && diff < 14 * DAY_MS;
+}
+
 function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string {
   let digits = phone.replace(/\D/g, "");
   if (digits.startsWith("0")) digits = "964" + digits.slice(1);
@@ -100,6 +119,10 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
     (r) => typeof r.available === "number",
   );
   const lastBooked = lastBookedLabel(hotel.lastBookedAt, t);
+  const isNew = isNewListing(hotel.createdAt);
+  // the cover counts too, so a hotel with no extra images still has one photo
+  const photoCount = (hotel.images?.length ?? 0) + (hotel.image ? 1 : 0);
+  const payments = (hotel.payments ?? []).filter((p) => p.type && p.url);
 
   return (
     <motion.div
@@ -160,6 +183,11 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             {hasDiscount && (
               <Badge variant="destructive">−{pct}%</Badge>
             )}
+            {isNew && (
+              <Badge className="bg-sky-500 text-white hover:bg-sky-500">
+                ✨ {t("badge_new")}
+              </Badge>
+            )}
           </div>
 
           {/* favourite heart — saved on the visitor's device, no login needed */}
@@ -186,6 +214,20 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             <SparkleStar className="size-4" delay={(index % 6) * 0.5} />
             {hotel.rating.toFixed(1)}
           </div>
+
+          {/* how much there is to see — only where the edit button isn't, so
+              an owner never loses their shortcut to it */}
+          {!canEdit && (photoCount > 1 || hotel.video) && (
+            <div className="absolute bottom-3 start-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-xs font-semibold text-white shadow-lg ring-1 ring-white/15 backdrop-blur-md">
+              {photoCount > 1 && (
+                <span className="inline-flex items-center gap-1">
+                  <Images className="size-3.5" />
+                  {photoCount}
+                </span>
+              )}
+              {hotel.video && <Play className="size-3.5 fill-white" />}
+            </div>
+          )}
 
           {/* owners get a quick edit button on their own hotel's card, so they
               can add/remove rooms without leaving the page */}
@@ -235,6 +277,18 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                   {t("views_word")}
                 </span>
               )}
+              {/* real guest reviews — `rating` above is the owner's own number,
+                  so this is the only figure on the card guests wrote */}
+              {!!hotel.reviewCount && hotel.reviewCount > 0 && (
+                <Link
+                  href={`/hotels/${hotel.id}#reviews`}
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center gap-1 text-xs font-semibold transition-colors hover:text-primary hover:underline"
+                >
+                  <MessageSquare className="size-3.5" />
+                  {t("rv_count", { n: hotel.reviewCount })}
+                </Link>
+              )}
             </div>
             {lastBooked && (
               <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -254,6 +308,23 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               </span>
             ))}
           </div>
+
+          {/* which rails this hotel accepts — guests pay the hotel directly, so
+              seeing a name they bank with is what makes the booking feel safe */}
+          {payments.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {payments.slice(0, 4).map((p) => (
+                <span
+                  key={p.type}
+                  title={paymentLabel(p.type)}
+                  className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold text-white"
+                  style={{ backgroundColor: paymentColor(p.type) }}
+                >
+                  {paymentLabel(p.type)}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* rooms available — per type when tracked, else the total */}
           {trackedRooms.length > 0 ? (

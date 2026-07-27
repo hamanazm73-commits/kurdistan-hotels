@@ -127,6 +127,7 @@ const ckb: Dict = {
   cities_sub: "شارەکەت هەڵبژێرە و باشترین هۆتێلەکانی ببینە.",
 
   badge_featured: "تایبەت",
+  badge_new: "نوێ",
   badge_recommended: "پێشنیارکراو",
   badge_discount: "داشکاندن",
   badge_hidden: "شاردراوە",
@@ -483,6 +484,7 @@ const en: Dict = {
   cities_sub: "Pick a city and see its best hotels.",
 
   badge_featured: "Featured",
+  badge_new: "New",
   badge_recommended: "Recommended",
   badge_discount: "Deal",
   badge_hidden: "Hidden",
@@ -839,6 +841,7 @@ const ar: Dict = {
   cities_sub: "اختر مدينة وشاهد أفضل فنادقها.",
 
   badge_featured: "مميز",
+  badge_new: "جديد",
   badge_recommended: "منصوح بيه",
   badge_discount: "تخفيض",
   badge_hidden: "مخفي",
@@ -1195,6 +1198,7 @@ const kmr: Dict = {
   cities_sub: "Bajarê xwe hilbijêre û otêlên wê yên herî baş bibîne.",
 
   badge_featured: "Taybet",
+  badge_new: "Nû",
   badge_recommended: "Pêşniyarkirî",
   badge_discount: "Xistina binê",
   badge_hidden: "Veşartî",
