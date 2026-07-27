@@ -25,7 +25,14 @@ import {
 import { useI18n } from "@/lib/i18n";
 import { useCurrency } from "@/lib/currency";
 import { useSiteConfig } from "@/lib/site-config";
-import { roomPriceOn, roomTypeLabel, seasonFor, type Hotel } from "@/lib/types";
+import {
+  roomPriceOn,
+  roomTypeLabel,
+  seasonFor,
+  buildBookingWhatsAppUrl,
+  type Hotel,
+} from "@/lib/types";
+import { track } from "@/lib/analytics";
 import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
 
@@ -149,7 +156,35 @@ export function BookingDialog({
         name: name.trim(),
         phone: phone.trim(),
       });
-      toast.success(t("book_success"));
+      // The guest gets no message of their own — only the hotel is notified —
+      // so offer to send the booking to the hotel on WhatsApp. That gives them
+      // a copy in their own chat history, and a thread to follow up in.
+      const wa = hotel.phone
+        ? buildBookingWhatsAppUrl(hotel.phone, {
+            hotel: hotel.name,
+            name: name.trim(),
+            roomType: roomTypeLabel(roomType, lang),
+            checkIn,
+            nights: Number(nights) || 1,
+            intro: t("book_wa_intro"),
+          })
+        : null;
+      track("booking_submitted", {
+        hotel_id: hotel.id,
+        city: hotel.city,
+        room_type: roomType,
+        nights: Number(nights) || 1,
+        value: roomPrice * (Number(nights) || 1),
+      });
+      toast.success(t("book_success"), {
+        duration: wa ? 12_000 : 4_000,
+        action: wa
+          ? {
+              label: t("book_wa_send"),
+              onClick: () => window.open(wa, "_blank", "noopener,noreferrer"),
+            }
+          : undefined,
+      });
       setOpen(false);
       setName("");
       setPhone("");

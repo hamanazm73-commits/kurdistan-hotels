@@ -352,6 +352,33 @@ export function formatPrice(price: number, lang: Lang): string {
   return lang === "en" || lang === "kmr" ? `${n} IQD` : `${n} دینار`;
 }
 
+/**
+ * A wa.me link carrying a booking summary, for the guest to send to the hotel.
+ * Local numbers are stored as 0xxx; WhatsApp needs the country code.
+ */
+export function buildBookingWhatsAppUrl(
+  phone: string,
+  b: {
+    hotel: string;
+    name: string;
+    roomType: string;
+    checkIn: string;
+    nights: number;
+    intro: string;
+  },
+): string {
+  let digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = "964" + digits.slice(1);
+  const text = [
+    b.intro,
+    `🏨 ${b.hotel}`,
+    `👤 ${b.name}`,
+    `🛏 ${b.roomType}`,
+    `📅 ${b.checkIn} — ${b.nights}`,
+  ].join("\n");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
+}
+
 /** Best Google Maps URL for a hotel: its explicit link, else a name+city search. */
 export function mapsUrl(
   h: Pick<Hotel, "mapUrl" | "name" | "city" | "address">,

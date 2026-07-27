@@ -28,6 +28,7 @@ if (firebaseEnabled) {
   storageInstance = getStorage(app);
 }
 
+export { app };
 export const auth = authInstance;
 export const db = dbInstance;
 export const storage = storageInstance;
