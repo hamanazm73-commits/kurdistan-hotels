@@ -242,12 +242,60 @@
   will-change: transform, filter;
 }
 
+/* Premium rating star: a soft, breathing golden glow — like the steady
+   light of a real star, gently brightening and dimming. */
+@keyframes star-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 55%, transparent))
+      drop-shadow(0 0 2.5px color-mix(in oklch, var(--gold) 28%, transparent));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 4px color-mix(in oklch, var(--gold) 95%, transparent))
+      drop-shadow(0 0 9px color-mix(in oklch, var(--gold) 55%, transparent));
+    transform: scale(1.06);
+  }
+}
+.star-glow {
+  animation: star-glow 2.8s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform, filter;
+}
+
+/* A tiny 4-point glint that flashes over the star every few seconds, like the
+   sudden twinkle of a real star catching the light. Invisible most of the
+   time, with one brief, bright sparkle. */
+@keyframes star-glint {
+  0%,
+  72%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1) rotate(18deg);
+  }
+  90% {
+    opacity: 0;
+    transform: scale(0.5) rotate(34deg);
+  }
+}
+.star-glint {
+  animation: star-glint 4.5s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
 /* respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-float,
   .aurora-blob,
   .text-gradient-gold,
   .star-shine,
+  .star-glow,
+  .star-glint,
   .shimmer::after {
     animation: none;
   }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
-import { MapPin, Star, BedDouble, Pencil, Heart, Eye, Flame } from "lucide-react";
+import { MapPin, BedDouble, Pencil, Heart, Eye, Flame } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -14,6 +14,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { SparkleStar } from "./sparkle-star";
 import { useI18n } from "@/lib/i18n";
 import {
   effectivePrice,
@@ -181,10 +182,7 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
           </button>
 
           <div className="absolute bottom-3 end-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-sm font-bold text-white shadow-lg ring-1 ring-white/15 backdrop-blur-md">
-            <Star
-              className="star-shine size-4 fill-gold text-gold"
-              style={{ animationDelay: `${(index % 6) * 0.5}s` }}
-            />
+            <SparkleStar className="size-4" delay={(index % 6) * 0.5} />
             {hotel.rating.toFixed(1)}
           </div>
 
