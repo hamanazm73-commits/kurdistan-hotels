@@ -173,17 +173,11 @@ export function HotelCard({
         )}
       >
         <div className="relative aspect-[3/2] overflow-hidden bg-muted">
-          {/* blurred fill so any image shape shows whole & looks nice. Lazy by
-              default, so off-screen cards don't fetch until scrolled near. */}
-          <Image
-            aria-hidden
-            alt=""
-            src={cover}
-            fill
-            sizes={CARD_SIZES}
-            unoptimized={isRawSrc(cover)}
-            className="scale-110 object-cover opacity-55 blur-xl"
-          />
+          {/* The cover fills the frame and crops to fit — every card reads the
+              same weight, whatever shape the photo was uploaded in. That also
+              means one image request per card rather than two, since the old
+              blurred backdrop only existed to fill the gaps a contained image
+              left behind. Lazy by default: off-screen cards don't fetch. */}
           <Link href={`/hotels/${hotel.id}`} className="relative block size-full">
             <Image
               src={cover}
@@ -191,7 +185,7 @@ export function HotelCard({
               fill
               sizes={CARD_SIZES}
               unoptimized={isRawSrc(cover)}
-              className="object-contain transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
           </Link>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
