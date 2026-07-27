@@ -37,6 +37,7 @@ export function CountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [n, setN] = useState(0);
+  const [done, setDone] = useState(false);
   const reduced = usePrefersReducedMotion();
   const animates = value > 0 && !reduced;
 
@@ -55,6 +56,7 @@ export function CountUp({
         const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
         setN(Math.round(eased * value));
         if (p < 1) raf = requestAnimationFrame(tick);
+        else setDone(true);
       };
       raf = requestAnimationFrame(tick);
     };
@@ -81,7 +83,10 @@ export function CountUp({
   }, [value, duration, animates]);
 
   return (
-    <span ref={ref} className={className}>
+    <span
+      ref={ref}
+      className={[className, done && "count-up-done"].filter(Boolean).join(" ")}
+    >
       {animates ? n : value}
     </span>
   );

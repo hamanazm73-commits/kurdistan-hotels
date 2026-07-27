@@ -261,8 +261,8 @@ export function HotelDetailClient({
                   className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400"
                   title={t("views_label")}
                 >
-                  <Eye className="views-pulse size-3.5" />
-                  <CountUp value={hotel.views} />
+                  <Eye className="views-eye size-3.5" />
+                  <CountUp value={hotel.views} duration={1500} />
                   {t("views_word")}
                 </span>
               )}

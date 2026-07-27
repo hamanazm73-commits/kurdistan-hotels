@@ -263,20 +263,58 @@
   will-change: transform, filter;
 }
 
-/* gentle "being watched" pulse for the view-count eye */
-@keyframes views-pulse {
+/* The view-count eye: a golden glow that breathes, then a quick blink — small
+   enough to stay tasteful, alive enough to read as "people are watching". */
+@keyframes views-eye {
   0%,
   100% {
-    opacity: 0.7;
-    transform: scale(1);
+    transform: scale(1) scaleY(1);
+    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 50%, transparent));
+    opacity: 0.8;
   }
-  50% {
+  28% {
+    transform: scale(1.13) scaleY(1);
+    filter: drop-shadow(0 0 4px color-mix(in oklch, var(--gold) 95%, transparent))
+      drop-shadow(0 0 9px color-mix(in oklch, var(--gold) 50%, transparent));
     opacity: 1;
-    transform: scale(1.14);
+  }
+  56% {
+    transform: scale(1) scaleY(1);
+    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 50%, transparent));
+    opacity: 0.8;
+  }
+  /* the blink — fast, so it reads as an eyelid rather than a squash */
+  90% {
+    transform: scale(1) scaleY(1);
+  }
+  94% {
+    transform: scale(1) scaleY(0.1);
+  }
+  98% {
+    transform: scale(1) scaleY(1);
   }
 }
-.views-pulse {
-  animation: views-pulse 2.6s ease-in-out infinite;
+.views-eye {
+  animation: views-eye 4.4s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform, filter;
+}
+
+/* the number lands with a small pop, so short counts still feel like an event */
+@keyframes count-up-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.32);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.count-up-done {
+  display: inline-block;
+  animation: count-up-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
   transform-origin: center;
 }
 
@@ -287,7 +325,8 @@
   .text-gradient-gold,
   .star-shine,
   .star-glow,
-  .views-pulse,
+  .views-eye,
+  .count-up-done,
   .shimmer::after {
     animation: none;
   }
