@@ -67,6 +67,9 @@ function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string
 
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80";
 
+/** How long before the same browser may count another view of a hotel. */
+const VIEW_WINDOW_MS = 12 * 60 * 60 * 1000;
+
 export function HotelDetailClient({
   id,
   initialHotel,
@@ -98,13 +101,17 @@ export function HotelDetailClient({
     };
   }, [id]);
 
-  // Count a view once per browser session per hotel (a refresh won't re-count).
+  // Count a view once per hotel per 12 hours on this browser. localStorage, not
+  // session: session storage dies with the tab, so closing and reopening handed
+  // out a fresh view every time. The window keeps a genuine return visit
+  // countable without rewarding anyone who just reopens the page.
   useEffect(() => {
     if (!id) return;
     const key = `viewed:${id}`;
     try {
-      if (sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, "1");
+      const last = Number(localStorage.getItem(key));
+      if (last && Date.now() - last < VIEW_WINDOW_MS) return;
+      localStorage.setItem(key, String(Date.now()));
     } catch {
       return;
     }
