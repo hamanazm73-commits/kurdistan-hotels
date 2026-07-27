@@ -2,6 +2,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Hero } from "@/components/hero";
 import { HotelsSection } from "@/components/hotels-section";
+import { RecentlyViewedRow } from "@/components/recently-viewed-row";
 import { BrowseByCity } from "@/components/browse-by-city";
 import { TrustSection } from "@/components/trust-section";
 import { OwnerCta } from "@/components/owner-cta";
@@ -33,6 +34,7 @@ export default function HomePage() {
       <SiteHeader />
       <main>
         <Hero />
+        <RecentlyViewedRow />
         <HotelsSection />
         <BrowseByCity />
         <TrustSection />

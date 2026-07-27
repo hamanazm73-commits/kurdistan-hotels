@@ -72,12 +72,24 @@ export async function POST(req: Request) {
       createdAt: Date.now(),
     });
 
-    // stamp the hotel so cards can show a "last booked …" note (best-effort)
+    // stamp the hotel so cards can show a "last booked …" note, and keep the
+    // recent timestamps so a card can say how many, not just how long ago.
+    // Capped and pruned here so the field can't grow without bound.
     if (hotelId) {
-      adminDb
-        .collection("hotels")
-        .doc(hotelId)
-        .update({ lastBookedAt: Date.now() })
+      const now = Date.now();
+      const hotelRef = adminDb.collection("hotels").doc(hotelId);
+      hotelRef
+        .get()
+        .then((snap) => {
+          const prev = snap.data()?.recentBookingsAt;
+          const kept = (Array.isArray(prev) ? prev : [])
+            .map(Number)
+            .filter((ts) => Number.isFinite(ts) && now - ts < 7 * 86_400_000);
+          return hotelRef.update({
+            lastBookedAt: now,
+            recentBookingsAt: [now, ...kept].slice(0, 50),
+          });
+        })
         .catch(() => {});
     }
 

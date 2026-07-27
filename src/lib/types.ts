@@ -158,6 +158,9 @@ export interface Hotel {
   views?: number;
   /** epoch ms of the most recent booking — used for the "last booked" note */
   lastBookedAt?: number;
+  /** epoch ms of recent bookings, newest first, pruned to the last 7 days —
+      lets a card say how many bookings, not just when the last one was */
+  recentBookingsAt?: number[];
   /** how many approved guest reviews this hotel has. Denormalized by
       syncHotelReviewStats so the listing doesn't query reviews per card. */
   reviewCount?: number;

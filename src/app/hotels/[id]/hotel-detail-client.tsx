@@ -25,6 +25,8 @@ import { BookingDialog } from "@/components/booking-dialog";
 import { HotelReviews } from "@/components/hotel-reviews";
 import { StarRating } from "@/components/star-rating";
 import { CountUp } from "@/components/count-up";
+import { ShareButton } from "@/components/share-button";
+import { recordView } from "@/lib/recently-viewed";
 import { useHotels } from "@/lib/use-hotels";
 import { useSiteConfig } from "@/lib/site-config";
 import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
@@ -99,6 +101,12 @@ export function HotelDetailClient({
     return () => {
       alive = false;
     };
+  }, [id]);
+
+  // Remember it for the "recently viewed" row — every visit, so reopening a
+  // hotel moves it back to the front where the visitor expects it.
+  useEffect(() => {
+    if (id) recordView(id);
   }, [id]);
 
   // Count a view once per hotel per 12 hours on this browser. localStorage, not
@@ -273,6 +281,7 @@ export function HotelDetailClient({
                   {t("views_word")}
                 </span>
               )}
+              <ShareButton title={name} />
             </div>
 
             {description && (

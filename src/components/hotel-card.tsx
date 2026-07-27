@@ -13,6 +13,8 @@ import {
   Images,
   Play,
   MessageSquare,
+  Phone,
+  TrendingDown,
 } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -81,6 +83,15 @@ function lastBookedLabel(
   return t("ago_days", { n: Math.floor(hours / 24) });
 }
 
+/** How many of the stored booking stamps fall inside the last 7 days. The
+    field is pruned on write, but a hotel that went quiet keeps stale stamps
+    until its next booking, so count rather than trust the length. */
+function bookingsThisWeek(stamps: number[] | undefined): number {
+  if (!Array.isArray(stamps)) return 0;
+  const cutoff = Date.now() - 7 * DAY_MS;
+  return stamps.filter((ts) => Number.isFinite(ts) && ts >= cutoff).length;
+}
+
 /** Whether a hotel joined recently enough to still be worth flagging as new. */
 function isNewListing(createdAt: number | undefined): boolean {
   if (!createdAt) return false;
@@ -95,7 +106,17 @@ function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string
   return `https://wa.me/${digits}?text=${text}`;
 }
 
-export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }) {
+export function HotelCard({
+  hotel,
+  index = 0,
+  cityMedianPrice,
+}: {
+  hotel: Hotel;
+  index?: number;
+  /** typical nightly price in this hotel's city, when the caller knows it —
+      lets the card flag a price that genuinely undercuts the local going rate */
+  cityMedianPrice?: number;
+}) {
   const { t, tCity, tFeature, lang } = useI18n();
   const { format } = useCurrency();
   const { role, hotelId } = useAuth();
@@ -119,10 +140,15 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
     (r) => typeof r.available === "number",
   );
   const lastBooked = lastBookedLabel(hotel.lastBookedAt, t);
+  const week = bookingsThisWeek(hotel.recentBookingsAt);
   const isNew = isNewListing(hotel.createdAt);
   // the cover counts too, so a hotel with no extra images still has one photo
   const photoCount = (hotel.images?.length ?? 0) + (hotel.image ? 1 : 0);
   const payments = (hotel.payments ?? []).filter((p) => p.type && p.url);
+  // "good price" only when it's a real gap — 15% under the city's median, so a
+  // rounding difference never earns the badge
+  const goodPrice =
+    !!cityMedianPrice && price > 0 && price <= cityMedianPrice * 0.85;
 
   return (
     <motion.div
@@ -186,6 +212,12 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
             {isNew && (
               <Badge className="bg-sky-500 text-white hover:bg-sky-500">
                 ✨ {t("badge_new")}
+              </Badge>
+            )}
+            {goodPrice && showPrice && (
+              <Badge className="bg-emerald-600 text-white hover:bg-emerald-600">
+                <TrendingDown className="me-1 size-3.5" />
+                {t("badge_good_price")}
               </Badge>
             )}
           </div>
@@ -290,10 +322,14 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
                 </Link>
               )}
             </div>
-            {lastBooked && (
+            {(lastBooked || week > 1) && (
               <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                 <Flame className="size-3.5" />
-                {t("book_last")} {lastBooked}
+                {/* how many beats how long ago, so prefer it when there's more
+                    than one — a lone booking is better told as "2 days ago" */}
+                {week > 1
+                  ? t("book_week", { n: week })
+                  : `${t("book_last")} ${lastBooked}`}
               </span>
             )}
           </div>
@@ -376,6 +412,17 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               <div />
             )}
             <div className="flex items-center gap-2">
+              {hotel.phone && (
+                <a
+                  href={`tel:${hotel.phone}`}
+                  title={t("call_cta")}
+                  aria-label={t("call_cta")}
+                  className="inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow transition hover:opacity-90 active:scale-95"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Phone className="size-4" />
+                </a>
+              )}
               {hotel.phone && (
                 <a
                   href={buildWhatsAppUrl(hotel.phone, name, t("whatsapp_msg"))}

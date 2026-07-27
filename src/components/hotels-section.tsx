@@ -78,6 +78,30 @@ export function HotelsSection() {
     return list;
   }, [hotels, search, city, featuredOnly, sort]);
 
+  // Median nightly price per city, from every visible hotel rather than the
+  // filtered view — otherwise narrowing the list would shift the yardstick and
+  // hotels would gain or lose the "good price" badge as you type.
+  const cityMedians = useMemo(() => {
+    const byCity = new Map<string, number[]>();
+    for (const h of hotels) {
+      if (h.hidden) continue;
+      const p = effectivePrice(h);
+      if (p > 0) byCity.set(h.city, [...(byCity.get(h.city) ?? []), p]);
+    }
+    const out = new Map<string, number>();
+    for (const [c, prices] of byCity) {
+      // a median needs something to sit in the middle of
+      if (prices.length < 3) continue;
+      const sorted = prices.sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      out.set(
+        c,
+        sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2,
+      );
+    }
+    return out;
+  }, [hotels]);
+
   return (
     <section
       id="hotels"
@@ -187,7 +211,12 @@ export function HotelsSection() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((h, i) => (
-            <HotelCard key={h.id} hotel={h} index={i} />
+            <HotelCard
+              key={h.id}
+              hotel={h}
+              index={i}
+              cityMedianPrice={cityMedians.get(h.city)}
+            />
           ))}
         </div>
       )}
