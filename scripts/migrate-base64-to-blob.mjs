@@ -10,6 +10,10 @@
  * (`hotelMedia/{id}.images[]`), plus any legacy inline gallery still on the
  * hotel doc.
  *
+ * Uploads to the same R2 bucket the site already serves images from, so the
+ * rewritten URLs go through /api/img and Vercel's CDN like every other hosted
+ * image.
+ *
  * DRY RUN BY DEFAULT — it reports what it would do and changes nothing.
  * Pass --apply to actually upload and write.
  *
@@ -18,11 +22,11 @@
  *
  * Needs, in the project root:
  *   - a firebase-adminsdk service-account .json
- *   - BLOB_READ_WRITE_TOKEN, in the environment or in .env.local
+ *   - the S3_* R2 credentials, in the environment or in .env.local
  */
 import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { put } from "@vercel/blob";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { readdirSync, readFileSync, existsSync, appendFileSync } from "fs";
 
 const APPLY = process.argv.includes("--apply");
@@ -38,24 +42,40 @@ if (!saFile) {
   process.exit(1);
 }
 
-/** Read BLOB_READ_WRITE_TOKEN from the env, else from .env.local. */
-function blobToken() {
-  if (process.env.BLOB_READ_WRITE_TOKEN) return process.env.BLOB_READ_WRITE_TOKEN;
+/** Load .env.local into process.env for any key not already set. */
+function loadEnv() {
   for (const file of [".env.local", ".env"]) {
     if (!existsSync(file)) continue;
     for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
-      const m = line.match(/^\s*([A-Z0-9_]*READ_WRITE_TOKEN)\s*=\s*"?([^"\s]+)"?/);
-      if (m && m[2].startsWith("vercel_blob_")) return m[2];
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*"?(.*?)"?\s*$/);
+      if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
     }
   }
-  return undefined;
 }
+loadEnv();
 
-const TOKEN = blobToken();
-if (APPLY && !TOKEN) {
-  console.error("No BLOB_READ_WRITE_TOKEN found (env or .env.local) — aborting.");
+const BUCKET = process.env.S3_BUCKET;
+const PUBLIC_URL = (process.env.NEXT_PUBLIC_S3_PUBLIC_URL || "").replace(
+  /\/+$/,
+  "",
+);
+if (APPLY && (!BUCKET || !process.env.S3_ENDPOINT || !process.env.S3_ACCESS_KEY_ID)) {
+  console.error("R2 is not configured (S3_* in .env.local) — aborting.");
   process.exit(1);
 }
+if (APPLY && !PUBLIC_URL) {
+  console.error("NEXT_PUBLIC_S3_PUBLIC_URL is not set — aborting.");
+  process.exit(1);
+}
+
+const s3 = new S3Client({
+  region: process.env.S3_REGION || "auto",
+  endpoint: process.env.S3_ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+  },
+});
 
 if (!getApps().length) initializeApp({ credential: cert(saFile) });
 const db = getFirestore();
@@ -122,18 +142,24 @@ async function toBlob(dataUrl, name) {
     return null;
   }
 
+  // a random suffix keeps a re-run from overwriting a previous upload
+  const key = `${name}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   try {
-    const res = await put(`${name}.${ext}`, buf, {
-      access: "public",
-      contentType,
-      addRandomSuffix: true,
-      token: TOKEN,
-    });
-    console.log(`  uploaded ${name} — ${kb(buf.length)} KB -> ${res.url}`);
-    appendFileSync(LOG, `${name}\t${kb(buf.length)}KB\t${res.url}\n`);
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: key,
+        Body: buf,
+        ContentType: contentType,
+        CacheControl: "public, max-age=31536000, immutable",
+      }),
+    );
+    const url = `${PUBLIC_URL}/${key}`;
+    console.log(`  uploaded ${name} — ${kb(buf.length)} KB -> ${url}`);
+    appendFileSync(LOG, `${name}\t${kb(buf.length)}KB\t${url}\n`);
     uploaded++;
     bytesSaved += buf.length;
-    return res.url;
+    return url;
   } catch (e) {
     failures.push(`${name}: upload failed — ${e?.message ?? e}`);
     return null;
