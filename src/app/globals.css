@@ -269,19 +269,19 @@
   0%,
   100% {
     transform: scale(1) scaleY(1);
-    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 50%, transparent));
-    opacity: 0.8;
+    filter: drop-shadow(0 0 3px color-mix(in oklch, var(--gold) 90%, transparent))
+      drop-shadow(0 0 7px color-mix(in oklch, var(--gold) 45%, transparent));
   }
   28% {
-    transform: scale(1.13) scaleY(1);
-    filter: drop-shadow(0 0 4px color-mix(in oklch, var(--gold) 95%, transparent))
-      drop-shadow(0 0 9px color-mix(in oklch, var(--gold) 50%, transparent));
-    opacity: 1;
+    transform: scale(1.2) scaleY(1);
+    filter: drop-shadow(0 0 6px color-mix(in oklch, var(--gold) 100%, transparent))
+      drop-shadow(0 0 14px color-mix(in oklch, var(--gold) 70%, transparent))
+      drop-shadow(0 0 22px color-mix(in oklch, var(--gold) 35%, transparent));
   }
   56% {
     transform: scale(1) scaleY(1);
-    filter: drop-shadow(0 0 1px color-mix(in oklch, var(--gold) 50%, transparent));
-    opacity: 0.8;
+    filter: drop-shadow(0 0 3px color-mix(in oklch, var(--gold) 90%, transparent))
+      drop-shadow(0 0 7px color-mix(in oklch, var(--gold) 45%, transparent));
   }
   /* the blink — fast, so it reads as an eyelid rather than a squash */
   90% {
@@ -295,9 +295,34 @@
   }
 }
 .views-eye {
+  /* The glow lives here, not only in the keyframes, so it survives
+     `animation: none` — phones with Reduce Motion on would otherwise render a
+     plain grey icon, which is exactly what it looked like before. */
+  color: var(--gold);
+  filter: drop-shadow(0 0 3px color-mix(in oklch, var(--gold) 90%, transparent))
+    drop-shadow(0 0 7px color-mix(in oklch, var(--gold) 45%, transparent));
   animation: views-eye 4.4s ease-in-out infinite;
   transform-origin: center;
   will-change: transform, filter;
+}
+
+/* the pill itself carries a gold ring + halo, so the whole thing reads at a
+   glance on a small screen in daylight */
+@keyframes views-halo {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--gold) 40%, transparent),
+      0 0 10px color-mix(in oklch, var(--gold) 20%, transparent);
+  }
+  28% {
+    box-shadow: 0 0 0 1px color-mix(in oklch, var(--gold) 75%, transparent),
+      0 0 18px color-mix(in oklch, var(--gold) 45%, transparent);
+  }
+}
+.views-pill {
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--gold) 40%, transparent),
+    0 0 10px color-mix(in oklch, var(--gold) 20%, transparent);
+  animation: views-halo 4.4s ease-in-out infinite;
 }
 
 /* the number lands with a small pop, so short counts still feel like an event */
@@ -326,6 +351,7 @@
   .star-shine,
   .star-glow,
   .views-eye,
+  .views-pill,
   .count-up-done,
   .shimmer::after {
     animation: none;

@@ -227,10 +227,10 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               </a>
               {typeof hotel.views === "number" && hotel.views > 0 && (
                 <span
-                  className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400"
+                  className="views-pill inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-2.5 py-1 text-sm font-bold text-amber-700 dark:text-amber-300 sm:text-xs"
                   title={t("views_label")}
                 >
-                  <Eye className="views-eye size-3.5" />
+                  <Eye className="views-eye size-4 sm:size-3.5" />
                   <CountUp value={hotel.views} duration={1500} />
                   {t("views_word")}
                 </span>
