@@ -15,6 +15,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { SparkleStar } from "./sparkle-star";
+import { CountUp } from "./count-up";
 import { useI18n } from "@/lib/i18n";
 import {
   effectivePrice,
@@ -226,11 +227,12 @@ export function HotelCard({ hotel, index = 0 }: { hotel: Hotel; index?: number }
               </a>
               {typeof hotel.views === "number" && hotel.views > 0 && (
                 <span
-                  className="inline-flex items-center gap-1 text-xs"
+                  className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400"
                   title={t("views_label")}
                 >
-                  <Eye className="size-3.5" />
-                  {t("views_count", { n: hotel.views })}
+                  <Eye className="views-pulse size-3.5" />
+                  <CountUp value={hotel.views} />
+                  {t("views_word")}
                 </span>
               )}
             </div>

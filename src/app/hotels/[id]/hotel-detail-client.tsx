@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Maximize2,
   CreditCard,
+  Eye,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -23,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "@/components/booking-dialog";
 import { HotelReviews } from "@/components/hotel-reviews";
 import { StarRating } from "@/components/star-rating";
+import { CountUp } from "@/components/count-up";
 import { useHotels } from "@/lib/use-hotels";
 import { useSiteConfig } from "@/lib/site-config";
 import { getHotelMedia, type HotelMedia } from "@/lib/hotels-db";
@@ -254,6 +256,16 @@ export function HotelDetailClient({
                 {tCity(hotel.city)}
               </a>
               <StarRating value={hotel.rating} size={20} showValue />
+              {typeof hotel.views === "number" && hotel.views > 0 && (
+                <span
+                  className="inline-flex items-center gap-1 rounded-full bg-gold/10 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400"
+                  title={t("views_label")}
+                >
+                  <Eye className="views-pulse size-3.5" />
+                  <CountUp value={hotel.views} />
+                  {t("views_word")}
+                </span>
+              )}
             </div>
 
             {description && (
