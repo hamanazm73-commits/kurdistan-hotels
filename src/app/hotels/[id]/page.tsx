@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { alternatesFor } from "@/lib/hreflang";
 import { getHotelById, getApprovedReviews } from "@/lib/hotels-server";
 import {
   effectivePrice,
@@ -55,7 +56,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `/hotels/${id}` },
+    alternates: alternatesFor(`/hotels/${id}`),
     // hidden hotels stay reachable by link but out of search results
     ...(hotel.hidden ? { robots: { index: false, follow: false } } : {}),
     openGraph: {

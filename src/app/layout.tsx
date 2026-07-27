@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { alternatesFor } from "@/lib/hreflang";
 import { Plus_Jakarta_Sans, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -51,7 +52,7 @@ export const metadata: Metadata = {
     "هۆتێل دووکان",
     "فنادق كردستان",
   ],
-  alternates: { canonical: "/" },
+  alternates: alternatesFor("/"),
   verification: {
     google: "UT4bf6T1LZ4-9pd0JnUeNIrh4MUB8uBacpWpcg3weGA",
   },

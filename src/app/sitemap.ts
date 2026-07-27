@@ -1,8 +1,12 @@
 import type { MetadataRoute } from "next";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { getPublishedPosts } from "@/lib/posts-server";
+import { languagesFor } from "@/lib/hreflang";
 
 const BASE = "https://hotelskurdistan.com";
+
+/** Tell search engines the four language variants of a path exist. */
+const alt = (path: string) => ({ alternates: { languages: languagesFor(path) } });
 
 // the per-city landing pages (must match the routes in /hotels-in/[city])
 const CITY_SLUGS = [
@@ -20,17 +24,18 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   const routes: MetadataRoute.Sitemap = [
-    { url: BASE, lastModified: now, changeFrequency: "daily", priority: 1 },
+    { url: BASE, lastModified: now, changeFrequency: "daily", priority: 1, ...alt("/") },
     // per-city landing pages — the ones that target "erbil hotels" etc.
     ...CITY_SLUGS.map((c) => ({
       url: `${BASE}/hotels-in/${c}`,
       lastModified: now,
       changeFrequency: "daily" as const,
       priority: 0.9,
+      ...alt(`/hotels-in/${c}`),
     })),
-    { url: `${BASE}/list-your-hotel`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
-    { url: `${BASE}/map`, lastModified: now, changeFrequency: "weekly", priority: 0.5 },
+    { url: `${BASE}/list-your-hotel`, lastModified: now, changeFrequency: "monthly", priority: 0.7, ...alt("/list-your-hotel") },
+    { url: `${BASE}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7, ...alt("/blog") },
+    { url: `${BASE}/map`, lastModified: now, changeFrequency: "weekly", priority: 0.5, ...alt("/map") },
     { url: `${BASE}/bookings`, lastModified: now, changeFrequency: "monthly", priority: 0.3 },
   ];
 
@@ -60,6 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           lastModified: now,
           changeFrequency: "weekly",
           priority: 0.8,
+          ...alt(`/hotels/${d.id}`),
         });
       }
     }

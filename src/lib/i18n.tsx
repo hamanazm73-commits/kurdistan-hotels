@@ -1555,6 +1555,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>("ckb");
 
   useEffect(() => {
+    // ?lang= wins over the saved choice: it's how a search result, a shared
+    // link, or a crawler asks for one specific language, and honouring the
+    // visitor's last pick instead would serve them the wrong page. Also what
+    // makes each language a distinct URL for hreflang to point at.
+    const asked = new URLSearchParams(window.location.search).get("lang");
+    const fromUrl = asked && asked in LANGS ? (asked as Lang) : null;
+    if (fromUrl) {
+      setLangState(fromUrl);
+      localStorage.setItem("lang", fromUrl);
+      return;
+    }
     const saved = (localStorage.getItem("lang") as Lang) || "ckb";
     setLangState(saved);
   }, []);
