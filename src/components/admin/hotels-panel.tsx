@@ -15,6 +15,8 @@ import {
   ChevronDown,
   Eye,
   EyeOff,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -145,7 +147,6 @@ const empty = {
   }[],
   featured: false,
   recommended: false,
-  closed: false,
   discountActive: false,
   oldPrice: 0,
   newPrice: 0,
@@ -205,6 +206,19 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
       toast.success(t("admin_saved"));
     } catch (e) {
       console.error("[price edit]", e);
+      toast.error(saveErrorMessage(e, t));
+    }
+  }
+
+  /** Closing is frequent and reversible, so it belongs on the row rather than
+      behind the edit form. Available to owners: whether their hotel is open is
+      their call, not the platform's. */
+  async function toggleClosed(h: Hotel) {
+    try {
+      await updateHotel(h.id, { closed: !h.closed });
+      toast.success(h.closed ? t("admin_reopened") : t("admin_closed_done"));
+    } catch (e) {
+      console.error("[toggle closed]", e);
       toast.error(saveErrorMessage(e, t));
     }
   }
@@ -384,6 +398,20 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
                     }
                   />
                 )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isSample}
+                  title={h.closed ? t("admin_reopen") : t("admin_close_temp")}
+                  className={cn(h.closed && "text-amber-600")}
+                  onClick={() => toggleClosed(h)}
+                >
+                  {h.closed ? (
+                    <Sun className="size-4" />
+                  ) : (
+                    <Moon className="size-4" />
+                  )}
+                </Button>
                 {/* only admins/owner control visibility */}
                 {!owner && (
                   <Button
@@ -485,7 +513,6 @@ export function HotelFormDialog({
       })),
       featured: h.featured,
       recommended: h.recommended,
-      closed: h.closed ?? false,
       discountActive: h.discount?.active ?? false,
       oldPrice: h.discount?.oldPrice ?? 0,
       newPrice: h.discount?.newPrice ?? 0,
@@ -570,7 +597,6 @@ export function HotelFormDialog({
         .filter((s) => s.rooms.length > 0),
       featured: f.featured,
       recommended: f.recommended,
-      closed: f.closed,
       discount: {
         active: f.discountActive,
         oldPrice: Number(f.oldPrice),
@@ -1188,19 +1214,6 @@ export function HotelFormDialog({
               </Button>
             </div>
           </Field>
-
-          {/* Available to owners too: closing for renovation or the off-season
-              is their call, not the platform's. */}
-          <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
-            <ToggleRow
-              label={t("admin_closed")}
-              checked={form.closed}
-              onChange={(v) => set("closed", v)}
-            />
-            <p className="mt-2 text-xs text-muted-foreground">
-              {t("admin_closed_hint")}
-            </p>
-          </div>
 
           {!restricted && (
             <>
