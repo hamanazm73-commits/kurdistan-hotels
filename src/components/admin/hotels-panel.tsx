@@ -819,7 +819,7 @@ export function HotelFormDialog({
             )}
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t("admin_city")}>
               <Select
                 value={form.city}
@@ -878,7 +878,7 @@ export function HotelFormDialog({
             />
           </Field>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t("admin_address")}>
               <Input
                 value={form.address}
@@ -1088,7 +1088,7 @@ export function HotelFormDialog({
                     </Button>
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-2">
-                    <div className="grid gap-1">
+                    <div className="grid min-w-0 gap-1">
                       <label className="text-xs text-muted-foreground">
                         {t("admin_room_price")}
                       </label>
@@ -1105,7 +1105,7 @@ export function HotelFormDialog({
                         }
                       />
                     </div>
-                    <div className="grid gap-1">
+                    <div className="grid min-w-0 gap-1">
                       <label className="text-xs text-muted-foreground">
                         {t("admin_room_available")}
                       </label>
@@ -1187,8 +1187,8 @@ export function HotelFormDialog({
                         <X className="size-4" />
                       </Button>
                     </div>
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                      <div className="grid gap-1">
+                    <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_offer_room")}
                         </label>
@@ -1199,7 +1199,7 @@ export function HotelFormDialog({
                           onChange={(e) => upd({ roomType: e.target.value })}
                         />
                       </div>
-                      <div className="grid gap-1">
+                      <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_offer_price")}
                         </label>
@@ -1208,7 +1208,7 @@ export function HotelFormDialog({
                           onChange={(n) => upd({ price: n })}
                         />
                       </div>
-                      <div className="grid gap-1">
+                      <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_offer_old_price")}
                         </label>
@@ -1269,7 +1269,7 @@ export function HotelFormDialog({
                   {/* the corner button overlaps the first label's line, so keep
                       that lane clear on mobile where the fields stack */}
                   <div className="flex items-end gap-2 pe-10 sm:pe-0">
-                    <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
+                    <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
                       <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_season_from")}
@@ -1367,7 +1367,7 @@ export function HotelFormDialog({
 
           {!restricted && (
             <>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <ToggleRow
                   label={t("admin_featured")}
                   checked={form.featured}

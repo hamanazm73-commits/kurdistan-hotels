@@ -367,3 +367,28 @@
   background: color-mix(in oklch, var(--primary) 35%, transparent);
   border-radius: 999px;
 }
+
+/* Native date/time pickers carry an intrinsic minimum width on iOS and Android
+   that desktop Chrome does not reproduce, even at a 375px viewport — a field
+   that measures correctly in the preview still spills out of its column on a
+   real phone. These pin the control to its container regardless of what the
+   platform thinks it needs. */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+}
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: start;
+}
+/* the picker button is what actually forces the extra width on Android */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-inline-start: 0;
+  padding: 0;
+}
