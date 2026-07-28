@@ -483,3 +483,25 @@ export function totalAvailable(h: Pick<Hotel, "available" | "rooms">): number {
     return tracked.reduce((s, r) => s + Math.max(0, r.available ?? 0), 0);
   return h.available ?? 0;
 }
+
+/** A hotel worth approaching, and how far along that conversation is.
+    The sales pipeline behind the directory: going door to door doesn't
+    scale on its own, and without this there's no record of who was
+    already visited or what they said. */
+export type LeadStatus =
+  | "new"
+  | "contacted"
+  | "interested"
+  | "listed"
+  | "declined";
+
+export interface Lead {
+  hotelName: string;
+  city?: string;
+  phone?: string;
+  mapUrl?: string;
+  note?: string;
+  status: LeadStatus;
+  createdAt?: number;
+  updatedAt?: number;
+}

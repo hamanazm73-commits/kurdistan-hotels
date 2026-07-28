@@ -25,6 +25,8 @@ import type {
   BookingStatus,
   Feedback,
   HotelInput,
+  Lead,
+  LeadStatus,
   Role,
 } from "./types";
 
@@ -414,4 +416,54 @@ export function watchBookings(
     },
     () => onError?.(),
   );
+}
+
+/* ---------------- sales leads (dashboard) ---------------- */
+
+export async function listLeads(): Promise<{
+  items: (Lead & { id: string })[];
+  misses: { term: string; count: number }[];
+}> {
+  const res = await fetch("/api/leads", { headers: await authHeaders() });
+  if (!res.ok) throw new Error("failed");
+  const d = (await res.json()) as {
+    items?: (Lead & { id: string })[];
+    misses?: { term: string; count: number }[];
+  };
+  return { items: d.items ?? [], misses: d.misses ?? [] };
+}
+
+export async function addLead(lead: {
+  hotelName: string;
+  city?: string;
+  phone?: string;
+  mapUrl?: string;
+  note?: string;
+}): Promise<void> {
+  const res = await fetch("/api/leads", {
+    method: "POST",
+    headers: { ...(await authHeaders()), "Content-Type": "application/json" },
+    body: JSON.stringify(lead),
+  });
+  if (!res.ok) throw new Error("failed");
+}
+
+export async function updateLead(
+  id: string,
+  patch: { status?: LeadStatus; note?: string; phone?: string },
+): Promise<void> {
+  const res = await fetch("/api/leads", {
+    method: "PATCH",
+    headers: { ...(await authHeaders()), "Content-Type": "application/json" },
+    body: JSON.stringify({ id, ...patch }),
+  });
+  if (!res.ok) throw new Error("failed");
+}
+
+export async function deleteLead(id: string): Promise<void> {
+  const res = await fetch(`/api/leads?id=${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: await authHeaders(),
+  });
+  if (!res.ok) throw new Error("failed");
 }

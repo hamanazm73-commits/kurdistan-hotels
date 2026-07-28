@@ -18,6 +18,7 @@ import { BookingsPanel } from "@/components/admin/bookings-panel";
 import { FeedbackPanel } from "@/components/admin/feedback-panel";
 import { BlogPanel } from "@/components/admin/blog-panel";
 import { ReviewsPanel } from "@/components/admin/reviews-panel";
+import { LeadsPanel } from "@/components/admin/leads-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 import { ExchangeRateCard } from "@/components/admin/exchange-rate";
 import { ComingSoonCard } from "@/components/admin/coming-soon-card";
@@ -194,6 +195,7 @@ export default function AdminPage() {
             <TabsTrigger value="reviews">{t("admin_reviews")}</TabsTrigger>
             <TabsTrigger value="blog">{t("admin_blog")}</TabsTrigger>
             <TabsTrigger value="feedback">{t("admin_feedback")}</TabsTrigger>
+            <TabsTrigger value="leads">{t("admin_leads")}</TabsTrigger>
             {isOwner && (
               <TabsTrigger value="admins">{t("admin_admins")}</TabsTrigger>
             )}
@@ -204,6 +206,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="bookings" className="mt-6">
             <BookingsPanel />
+          </TabsContent>
+          <TabsContent value="leads" className="mt-6">
+            <LeadsPanel />
           </TabsContent>
           <TabsContent value="reviews" className="mt-6">
             <ReviewsPanel />

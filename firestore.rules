@@ -93,5 +93,21 @@ service cloud.firestore {
     match /hotelAccess/{hotelId} {
       allow read, write: if false;
     }
+
+    // Sales pipeline and hotel applications: server-only. The Admin SDK
+    // bypasses these rules, so /api/leads and /api/hotel-application still
+    // work — but nothing reaches this from a browser. A hotel owner has a
+    // dashboard login, and must not be able to read which of their
+    // competitors we are approaching, or what was said about them.
+    match /leads/{id} {
+      allow read, write: if false;
+    }
+    match /hotelApplications/{id} {
+      allow read, write: if false;
+    }
+    // Failed searches: written by /api/search-miss, read only in the dashboard.
+    match /searchMisses/{id} {
+      allow read, write: if false;
+    }
   }
 }
