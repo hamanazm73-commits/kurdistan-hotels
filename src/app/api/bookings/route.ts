@@ -16,6 +16,8 @@ const BookingSchema = z.object({
   checkIn: z.string().min(4).max(40),
   nights: z.number().int().min(1).max(60),
   guests: z.number().int().min(1).max(20).optional(),
+  children: z.number().int().min(0).max(10).optional(),
+  childAges: z.array(z.number().int().min(0).max(17)).max(10).optional(),
   gender: z.enum(["male", "female"]).optional(),
   fromCity: z.string().min(1).max(80).optional(),
 });

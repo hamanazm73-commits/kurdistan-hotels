@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check, Ban, UserX, Users } from "lucide-react";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check, Ban, UserX, Users, Baby } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -523,6 +523,15 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                   <span className="font-medium">{b.guests}</span>
                 </>
               )}
+              {!!b.children && (
+                <>
+                  <span className="text-muted-foreground">{t("book_children")}</span>
+                  <span className="font-medium">
+                    {b.children}
+                    {b.childAges?.length ? ` (${b.childAges.join(", ")})` : ""}
+                  </span>
+                </>
+              )}
               {b.gender && (
                 <>
                   <span className="text-muted-foreground">{t("book_gender")}</span>
@@ -601,12 +610,21 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                 <TableCell>
                   {b.name}
                   {/* who's staying, kept under the name so the table stays narrow */}
-                  {(!!b.guests || b.gender || b.fromCity) && (
+                  {(!!b.guests || !!b.children || b.gender || b.fromCity) && (
                     <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs font-normal text-muted-foreground">
                       {!!b.guests && (
                         <span className="inline-flex items-center gap-1">
                           <Users className="size-3 shrink-0" />
                           {b.guests}
+                        </span>
+                      )}
+                      {!!b.children && (
+                        <span className="inline-flex items-center gap-1">
+                          <Baby className="size-3 shrink-0" />
+                          {b.children}
+                          {b.childAges?.length
+                            ? ` (${b.childAges.join(", ")})`
+                            : ""}
                         </span>
                       )}
                       {b.gender && (

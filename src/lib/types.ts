@@ -258,8 +258,12 @@ export interface Booking {
   roomPrice: number;
   checkIn: string;
   nights: number;
-  /** how many people are staying (hotels need this for the room) */
+  /** how many adults are staying (hotels need this for the room) */
   guests?: number;
+  /** how many children are staying */
+  children?: number;
+  /** each child's age — hotels price and place children by age */
+  childAges?: number[];
   /** the guest's gender, as some hotels must record it */
   gender?: "male" | "female";
   /** where the guest is travelling from */

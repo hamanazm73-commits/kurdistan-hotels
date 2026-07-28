@@ -78,6 +78,7 @@ export function BookingDialog({
   const [nights, setNights] = useState("1");
   const [roomType, setRoomType] = useState(initialRoomType ?? "");
   const [guests, setGuests] = useState(1);
+  const [childAges, setChildAges] = useState<number[]>([]);
   const [gender, setGender] = useState<"male" | "female" | "">("");
   const [fromCity, setFromCity] = useState("");
   const [fromCityOther, setFromCityOther] = useState("");
@@ -142,6 +143,13 @@ export function BookingDialog({
           checkIn,
           nights: Number(nights) || 1,
           guests,
+          ...(childAges.length
+            ? {
+                children: childAges.length,
+                // -1 means the guest left an age unset; send only real ages
+                childAges: childAges.filter((a) => a >= 0),
+              }
+            : {}),
           ...(gender ? { gender } : {}),
           ...(originCity ? { fromCity: originCity } : {}),
         }),
@@ -209,6 +217,7 @@ export function BookingDialog({
       setNights("1");
       setRoomType("");
       setGuests(1);
+      setChildAges([]);
       setGender("");
       setFromCity("");
       setFromCityOther("");
@@ -261,57 +270,82 @@ export function BookingDialog({
             />
           </div>
 
-          {/* guests + gender — taps only, no typing */}
+          {/* who's staying — taps only, no typing */}
           <div className="grid gap-4 sm:grid-cols-2 sm:gap-3">
-            <div className="grid min-w-0 gap-2">
-              <Label>{t("book_guests")}</Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="size-10 shrink-0 rounded-full"
-                  aria-label="-"
-                  onClick={() => setGuests((n) => Math.max(1, n - 1))}
-                  disabled={guests <= 1}
-                >
-                  <Minus className="size-4" />
-                </Button>
-                <span
-                  aria-live="polite"
-                  className="min-w-10 flex-1 text-center text-lg font-bold tabular-nums"
-                >
-                  {guests}
-                </span>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="size-10 shrink-0 rounded-full"
-                  aria-label="+"
-                  onClick={() => setGuests((n) => Math.min(20, n + 1))}
-                  disabled={guests >= 20}
-                >
-                  <Plus className="size-4" />
-                </Button>
-              </div>
-            </div>
+            <Stepper
+              label={t("book_guests")}
+              value={guests}
+              min={1}
+              max={20}
+              onChange={setGuests}
+            />
+            <Stepper
+              label={t("book_children")}
+              value={childAges.length}
+              min={0}
+              max={10}
+              onChange={(n) =>
+                // keep the ages already picked; new children start unset
+                setChildAges((prev) =>
+                  n < prev.length
+                    ? prev.slice(0, n)
+                    : [...prev, ...Array(n - prev.length).fill(-1)],
+                )
+              }
+            />
+          </div>
 
-            <div className="grid min-w-0 gap-2">
-              <Label>{t("book_gender")}</Label>
-              <div className="flex gap-2">
-                {(["male", "female"] as const).map((g) => (
-                  <Button
-                    key={g}
-                    type="button"
-                    variant={gender === g ? "default" : "outline"}
-                    className="h-10 flex-1 rounded-full"
-                    onClick={() => setGender(gender === g ? "" : g)}
+          {/* a child's age decides their price and bed, so ask per child */}
+          {childAges.length > 0 && (
+            <div className="grid gap-2">
+              <Label>{t("book_child_ages")}</Label>
+              <div className="flex flex-wrap gap-2">
+                {childAges.map((age, i) => (
+                  <label
+                    key={i}
+                    className="flex items-center gap-1.5 rounded-lg border bg-muted/40 px-2.5 py-1.5"
                   >
-                    {t(g === "male" ? "book_male" : "book_female")}
-                  </Button>
+                    <span className="text-xs text-muted-foreground">
+                      {i + 1}.
+                    </span>
+                    <select
+                      value={age}
+                      onChange={(e) =>
+                        setChildAges((prev) =>
+                          prev.map((a, j) =>
+                            j === i ? Number(e.target.value) : a,
+                          ),
+                        )
+                      }
+                      className="bg-transparent text-sm font-semibold outline-none"
+                    >
+                      <option value={-1}>{t("book_child_age_ph")}</option>
+                      {Array.from({ length: 18 }, (_, n) => (
+                        <option key={n} value={n}>
+                          {n === 0 ? t("book_child_under1") : n}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 ))}
               </div>
+            </div>
+          )}
+
+          <div className="grid gap-2">
+            <Label>{t("book_gender")}</Label>
+            <div className="flex gap-2">
+              {(["male", "female"] as const).map((g) => (
+                <Button
+                  key={g}
+                  type="button"
+                  variant={gender === g ? "default" : "outline"}
+                  className="h-10 flex-1 rounded-full"
+                  onClick={() => setGender(gender === g ? "" : g)}
+                >
+                  {t(g === "male" ? "book_male" : "book_female")}
+                </Button>
+              ))}
             </div>
           </div>
 
@@ -451,5 +485,57 @@ export function BookingDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/** A −/+ counter. Tapping beats typing on a phone, which is where most
+    guests book from. */
+function Stepper({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (n: number) => void;
+}) {
+  return (
+    <div className="grid min-w-0 gap-2">
+      <Label>{label}</Label>
+      <div className="flex items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-10 shrink-0 rounded-full"
+          aria-label="-"
+          onClick={() => onChange(Math.max(min, value - 1))}
+          disabled={value <= min}
+        >
+          <Minus className="size-4" />
+        </Button>
+        <span
+          aria-live="polite"
+          className="min-w-10 flex-1 text-center text-lg font-bold tabular-nums"
+        >
+          {value}
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="size-10 shrink-0 rounded-full"
+          aria-label="+"
+          onClick={() => onChange(Math.min(max, value + 1))}
+          disabled={value >= max}
+        >
+          <Plus className="size-4" />
+        </Button>
+      </div>
+    </div>
   );
 }
