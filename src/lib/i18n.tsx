@@ -1,5 +1,6 @@
 "use client";
 
+import { pathFor, stripLangPrefix } from "./hreflang";
 import {
   createContext,
   useContext,
@@ -1578,6 +1579,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
     localStorage.setItem("lang", l);
+    // Move the address bar onto this language's path, so what the visitor
+    // copies or bookmarks opens in the language they're reading. replaceState,
+    // not a router push: the page is already rendering in `l` from state, and
+    // navigating would only refetch it.
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("lang");
+      url.pathname = pathFor(stripLangPrefix(url.pathname), l);
+      window.history.replaceState(null, "", url);
+    } catch {
+      /* history blocked — the language still applies, just not the URL */
+    }
   }, []);
 
   const t = useCallback(

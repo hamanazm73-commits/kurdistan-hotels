@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { alternatesFor } from "@/lib/hreflang";
+import { alternatesFor, asLang } from "@/lib/hreflang";
 import { getHotelById, getApprovedReviews } from "@/lib/hotels-server";
 import {
   effectivePrice,
@@ -34,10 +34,14 @@ function metaDescription(h: Hotel): string {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  // proxy.ts serves /ar/hotels/x by rewriting to this route with ?lang=ar
+  searchParams: Promise<{ lang?: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
+  const lang = asLang((await searchParams).lang);
   const hotel = await getHotelById(id);
 
   if (!hotel) {
@@ -56,7 +60,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: alternatesFor(`/hotels/${id}`),
+    alternates: alternatesFor(`/hotels/${id}`, lang),
     // hidden hotels stay reachable by link but out of search results
     ...(hotel.hidden ? { robots: { index: false, follow: false } } : {}),
     openGraph: {

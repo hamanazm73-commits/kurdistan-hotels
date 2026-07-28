@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { alternatesFor, asLang } from "@/lib/hreflang";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Hero } from "@/components/hero";
@@ -21,6 +23,19 @@ const faqJsonLd = {
     acceptedAnswer: { "@type": "Answer", text: f.a.ckb },
   })),
 };
+
+/**
+ * The canonical has to live here rather than in the root layout: only a page
+ * receives searchParams, and proxy.ts passes the language that way, so this is
+ * the only place that can point each translation at its own URL.
+ */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}): Promise<Metadata> {
+  return { alternates: alternatesFor("/", asLang((await searchParams).lang)) };
+}
 
 export default function HomePage() {
   return (
