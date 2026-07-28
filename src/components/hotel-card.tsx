@@ -35,6 +35,7 @@ import {
   pickLang,
   mapsUrl,
   mediaSrc,
+  buildHotelWhatsAppUrl,
   totalAvailable,
   isRawSrc,
   paymentLabel,
@@ -103,13 +104,6 @@ function isNewListing(createdAt: number | undefined): boolean {
   if (!createdAt) return false;
   const diff = Date.now() - createdAt;
   return diff >= 0 && diff < 14 * DAY_MS;
-}
-
-function buildWhatsAppUrl(phone: string, hotelName: string, msg: string): string {
-  let digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("0")) digits = "964" + digits.slice(1);
-  const text = encodeURIComponent(`${msg} ${hotelName}`);
-  return `https://wa.me/${digits}?text=${text}`;
 }
 
 export function HotelCard({
@@ -420,7 +414,10 @@ export function HotelCard({
               )}
               {hotel.phone && (
                 <a
-                  href={buildWhatsAppUrl(hotel.phone, name, t("whatsapp_msg"))}
+                  href={buildHotelWhatsAppUrl(hotel.phone, name, t("whatsapp_msg"), {
+                    hotelId: hotel.id,
+                    via: t("wa_via"),
+                  })}
                   target="_blank"
                   rel="noopener noreferrer"
                   title={t("whatsapp_cta")}

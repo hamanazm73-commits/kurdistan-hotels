@@ -352,31 +352,66 @@ export function formatPrice(price: number, lang: Lang): string {
   return lang === "en" || lang === "kmr" ? `${n} IQD` : `${n} دینار`;
 }
 
+/** Local numbers are stored as 0xxx; WhatsApp needs the country code. */
+function waNumber(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return digits.startsWith("0") ? "964" + digits.slice(1) : digits;
+}
+
+/**
+ * The line that tells the hotel where a WhatsApp message came from.
+ *
+ * Without it an owner has no way to know the site sent them the guest — the
+ * message looks like any other walk-in enquiry, and the listing gets no credit
+ * for the business it brought. The link is to the hotel's own page, so it
+ * doubles as proof and lets the owner open what the guest was looking at.
+ */
+function waSource(hotelId: string | undefined, via: string): string {
+  return hotelId
+    ? `${via} https://hotelskurdistan.com/hotels/${hotelId}`
+    : `${via} hotelskurdistan.com`;
+}
+
+/**
+ * A wa.me link for a general enquiry about a hotel, tagged with where the
+ * guest came from.
+ */
+export function buildHotelWhatsAppUrl(
+  phone: string,
+  hotelName: string,
+  msg: string,
+  opts: { hotelId?: string; via: string },
+): string {
+  const text = `${msg} ${hotelName}\n\n${waSource(opts.hotelId, opts.via)}`;
+  return `https://wa.me/${waNumber(phone)}?text=${encodeURIComponent(text)}`;
+}
+
 /**
  * A wa.me link carrying a booking summary, for the guest to send to the hotel.
- * Local numbers are stored as 0xxx; WhatsApp needs the country code.
  */
 export function buildBookingWhatsAppUrl(
   phone: string,
   b: {
     hotel: string;
+    hotelId?: string;
     name: string;
     roomType: string;
     checkIn: string;
     nights: number;
     intro: string;
+    via: string;
   },
 ): string {
-  let digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("0")) digits = "964" + digits.slice(1);
   const text = [
     b.intro,
     `🏨 ${b.hotel}`,
     `👤 ${b.name}`,
     `🛏 ${b.roomType}`,
     `📅 ${b.checkIn} — ${b.nights}`,
+    "",
+    waSource(b.hotelId, b.via),
   ].join("\n");
-  return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
+  return `https://wa.me/${waNumber(phone)}?text=${encodeURIComponent(text)}`;
 }
 
 /** Best Google Maps URL for a hotel: its explicit link, else a name+city search. */

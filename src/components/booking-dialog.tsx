@@ -167,6 +167,7 @@ export function BookingDialog({
             checkIn,
             nights: Number(nights) || 1,
             intro: t("book_wa_intro"),
+            via: t("wa_via"),
           })
         : null;
       track("booking_submitted", {

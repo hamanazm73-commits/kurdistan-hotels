@@ -391,6 +391,7 @@ const ckb: Dict = {
   detail_gallery: "وێنەکان",
   whatsapp_cta: "پەیوەندی بە WhatsApp",
   whatsapp_msg: "سڵاو، دەمەوێت دەربارەی حیجز لە",
+  wa_via: "لە ڕێگەی:",
 
   loading: "چاوەڕێبە...",
 };
@@ -763,6 +764,7 @@ const en: Dict = {
   detail_gallery: "Photos",
   whatsapp_cta: "Chat on WhatsApp",
   whatsapp_msg: "Hello, I'd like to inquire about a booking at",
+  wa_via: "Via:",
 
   loading: "Loading...",
 };
@@ -1135,6 +1137,7 @@ const ar: Dict = {
   detail_gallery: "الصور",
   whatsapp_cta: "تواصل واتساب",
   whatsapp_msg: "مرحبا، أريد الاستفسار عن حجز في",
+  wa_via: "عبر:",
 
   loading: "جاري التحميل...",
 };
@@ -1507,6 +1510,7 @@ const kmr: Dict = {
   detail_gallery: "Wêne",
   whatsapp_cta: "WhatsApp-ê bike",
   whatsapp_msg: "Silav, ez dixwazim li ser rezervasyonê bipirsinim li",
+  wa_via: "Bi rêya:",
 
   loading: "Bisekine...",
 };
