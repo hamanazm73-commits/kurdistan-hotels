@@ -30,6 +30,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { SparkleStar } from "./sparkle-star";
+import { StarRating } from "./star-rating";
 import { CountUp } from "./count-up";
 import { useI18n } from "@/lib/i18n";
 import { recordContactClick } from "@/lib/contact-click";
@@ -299,6 +300,13 @@ export function HotelCard({
                 {name}
               </h3>
             </Link>
+            {/* the rating, big and gold — the first thing the eye lands on */}
+            <StarRating
+              value={hotel.rating}
+              size={18}
+              showValue
+              className="mt-2"
+            />
             <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
               <a
                 href={mapsUrl(hotel)}

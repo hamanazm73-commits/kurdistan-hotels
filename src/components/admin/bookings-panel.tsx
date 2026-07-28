@@ -242,28 +242,46 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
     };
   }, [hotels]);
 
-  // Distinct hotels present in the bookings, for the hotel filter dropdown.
+  /**
+   * Hotels offered in the filter.
+   *
+   * Built from the hotel list first, not from the bookings: a hotel added
+   * yesterday has no bookings yet and so never appeared, which is exactly when
+   * you want to check whether any have come in. Hotels that no longer exist but
+   * still have bookings against them are kept on the end, otherwise those rows
+   * would be unreachable.
+   */
   const bookingHotels = useMemo(() => {
-    const seen = new Map<string, { key: string; name: string; city: string | null }>();
+    const live = hotels.map((h) => ({
+      key: h.id,
+      name: h.name,
+      city: h.city as string | null,
+      gone: false,
+    }));
+    const known = new Set(live.map((h) => h.key));
+
+    const orphans = new Map<
+      string,
+      { key: string; name: string; city: string | null; gone: boolean }
+    >();
     for (const b of rows) {
       const key = hotelKeyOf(b);
-      if (!seen.has(key)) {
-        const info = hotelInfoOf(b);
-        seen.set(key, { key, name: info.name, city: info.city });
-      }
+      if (known.has(key) || orphans.has(key)) continue;
+      const info = hotelInfoOf(b);
+      orphans.set(key, { key, name: info.name, city: info.city, gone: true });
     }
-    return [...seen.values()];
-  }, [rows, hotelInfoOf]);
 
-  // Distinct cities present in the bookings, for the city filter dropdown.
+    return [...live, ...orphans.values()];
+  }, [hotels, rows, hotelInfoOf]);
+
+  // Cities offered in the filter — taken from the hotels in the dropdown (not
+  // just the ones with bookings), so narrowing by city can still reach a hotel
+  // that hasn't received a booking yet.
   const bookingCities = useMemo(() => {
     const set = new Set<string>();
-    for (const b of rows) {
-      const c = hotelInfoOf(b).city;
-      if (c) set.add(c);
-    }
+    for (const h of bookingHotels) if (h.city) set.add(h.city);
     return [...set];
-  }, [rows, hotelInfoOf]);
+  }, [bookingHotels]);
 
   // Distinct room types present in the bookings, for the room filter dropdown.
   const bookingRoomTypes = useMemo(() => {
@@ -351,7 +369,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                   <SelectItem value="all">{t("bookings_all_hotels")}</SelectItem>
                   {hotelOptions.map((bh) => (
                     <SelectItem key={bh.key} value={bh.key}>
-                      {bh.name}
+                      {bh.gone ? `${bh.name} · ${t("bookings_hotel_gone")}` : bh.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
