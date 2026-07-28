@@ -54,37 +54,42 @@ export function HotelsSection() {
   const [roomType, setRoomType] = useState<string>("any");
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  // hotel id -> rooms free across the chosen dates; null while unasked
-  const [freeByHotel, setFreeByHotel] = useState<Record<string, number> | null>(
-    null,
-  );
+  // The range we'd ask about, or "" when the dates aren't a usable pair yet.
+  const dateKey = from && to && to > from ? `${from}|${to}` : "";
+  // The last answer, tagged with the range it was for.
+  const [avail, setAvail] = useState<{
+    key: string;
+    free: Record<string, number>;
+  } | null>(null);
 
-  // Ask the server which hotels are free, but only once both dates are set and
-  // the range makes sense — availability needs the bookings collection, which
-  // is private, so it can't be worked out here.
+  // Availability needs the bookings collection, which is private, so it has to
+  // be asked for rather than worked out here.
   useEffect(() => {
-    if (!from || !to || to <= from) {
-      setFreeByHotel(null);
-      return;
-    }
+    if (!dateKey) return;
+    const [f, t2] = dateKey.split("|");
     let alive = true;
     fetch("/api/availability", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to }),
+      body: JSON.stringify({ from: f, to: t2 }),
     })
       .then((r) => r.json())
       .then((d: { hotels?: Record<string, { free: number }> }) => {
         if (!alive) return;
-        const out: Record<string, number> = {};
-        for (const [id, v] of Object.entries(d.hotels ?? {})) out[id] = v.free;
-        setFreeByHotel(out);
+        const free: Record<string, number> = {};
+        for (const [id, v] of Object.entries(d.hotels ?? {})) free[id] = v.free;
+        setAvail({ key: dateKey, free });
       })
-      .catch(() => alive && setFreeByHotel(null));
+      .catch(() => {});
     return () => {
       alive = false;
     };
-  }, [from, to]);
+  }, [dateKey]);
+
+  // Derived, not stored: clearing the dates or editing them mid-flight drops
+  // the previous answer here rather than needing an effect to wipe it, so a
+  // stale range can never filter the list.
+  const freeByHotel = avail && avail.key === dateKey ? avail.free : null;
 
   // only offer rooms some hotel actually has, so the filter never returns nothing
   const offeredRoomTypes = useMemo(() => {
