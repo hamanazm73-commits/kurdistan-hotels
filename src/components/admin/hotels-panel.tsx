@@ -819,7 +819,7 @@ export function HotelFormDialog({
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <Field label={t("admin_city")}>
               <Select
                 value={form.city}
@@ -878,7 +878,7 @@ export function HotelFormDialog({
             />
           </Field>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <Field label={t("admin_address")}>
               <Input
                 value={form.address}
@@ -1187,7 +1187,7 @@ export function HotelFormDialog({
                         <X className="size-4" />
                       </Button>
                     </div>
-                    <div className="mt-2 grid grid-cols-2 gap-2">
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
                       <div className="grid gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_offer_room")}
@@ -1217,27 +1217,25 @@ export function HotelFormDialog({
                           onChange={(n) => upd({ oldPrice: n })}
                         />
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="grid gap-1">
-                          <label className="text-xs text-muted-foreground">
-                            {t("admin_offer_from")}
-                          </label>
-                          <Input
-                            type="date"
-                            value={o.from}
-                            onChange={(e) => upd({ from: e.target.value })}
-                          />
-                        </div>
-                        <div className="grid gap-1">
-                          <label className="text-xs text-muted-foreground">
-                            {t("admin_offer_to")}
-                          </label>
-                          <Input
-                            type="date"
-                            value={o.to}
-                            onChange={(e) => upd({ to: e.target.value })}
-                          />
-                        </div>
+                      <div className="grid gap-1">
+                        <label className="text-xs text-muted-foreground">
+                          {t("admin_offer_from")}
+                        </label>
+                        <Input
+                          type="date"
+                          value={o.from}
+                          onChange={(e) => upd({ from: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-1">
+                        <label className="text-xs text-muted-foreground">
+                          {t("admin_offer_to")}
+                        </label>
+                        <Input
+                          type="date"
+                          value={o.to}
+                          onChange={(e) => upd({ to: e.target.value })}
+                        />
                       </div>
                     </div>
                   </div>
@@ -1269,7 +1267,7 @@ export function HotelFormDialog({
               {form.seasons.map((s, i) => (
                 <div key={i} className="rounded-xl border bg-muted/30 p-3">
                   <div className="flex items-end gap-2">
-                    <div className="grid flex-1 grid-cols-2 gap-2">
+                    <div className="grid flex-1 gap-2 sm:grid-cols-2">
                       <div className="grid gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_season_from")}
@@ -1367,7 +1365,7 @@ export function HotelFormDialog({
 
           {!restricted && (
             <>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <ToggleRow
                   label={t("admin_featured")}
                   checked={form.featured}
