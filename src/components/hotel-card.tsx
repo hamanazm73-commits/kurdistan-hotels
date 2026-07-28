@@ -17,6 +17,7 @@ import {
   Phone,
   TrendingDown,
   Moon,
+  Tag,
 } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -38,6 +39,7 @@ import {
   mapsUrl,
   mediaSrc,
   buildHotelWhatsAppUrl,
+  liveOffers,
   totalAvailable,
   isRawSrc,
   paymentLabel,
@@ -148,6 +150,7 @@ export function HotelCard({
   // the cover counts too, so a hotel with no extra images still has one photo
   const photoCount = (hotel.images?.length ?? 0) + (hotel.image ? 1 : 0);
   const payments = (hotel.payments ?? []).filter((p) => p.type && p.url);
+  const offers = liveOffers(hotel);
   // "good price" only when it's a real gap — 15% under the city's median, so a
   // rounding difference never earns the badge
   const goodPrice =
@@ -213,6 +216,14 @@ export function HotelCard({
               <Badge className="gap-1 bg-slate-800 text-white hover:bg-slate-800">
                 <Moon className="size-3" />
                 {t("closed_badge")}
+              </Badge>
+            )}
+            {offers.length > 0 && !hotel.closed && (
+              <Badge className="gap-1 bg-gold text-gold-foreground hover:bg-gold">
+                <Tag className="size-3" />
+                {offers.length > 1
+                  ? t("offers_count", { n: offers.length })
+                  : t("offer_badge")}
               </Badge>
             )}
             {goodPrice && showPrice && (

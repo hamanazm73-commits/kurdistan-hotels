@@ -16,6 +16,8 @@ import {
   CreditCard,
   Eye,
   Moon,
+  Tag,
+  CalendarDays,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -40,6 +42,7 @@ import {
   mapsUrl,
   mediaSrc,
   buildHotelWhatsAppUrl,
+  liveOffers,
   paymentLabel,
   paymentColor,
   roomTypeLabel,
@@ -179,6 +182,7 @@ export function HotelDetailClient({
   const gallery = [hotel.image, ...galleryImages].filter(Boolean).map(mediaSrc);
   const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const description = pickLang(hotel.description, hotel.descriptionI18n, lang);
+  const offers = liveOffers(hotel);
 
   return (
     <>
@@ -389,6 +393,52 @@ export function HotelDetailClient({
                 ))}
               </div>
             </section>
+
+            {/* the owner's own promotions, under the rooms they apply to */}
+            {offers.length > 0 && (
+              <section className="mt-7">
+                <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+                  <Tag className="size-5 text-gold" />
+                  {t("detail_offers")}
+                </h2>
+                <div className="grid gap-2">
+                  {offers.map((o, i) => (
+                    <div
+                      key={i}
+                      className="rounded-xl border border-gold/40 bg-gold/5 p-3"
+                    >
+                      <p className="font-semibold">{o.title}</p>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                        {o.roomType && (
+                          <span className="inline-flex items-center gap-1">
+                            <BedDouble className="size-3.5" />
+                            {roomTypeLabel(o.roomType, lang)}
+                          </span>
+                        )}
+                        {showPrice && !!o.price && (
+                          <span className="inline-flex items-baseline gap-1.5">
+                            {!!o.oldPrice && o.oldPrice > o.price && (
+                              <span className="text-xs line-through">
+                                {format(o.oldPrice, hotel.iqdPerUsd)}
+                              </span>
+                            )}
+                            <span className="font-bold text-gold">
+                              {format(o.price, hotel.iqdPerUsd)}
+                            </span>
+                          </span>
+                        )}
+                        {o.to && (
+                          <span className="inline-flex items-center gap-1">
+                            <CalendarDays className="size-3.5" />
+                            {t("offer_until", { d: o.to })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
             <BookingDialog
               hotel={hotel}

@@ -145,6 +145,14 @@ const empty = {
     to: string;
     rooms: { type: string; price: number }[];
   }[],
+  offers: [] as {
+    title: string;
+    roomType: string;
+    price: number;
+    oldPrice: number;
+    from: string;
+    to: string;
+  }[],
   featured: false,
   recommended: false,
   discountActive: false,
@@ -513,6 +521,14 @@ export function HotelFormDialog({
       })),
       featured: h.featured,
       recommended: h.recommended,
+      offers: (h.offers ?? []).map((o) => ({
+        title: o.title ?? "",
+        roomType: o.roomType ?? "",
+        price: o.price ?? 0,
+        oldPrice: o.oldPrice ?? 0,
+        from: o.from ?? "",
+        to: o.to ?? "",
+      })),
       discountActive: h.discount?.active ?? false,
       oldPrice: h.discount?.oldPrice ?? 0,
       newPrice: h.discount?.newPrice ?? 0,
@@ -595,6 +611,16 @@ export function HotelFormDialog({
           };
         })
         .filter((s) => s.rooms.length > 0),
+      offers: f.offers
+        .filter((o) => o.title.trim())
+        .map((o) => ({
+          title: o.title.trim(),
+          ...(o.roomType.trim() ? { roomType: o.roomType.trim() } : {}),
+          ...(o.price > 0 ? { price: o.price } : {}),
+          ...(o.oldPrice > 0 ? { oldPrice: o.oldPrice } : {}),
+          ...(o.from ? { from: o.from } : {}),
+          ...(o.to ? { to: o.to } : {}),
+        })),
       featured: f.featured,
       recommended: f.recommended,
       discount: {
@@ -1117,6 +1143,116 @@ export function HotelFormDialog({
               >
                 <Plus className="size-4" />
                 {t("admin_add_room")}
+              </Button>
+            </div>
+          </Field>
+
+          {/* offers — the owner's own promotions, in their words */}
+          <Field label={t("admin_offers")}>
+            <div className="space-y-2.5">
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                {t("admin_offers_hint")}
+              </p>
+              {form.offers.map((o, i) => {
+                const upd = (patch: Partial<(typeof form.offers)[number]>) =>
+                  set(
+                    "offers",
+                    form.offers.map((x, j) => (j === i ? { ...x, ...patch } : x)),
+                  );
+                return (
+                  <div key={i} className="rounded-xl border bg-muted/30 p-3">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        className="min-w-0 flex-1"
+                        placeholder={t("admin_offer_title")}
+                        value={o.title}
+                        onChange={(e) => upd({ title: e.target.value })}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="size-9 shrink-0 text-muted-foreground hover:text-destructive"
+                        title={t("admin_delete")}
+                        onClick={() =>
+                          set(
+                            "offers",
+                            form.offers.filter((_, j) => j !== i),
+                          )
+                        }
+                      >
+                        <X className="size-4" />
+                      </Button>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <div className="grid gap-1">
+                        <label className="text-xs text-muted-foreground">
+                          {t("admin_offer_room")}
+                        </label>
+                        <Input
+                          list="room-type-suggestions"
+                          placeholder={t("admin_offer_any_room")}
+                          value={o.roomType}
+                          onChange={(e) => upd({ roomType: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid gap-1">
+                        <label className="text-xs text-muted-foreground">
+                          {t("admin_offer_price")}
+                        </label>
+                        <MoneyInput
+                          value={o.price}
+                          onChange={(n) => upd({ price: n })}
+                        />
+                      </div>
+                      <div className="grid gap-1">
+                        <label className="text-xs text-muted-foreground">
+                          {t("admin_offer_old_price")}
+                        </label>
+                        <MoneyInput
+                          value={o.oldPrice}
+                          onChange={(n) => upd({ oldPrice: n })}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="grid gap-1">
+                          <label className="text-xs text-muted-foreground">
+                            {t("admin_offer_from")}
+                          </label>
+                          <Input
+                            type="date"
+                            value={o.from}
+                            onChange={(e) => upd({ from: e.target.value })}
+                          />
+                        </div>
+                        <div className="grid gap-1">
+                          <label className="text-xs text-muted-foreground">
+                            {t("admin_offer_to")}
+                          </label>
+                          <Input
+                            type="date"
+                            value={o.to}
+                            onChange={(e) => upd({ to: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full gap-1.5"
+                onClick={() =>
+                  set("offers", [
+                    ...form.offers,
+                    { title: "", roomType: "", price: 0, oldPrice: 0, from: "", to: "" },
+                  ])
+                }
+              >
+                <Plus className="size-4" />
+                {t("admin_add_offer")}
               </Button>
             </div>
           </Field>

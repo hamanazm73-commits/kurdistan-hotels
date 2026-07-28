@@ -22,6 +22,41 @@ export interface RoomType {
   available?: number;
 }
 
+/**
+ * A promotional offer on a room — "3 nights for the price of 2", "suite with
+ * breakfast included".
+ *
+ * Distinct from `discount`, which is a blanket cut on the hotel's headline
+ * price, and from `seasons`, which is what a room simply costs at that time of
+ * year. An offer is something the owner is choosing to advertise, in their own
+ * words, and it may or may not carry a price of its own.
+ */
+export interface Offer {
+  /** the deal itself, in the owner's words */
+  title: string;
+  /** which room it applies to; empty means the whole hotel */
+  roomType?: string;
+  /** the offer price, when it has one */
+  price?: number;
+  /** what that replaces, so the saving can be shown struck through */
+  oldPrice?: number;
+  /** optional validity window, ISO "YYYY-MM-DD" */
+  from?: string;
+  to?: string;
+}
+
+/** Whether `o` is currently running (an offer with no dates always is). */
+export function offerLive(o: Offer, today = new Date().toISOString().slice(0, 10)): boolean {
+  if (o.from && today < o.from) return false;
+  if (o.to && today > o.to) return false;
+  return true;
+}
+
+/** The hotel's live offers, newest-set first, ignoring blank rows. */
+export function liveOffers(h: Pick<Hotel, "offers">): Offer[] {
+  return (h.offers ?? []).filter((o) => o?.title?.trim() && offerLive(o));
+}
+
 /** A date range with its own per-room nightly prices (seasonal pricing).
     Dates are ISO "YYYY-MM-DD", so they compare and sort as plain strings. */
 export interface Season {
@@ -178,6 +213,8 @@ export interface Hotel {
   /** date-range price overrides: a room's price on a given check-in date is its
       matching season's price, otherwise its base price. */
   seasons?: Season[];
+  /** promotional offers the owner is advertising on their rooms */
+  offers?: Offer[];
   /** how many times this hotel's detail page has been viewed */
   views?: number;
   /** epoch ms of the most recent booking — used for the "last booked" note */
