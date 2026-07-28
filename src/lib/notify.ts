@@ -24,7 +24,12 @@ export async function notifyBooking(b: Booking) {
     `<b>تەلەفۆن / Phone:</b> ${esc(b.phone)}\n` +
     `<b>ژوور / Room:</b> ${esc(b.roomType)}\n` +
     `<b>بەروار / Check-in:</b> ${esc(b.checkIn)}\n` +
-    `<b>شەو / Nights:</b> ${esc(b.nights)}`;
+    `<b>شەو / Nights:</b> ${esc(b.nights)}` +
+    (b.guests ? `\n<b>کەس / Guests:</b> ${esc(b.guests)}` : "") +
+    (b.gender
+      ? `\n<b>ڕەگەز / Gender:</b> ${b.gender === "male" ? "نێر / Male" : "مێ / Female"}`
+      : "") +
+    (b.fromCity ? `\n<b>لە / From:</b> ${esc(b.fromCity)}` : "");
 
   try {
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -121,6 +126,16 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
           ${row("ژوور / Room", b.roomType)}
           ${row("بەروار / Check-in", b.checkIn)}
           ${row("شەو / Nights", b.nights)}
+          ${b.guests ? row("کەس / Guests", b.guests) : ""}
+          ${
+            b.gender
+              ? row(
+                  "ڕەگەز / Gender",
+                  b.gender === "male" ? "نێر / Male" : "مێ / Female",
+                )
+              : ""
+          }
+          ${b.fromCity ? row("لە / From", b.fromCity) : ""}
           ${row("نرخی شەو / Per night", money(b.roomPrice || 0))}
         </table>
         <div style="margin-top:20px;padding:18px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;text-align:center;">

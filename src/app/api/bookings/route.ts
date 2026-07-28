@@ -15,6 +15,9 @@ const BookingSchema = z.object({
   roomPrice: z.number().nonnegative().max(10_000_000),
   checkIn: z.string().min(4).max(40),
   nights: z.number().int().min(1).max(60),
+  guests: z.number().int().min(1).max(20).optional(),
+  gender: z.enum(["male", "female"]).optional(),
+  fromCity: z.string().min(1).max(80).optional(),
 });
 
 export async function POST(req: Request) {

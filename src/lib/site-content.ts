@@ -394,3 +394,42 @@ export const OWNER_WHATSAPP_CTA: L = {
   ar: "تواصل عبر واتساب",
   kmr: "Bi WhatsApp têkilî deyne",
 };
+
+/* ---------------- Where the guest is travelling from ----------------
+   Offered as a short list so booking stays a few taps — the cities guests
+   actually come from, then a free-text fallback for anywhere else. */
+
+export interface OriginCity {
+  /** stored value (stable, language-independent) */
+  value: string;
+  label: L;
+}
+
+export const ORIGIN_CITIES: OriginCity[] = [
+  { value: "Erbil", label: { ckb: "هەولێر", en: "Erbil", ar: "أربيل", kmr: "Hewlêr" } },
+  { value: "Sulaymaniyah", label: { ckb: "سلێمانی", en: "Sulaymaniyah", ar: "السليمانية", kmr: "Silêmanî" } },
+  { value: "Duhok", label: { ckb: "دهۆک", en: "Duhok", ar: "دهوك", kmr: "Dihok" } },
+  { value: "Halabja", label: { ckb: "هەڵەبجە", en: "Halabja", ar: "حلبجة", kmr: "Helebce" } },
+  { value: "Kirkuk", label: { ckb: "کەرکووک", en: "Kirkuk", ar: "كركوك", kmr: "Kerkûk" } },
+  { value: "Zakho", label: { ckb: "زاخۆ", en: "Zakho", ar: "زاخو", kmr: "Zaxo" } },
+  { value: "Ranya", label: { ckb: "ڕانیە", en: "Ranya", ar: "رانية", kmr: "Ranya" } },
+  { value: "Soran", label: { ckb: "سۆران", en: "Soran", ar: "سوران", kmr: "Soran" } },
+  { value: "Baghdad", label: { ckb: "بەغدا", en: "Baghdad", ar: "بغداد", kmr: "Bexda" } },
+  { value: "Basra", label: { ckb: "بەسرە", en: "Basra", ar: "البصرة", kmr: "Besre" } },
+  { value: "Mosul", label: { ckb: "موسڵ", en: "Mosul", ar: "الموصل", kmr: "Mûsil" } },
+  { value: "Najaf", label: { ckb: "نەجەف", en: "Najaf", ar: "النجف", kmr: "Necef" } },
+  { value: "Karbala", label: { ckb: "کەربەلا", en: "Karbala", ar: "كربلاء", kmr: "Kerbela" } },
+  { value: "Anbar", label: { ckb: "ئەنبار", en: "Anbar", ar: "الأنبار", kmr: "Enbar" } },
+  { value: "Diyala", label: { ckb: "دیالە", en: "Diyala", ar: "ديالى", kmr: "Diyale" } },
+  { value: "Abroad", label: { ckb: "دەرەوەی عێراق", en: "Outside Iraq", ar: "خارج العراق", kmr: "Derveyî Iraqê" } },
+];
+
+/** Sentinel for "somewhere else" — reveals a free-text field. */
+export const ORIGIN_OTHER = "__other__";
+
+export const ORIGIN_OTHER_LABEL: L = {
+  ckb: "شارێکی تر",
+  en: "Another city",
+  ar: "مدينة أخرى",
+  kmr: "Bajarekî din",
+};

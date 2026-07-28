@@ -258,6 +258,12 @@ export interface Booking {
   roomPrice: number;
   checkIn: string;
   nights: number;
+  /** how many people are staying (hotels need this for the room) */
+  guests?: number;
+  /** the guest's gender, as some hotels must record it */
+  gender?: "male" | "female";
+  /** where the guest is travelling from */
+  fromCity?: string;
   createdAt?: number;
 }
 

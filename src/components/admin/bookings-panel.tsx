@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check, Ban, UserX } from "lucide-react";
+import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check, Ban, UserX, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -517,6 +517,26 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
               </span>
               <span className="text-muted-foreground">{t("book_nights")}</span>
               <span className="font-medium">{b.nights} {t("per_night").replace("/", "").trim()}</span>
+              {!!b.guests && (
+                <>
+                  <span className="text-muted-foreground">{t("book_guests")}</span>
+                  <span className="font-medium">{b.guests}</span>
+                </>
+              )}
+              {b.gender && (
+                <>
+                  <span className="text-muted-foreground">{t("book_gender")}</span>
+                  <span className="font-medium">
+                    {t(b.gender === "male" ? "book_male" : "book_female")}
+                  </span>
+                </>
+              )}
+              {b.fromCity && (
+                <>
+                  <span className="text-muted-foreground">{t("book_from_city")}</span>
+                  <span className="font-medium">{tCity(b.fromCity)}</span>
+                </>
+              )}
             </div>
 
             {/* phone + whatsapp */}
@@ -578,7 +598,31 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                     </span>
                   )}
                 </TableCell>
-                <TableCell>{b.name}</TableCell>
+                <TableCell>
+                  {b.name}
+                  {/* who's staying, kept under the name so the table stays narrow */}
+                  {(!!b.guests || b.gender || b.fromCity) && (
+                    <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs font-normal text-muted-foreground">
+                      {!!b.guests && (
+                        <span className="inline-flex items-center gap-1">
+                          <Users className="size-3 shrink-0" />
+                          {b.guests}
+                        </span>
+                      )}
+                      {b.gender && (
+                        <span>
+                          {t(b.gender === "male" ? "book_male" : "book_female")}
+                        </span>
+                      )}
+                      {b.fromCity && (
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="size-3 shrink-0" />
+                          {tCity(b.fromCity)}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <a

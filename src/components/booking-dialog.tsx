@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -32,6 +32,11 @@ import {
   buildBookingWhatsAppUrl,
   type Hotel,
 } from "@/lib/types";
+import {
+  ORIGIN_CITIES,
+  ORIGIN_OTHER,
+  ORIGIN_OTHER_LABEL,
+} from "@/lib/site-content";
 import { track } from "@/lib/analytics";
 import { addMyBooking } from "@/lib/my-bookings";
 import { cn } from "@/lib/utils";
@@ -72,6 +77,14 @@ export function BookingDialog({
   const [checkIn, setCheckIn] = useState("");
   const [nights, setNights] = useState("1");
   const [roomType, setRoomType] = useState(initialRoomType ?? "");
+  const [guests, setGuests] = useState(1);
+  const [gender, setGender] = useState<"male" | "female" | "">("");
+  const [fromCity, setFromCity] = useState("");
+  const [fromCityOther, setFromCityOther] = useState("");
+
+  /** What we store for origin: the free-text city when "another city" is picked. */
+  const originCity =
+    fromCity === ORIGIN_OTHER ? fromCityOther.trim() : fromCity;
 
   // preselect the tapped room each time the dialog opens
   useEffect(() => {
@@ -128,6 +141,9 @@ export function BookingDialog({
           roomPrice,
           checkIn,
           nights: Number(nights) || 1,
+          guests,
+          ...(gender ? { gender } : {}),
+          ...(originCity ? { fromCity: originCity } : {}),
         }),
       });
       if (res.status === 429) {
@@ -192,6 +208,10 @@ export function BookingDialog({
       setCheckIn("");
       setNights("1");
       setRoomType("");
+      setGuests(1);
+      setGender("");
+      setFromCity("");
+      setFromCityOther("");
     } catch {
       toast.error(t("book_required"));
     } finally {
@@ -239,6 +259,98 @@ export function BookingDialog({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
+          </div>
+
+          {/* guests + gender — taps only, no typing */}
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-3">
+            <div className="grid min-w-0 gap-2">
+              <Label>{t("book_guests")}</Label>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="size-10 shrink-0 rounded-full"
+                  aria-label="-"
+                  onClick={() => setGuests((n) => Math.max(1, n - 1))}
+                  disabled={guests <= 1}
+                >
+                  <Minus className="size-4" />
+                </Button>
+                <span
+                  aria-live="polite"
+                  className="min-w-10 flex-1 text-center text-lg font-bold tabular-nums"
+                >
+                  {guests}
+                </span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="size-10 shrink-0 rounded-full"
+                  aria-label="+"
+                  onClick={() => setGuests((n) => Math.min(20, n + 1))}
+                  disabled={guests >= 20}
+                >
+                  <Plus className="size-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid min-w-0 gap-2">
+              <Label>{t("book_gender")}</Label>
+              <div className="flex gap-2">
+                {(["male", "female"] as const).map((g) => (
+                  <Button
+                    key={g}
+                    type="button"
+                    variant={gender === g ? "default" : "outline"}
+                    className="h-10 flex-1 rounded-full"
+                    onClick={() => setGender(gender === g ? "" : g)}
+                  >
+                    {t(g === "male" ? "book_male" : "book_female")}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* where they're travelling from */}
+          <div className="grid gap-2">
+            <Label>{t("book_from_city")}</Label>
+            <Select
+              value={fromCity}
+              onValueChange={(v) => setFromCity(v ?? "")}
+            >
+              <SelectTrigger>
+                <SelectValue>
+                  {(v: string | null) => {
+                    if (!v) return t("book_from_city_ph");
+                    if (v === ORIGIN_OTHER) return ORIGIN_OTHER_LABEL[lang];
+                    return (
+                      ORIGIN_CITIES.find((c) => c.value === v)?.label[lang] ?? v
+                    );
+                  }}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent className="w-[min(92vw,22rem)]">
+                {ORIGIN_CITIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>
+                    {c.label[lang]}
+                  </SelectItem>
+                ))}
+                <SelectItem value={ORIGIN_OTHER}>
+                  {ORIGIN_OTHER_LABEL[lang]}
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            {fromCity === ORIGIN_OTHER && (
+              <Input
+                value={fromCityOther}
+                onChange={(e) => setFromCityOther(e.target.value)}
+                placeholder={t("book_from_city_ph")}
+              />
+            )}
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-3">
             <div className="grid min-w-0 gap-2">
