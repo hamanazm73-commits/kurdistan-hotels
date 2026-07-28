@@ -1217,7 +1217,7 @@ export function HotelFormDialog({
                           onChange={(n) => upd({ oldPrice: n })}
                         />
                       </div>
-                      <div className="grid gap-1">
+                      <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_offer_from")}
                         </label>
@@ -1227,7 +1227,7 @@ export function HotelFormDialog({
                           onChange={(e) => upd({ from: e.target.value })}
                         />
                       </div>
-                      <div className="grid gap-1">
+                      <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_offer_to")}
                         </label>
@@ -1265,10 +1265,12 @@ export function HotelFormDialog({
                 {t("admin_seasons_hint")}
               </p>
               {form.seasons.map((s, i) => (
-                <div key={i} className="rounded-xl border bg-muted/30 p-3">
-                  <div className="flex items-end gap-2">
-                    <div className="grid flex-1 gap-2 sm:grid-cols-2">
-                      <div className="grid gap-1">
+                <div key={i} className="relative rounded-xl border bg-muted/30 p-3">
+                  {/* the corner button overlaps the first label's line, so keep
+                      that lane clear on mobile where the fields stack */}
+                  <div className="flex items-end gap-2 pe-10 sm:pe-0">
+                    <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
+                      <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_season_from")}
                         </label>
@@ -1278,7 +1280,7 @@ export function HotelFormDialog({
                           onChange={(e) => setSeason(i, { from: e.target.value })}
                         />
                       </div>
-                      <div className="grid gap-1">
+                      <div className="grid min-w-0 gap-1">
                         <label className="text-xs text-muted-foreground">
                           {t("admin_season_to")}
                         </label>
@@ -1289,22 +1291,22 @@ export function HotelFormDialog({
                         />
                       </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="size-9 shrink-0 text-muted-foreground hover:text-destructive"
-                      title={t("admin_delete")}
-                      onClick={() =>
-                        set(
-                          "seasons",
-                          form.seasons.filter((_, j) => j !== i),
-                        )
-                      }
-                    >
-                      <X className="size-4" />
-                    </Button>
                   </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute end-1 top-1 size-9 text-muted-foreground hover:text-destructive"
+                    title={t("admin_delete")}
+                    onClick={() =>
+                      set(
+                        "seasons",
+                        form.seasons.filter((_, j) => j !== i),
+                      )
+                    }
+                  >
+                    <X className="size-4" />
+                  </Button>
                   <div className="mt-2 space-y-1.5">
                     {form.rooms
                       .filter((r) => r.type.trim())
