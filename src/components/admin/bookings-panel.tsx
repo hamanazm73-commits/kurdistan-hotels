@@ -75,7 +75,20 @@ function BookingActions({
     setBusy(true);
     try {
       await updateBookingStatus(b.id, next); // live subscription refreshes the row
-      toast.success(t("bk_updated"));
+      // offer to tell the guest, while the owner is still on this booking
+      const wa =
+        b.phone && (next === "confirmed" || next === "cancelled")
+          ? buildDecisionWhatsApp(b, next, t)
+          : null;
+      toast.success(t("bk_updated"), {
+        duration: wa ? 12_000 : 4_000,
+        action: wa
+          ? {
+              label: t("bk_wa_notify"),
+              onClick: () => window.open(wa, "_blank", "noopener,noreferrer"),
+            }
+          : undefined,
+      });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
     } finally {
@@ -157,11 +170,37 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
+function waNumber(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return digits.startsWith("0") ? "964" + digits.slice(1) : digits;
+}
+
 function buildWhatsApp(phone: string, customerName: string): string {
-  let digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("0")) digits = "964" + digits.slice(1);
   const msg = encodeURIComponent(`سڵاو ${customerName}، دەربارەی حیجزەکەت پەیوەندیت پێوەکرا.`);
-  return `https://wa.me/${digits}?text=${msg}`;
+  return `https://wa.me/${waNumber(phone)}?text=${msg}`;
+}
+
+/**
+ * A WhatsApp link telling the guest what happened to their booking.
+ *
+ * The guest leaves a phone number, not an email, and nothing reaches them when
+ * a booking is decided — they'd have to come back to the site and check, which
+ * most never do. The owner is already here at the moment of deciding, so this
+ * turns telling them into one tap.
+ */
+function buildDecisionWhatsApp(
+  b: Booking,
+  status: Exclude<BookingStatus, "pending">,
+  t: (k: string, v?: Record<string, string | number>) => string,
+): string {
+  const head =
+    status === "confirmed"
+      ? t("bk_wa_confirmed", { name: b.name })
+      : t("bk_wa_cancelled", { name: b.name });
+  const text = [head, "", `🏨 ${b.hotel}`, `📅 ${b.checkIn} — ${b.nights}`].join(
+    "\n",
+  );
+  return `https://wa.me/${waNumber(b.phone)}?text=${encodeURIComponent(text)}`;
 }
 
 export function BookingsPanel({ hotelId }: { hotelId?: string }) {

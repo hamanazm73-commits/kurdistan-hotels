@@ -52,6 +52,39 @@ export function HotelsSection() {
   const [sort, setSort] = useState<Sort>("recommended");
   const [maxPrice, setMaxPrice] = useState<string>("any");
   const [roomType, setRoomType] = useState<string>("any");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  // hotel id -> rooms free across the chosen dates; null while unasked
+  const [freeByHotel, setFreeByHotel] = useState<Record<string, number> | null>(
+    null,
+  );
+
+  // Ask the server which hotels are free, but only once both dates are set and
+  // the range makes sense — availability needs the bookings collection, which
+  // is private, so it can't be worked out here.
+  useEffect(() => {
+    if (!from || !to || to <= from) {
+      setFreeByHotel(null);
+      return;
+    }
+    let alive = true;
+    fetch("/api/availability", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ from, to }),
+    })
+      .then((r) => r.json())
+      .then((d: { hotels?: Record<string, { free: number }> }) => {
+        if (!alive) return;
+        const out: Record<string, number> = {};
+        for (const [id, v] of Object.entries(d.hotels ?? {})) out[id] = v.free;
+        setFreeByHotel(out);
+      })
+      .catch(() => alive && setFreeByHotel(null));
+    return () => {
+      alive = false;
+    };
+  }, [from, to]);
 
   // only offer rooms some hotel actually has, so the filter never returns nothing
   const offeredRoomTypes = useMemo(() => {
@@ -84,12 +117,15 @@ export function HotelsSection() {
       const matchesRoom =
         roomType === "any" ||
         (h.rooms ?? []).some((r) => sameRoomType(r.type, roomType));
+      // only filter on dates once the server has answered
+      const matchesDates = !freeByHotel || (freeByHotel[h.id] ?? 0) > 0;
       return (
         matchesSearch &&
         matchesCity &&
         matchesFeatured &&
         matchesPrice &&
-        matchesRoom
+        matchesRoom &&
+        matchesDates
       );
     });
 
@@ -111,7 +147,7 @@ export function HotelsSection() {
       }
     });
     return list;
-  }, [hotels, search, city, featuredOnly, sort, maxPrice, roomType]);
+  }, [hotels, search, city, featuredOnly, sort, maxPrice, roomType, freeByHotel]);
 
   // A search that finds nothing is the visitor telling us what the site is
   // missing. Report it once they've stopped typing, and only for a plain search
@@ -180,6 +216,52 @@ export function HotelsSection() {
             placeholder={t("search_ph")}
             className="h-14 rounded-2xl ps-12 text-base shadow-sm"
           />
+        </div>
+
+        {/* dates — the only filter that has to ask the server, so it sits on
+            its own row rather than crowding the instant ones */}
+        <div className="flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+            {t("date_from")}
+            <Input
+              type="date"
+              value={from}
+              min={new Date().toISOString().slice(0, 10)}
+              onChange={(e) => {
+                setFrom(e.target.value);
+                // a check-out on or before the new check-in is meaningless
+                if (to && e.target.value && to <= e.target.value) setTo("");
+              }}
+              className="h-10 w-40"
+            />
+          </label>
+          <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">
+            {t("date_to")}
+            <Input
+              type="date"
+              value={to}
+              min={from || new Date().toISOString().slice(0, 10)}
+              onChange={(e) => setTo(e.target.value)}
+              className="h-10 w-40"
+            />
+          </label>
+          {(from || to) && (
+            <Button
+              variant="ghost"
+              className="h-10"
+              onClick={() => {
+                setFrom("");
+                setTo("");
+              }}
+            >
+              {t("date_clear")}
+            </Button>
+          )}
+          {freeByHotel && (
+            <span className="pb-2.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+              {t("date_filtering")}
+            </span>
+          )}
         </div>
 
         {/* filters row */}

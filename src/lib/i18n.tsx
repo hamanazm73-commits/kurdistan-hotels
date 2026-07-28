@@ -396,6 +396,13 @@ const ckb: Dict = {
   stat_contacts: "پەیوەندی (٣٠ ڕۆژ)",
   stat_bookings: "حیجز (٧ ڕۆژ)",
   stat_reviews: "هەڵسەنگاندن",
+  bk_wa_notify: "میوان ئاگادار بکەرەوە",
+  date_from: "لە بەرواری",
+  date_to: "تا بەرواری",
+  date_clear: "بەروارەکان بسڕەوە",
+  date_filtering: "تەنها هۆتێلی بەردەست لەم بەروارانەدا",
+  bk_wa_confirmed: "سڵاو {name}، حیجزەکەت پەسەند کرا ✅ چاوەڕێت دەکەین.",
+  bk_wa_cancelled: "سڵاو {name}، ببوورە، نەمانتوانی حیجزەکەت پەسەند بکەین.",
 
   loading: "چاوەڕێبە...",
 };
@@ -773,6 +780,13 @@ const en: Dict = {
   stat_contacts: "contacts (30d)",
   stat_bookings: "bookings (7d)",
   stat_reviews: "reviews",
+  bk_wa_notify: "Tell the guest",
+  date_from: "Check-in",
+  date_to: "Check-out",
+  date_clear: "Clear dates",
+  date_filtering: "Showing hotels free on these dates",
+  bk_wa_confirmed: "Hello {name}, your booking is confirmed ✅ We look forward to having you.",
+  bk_wa_cancelled: "Hello {name}, sorry — we could not confirm your booking.",
 
   loading: "Loading...",
 };
@@ -1150,6 +1164,13 @@ const ar: Dict = {
   stat_contacts: "تواصل (30 يوم)",
   stat_bookings: "حجز (7 أيام)",
   stat_reviews: "تقييم",
+  bk_wa_notify: "إبلاغ الضيف",
+  date_from: "تاريخ الوصول",
+  date_to: "تاريخ المغادرة",
+  date_clear: "مسح التواريخ",
+  date_filtering: "الفنادق المتاحة في هذه التواريخ فقط",
+  bk_wa_confirmed: "مرحباً {name}، تم تأكيد حجزك ✅ في انتظارك.",
+  bk_wa_cancelled: "مرحباً {name}، نعتذر — لم نتمكن من تأكيد حجزك.",
 
   loading: "جاري التحميل...",
 };
@@ -1527,6 +1548,13 @@ const kmr: Dict = {
   stat_contacts: "pêwendî (30 roj)",
   stat_bookings: "rezervasyon (7 roj)",
   stat_reviews: "nirxandin",
+  bk_wa_notify: "Mêvan agahdar bike",
+  date_from: "Ketin",
+  date_to: "Derketin",
+  date_clear: "Dîrokan paqij bike",
+  date_filtering: "Tenê otêlên vala di van dîrokan de",
+  bk_wa_confirmed: "Silav {name}, rezervasyona te hat pejirandin ✅ Em li benda te ne.",
+  bk_wa_cancelled: "Silav {name}, bibore — me nekarî rezervasyona te bipejirîne.",
 
   loading: "Bisekine...",
 };
