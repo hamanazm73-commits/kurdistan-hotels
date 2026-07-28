@@ -215,10 +215,6 @@ export interface Hotel {
   seasons?: Season[];
   /** promotional offers the owner is advertising on their rooms */
   offers?: Offer[];
-  /** "14:00" — the questions every guest asks before booking, so the owner
-      isn't answering them one WhatsApp message at a time */
-  checkInTime?: string;
-  checkOutTime?: string;
   /** free-text house rules / cancellation policy, in the owner's words */
   policy?: string;
   /** optional per-language policy (falls back to `policy`) */

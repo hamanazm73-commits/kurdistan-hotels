@@ -185,7 +185,7 @@ export function HotelDetailClient({
   const description = pickLang(hotel.description, hotel.descriptionI18n, lang);
   const offers = liveOffers(hotel);
   const policy = pickLang(hotel.policy, hotel.policyI18n, lang);
-  const hasStayInfo = !!(hotel.checkInTime || hotel.checkOutTime || policy);
+  const hasStayInfo = !!policy;
 
   return (
     <>
@@ -492,35 +492,9 @@ export function HotelDetailClient({
                   {t("detail_stay_info")}
                 </h2>
                 <div className="rounded-xl border bg-muted/30 p-4">
-                  {(hotel.checkInTime || hotel.checkOutTime) && (
-                    <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
-                      {hotel.checkInTime && (
-                        <span>
-                          <span className="text-muted-foreground">
-                            {t("detail_checkin")}:{" "}
-                          </span>
-                          <span dir="ltr" className="font-semibold">
-                            {hotel.checkInTime}
-                          </span>
-                        </span>
-                      )}
-                      {hotel.checkOutTime && (
-                        <span>
-                          <span className="text-muted-foreground">
-                            {t("detail_checkout")}:{" "}
-                          </span>
-                          <span dir="ltr" className="font-semibold">
-                            {hotel.checkOutTime}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  {policy && (
-                    <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                      {policy}
-                    </p>
-                  )}
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                    {policy}
+                  </p>
                 </div>
               </section>
             )}
