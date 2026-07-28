@@ -228,3 +228,81 @@ export async function notifyFeedback(fb: Feedback) {
     );
   }
 }
+
+/** A hotel owner has asked to be listed. Telegram is enough here: it's a lead
+    to act on, not a record to file, and the row is already in Firestore. */
+export async function notifyHotelApplication(a: {
+  hotelName: string;
+  city: string;
+  contactName: string;
+  phone: string;
+  rooms?: number;
+  note?: string;
+}) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const esc = (s: unknown) =>
+    String(s).replace(/[<>&]/g, (c) =>
+      c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;",
+    );
+  // a tappable number, so the lead can be called straight from the message
+  const digits = a.phone.replace(/\D/g, "");
+  const wa = digits.startsWith("0") ? "964" + digits.slice(1) : digits;
+
+  const text =
+    `🏨 <b>داواکاری هۆتێلی نوێ — New hotel application</b>\n\n` +
+    `<b>هۆتێل / Hotel:</b> ${esc(a.hotelName)}\n` +
+    `<b>شار / City:</b> ${esc(a.city)}\n` +
+    `<b>کەس / Contact:</b> ${esc(a.contactName)}\n` +
+    `<b>تەلەفۆن / Phone:</b> ${esc(a.phone)}\n` +
+    (a.rooms ? `<b>ژوور / Rooms:</b> ${a.rooms}\n` : "") +
+    (a.note ? `\n${esc(a.note)}\n` : "") +
+    `\nhttps://wa.me/${wa}`;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+    });
+  } catch {
+    /* best-effort */
+  }
+}
+
+/** A visitor hit the error screen. Telegram only — this is an alert to act on,
+    not a record, and a broken page needs to reach a person fast. */
+export async function notifyClientError(e: {
+  message: string;
+  digest?: string;
+  path?: string;
+  ua?: string;
+}) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+
+  const esc = (s: unknown) =>
+    String(s).replace(/[<>&]/g, (c) =>
+      c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&amp;",
+    );
+
+  const text =
+    `🐞 <b>هەڵەیەک لەسەر سایتەکە — Site error</b>\n\n` +
+    (e.path ? `<b>لاپەڕە / Page:</b> ${esc(e.path)}\n` : "") +
+    `<b>هەڵە / Error:</b>\n${esc(e.message)}\n` +
+    (e.digest ? `\n<code>${esc(e.digest)}</code>\n` : "") +
+    (e.ua ? `\n<i>${esc(e.ua.slice(0, 160))}</i>` : "");
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+    });
+  } catch {
+    /* best-effort */
+  }
+}

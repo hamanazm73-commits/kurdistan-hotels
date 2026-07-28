@@ -153,6 +153,9 @@ const empty = {
     from: string;
     to: string;
   }[],
+  checkInTime: "",
+  checkOutTime: "",
+  policy: "",
   featured: false,
   recommended: false,
   discountActive: false,
@@ -529,6 +532,9 @@ export function HotelFormDialog({
         from: o.from ?? "",
         to: o.to ?? "",
       })),
+      checkInTime: h.checkInTime ?? "",
+      checkOutTime: h.checkOutTime ?? "",
+      policy: h.policy ?? "",
       discountActive: h.discount?.active ?? false,
       oldPrice: h.discount?.oldPrice ?? 0,
       newPrice: h.discount?.newPrice ?? 0,
@@ -621,6 +627,9 @@ export function HotelFormDialog({
           ...(o.from ? { from: o.from } : {}),
           ...(o.to ? { to: o.to } : {}),
         })),
+      checkInTime: f.checkInTime.trim(),
+      checkOutTime: f.checkOutTime.trim(),
+      policy: f.policy.trim(),
       featured: f.featured,
       recommended: f.recommended,
       discount: {
@@ -1349,6 +1358,40 @@ export function HotelFormDialog({
                 {t("admin_add_season")}
               </Button>
             </div>
+          </Field>
+
+          {/* The questions guests ask before every booking. Owners answer
+              these over and over on WhatsApp; answering once here is cheaper. */}
+          <Field label={t("admin_stay_info")}>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="grid gap-1">
+                <label className="text-xs text-muted-foreground">
+                  {t("admin_checkin_time")}
+                </label>
+                <Input
+                  type="time"
+                  value={form.checkInTime}
+                  onChange={(e) => set("checkInTime", e.target.value)}
+                />
+              </div>
+              <div className="grid gap-1">
+                <label className="text-xs text-muted-foreground">
+                  {t("admin_checkout_time")}
+                </label>
+                <Input
+                  type="time"
+                  value={form.checkOutTime}
+                  onChange={(e) => set("checkOutTime", e.target.value)}
+                />
+              </div>
+            </div>
+            <Textarea
+              className="mt-2"
+              rows={3}
+              placeholder={t("admin_policy_ph")}
+              value={form.policy}
+              onChange={(e) => set("policy", e.target.value)}
+            />
           </Field>
 
           {!restricted && (

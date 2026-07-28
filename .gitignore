@@ -46,3 +46,6 @@ next-env.d.ts
 
 # migration run logs (URLs of moved images)
 migrate-*.log
+
+# database backups — contain guest names and phone numbers
+backups/

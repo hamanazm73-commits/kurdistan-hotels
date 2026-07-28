@@ -18,6 +18,7 @@ import {
   Moon,
   Tag,
   CalendarDays,
+  Clock,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -183,6 +184,8 @@ export function HotelDetailClient({
   const name = pickLang(hotel.name, hotel.nameI18n, lang);
   const description = pickLang(hotel.description, hotel.descriptionI18n, lang);
   const offers = liveOffers(hotel);
+  const policy = pickLang(hotel.policy, hotel.policyI18n, lang);
+  const hasStayInfo = !!(hotel.checkInTime || hotel.checkOutTime || policy);
 
   return (
     <>
@@ -478,6 +481,46 @@ export function HotelDetailClient({
                     <MapPin className="size-4" />
                     {t("view_on_map")}
                   </a>
+                </div>
+              </section>
+            )}
+
+            {hasStayInfo && (
+              <section className="mt-7">
+                <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+                  <Clock className="size-5 text-gold" />
+                  {t("detail_stay_info")}
+                </h2>
+                <div className="rounded-xl border bg-muted/30 p-4">
+                  {(hotel.checkInTime || hotel.checkOutTime) && (
+                    <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+                      {hotel.checkInTime && (
+                        <span>
+                          <span className="text-muted-foreground">
+                            {t("detail_checkin")}:{" "}
+                          </span>
+                          <span dir="ltr" className="font-semibold">
+                            {hotel.checkInTime}
+                          </span>
+                        </span>
+                      )}
+                      {hotel.checkOutTime && (
+                        <span>
+                          <span className="text-muted-foreground">
+                            {t("detail_checkout")}:{" "}
+                          </span>
+                          <span dir="ltr" className="font-semibold">
+                            {hotel.checkOutTime}
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {policy && (
+                    <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                      {policy}
+                    </p>
+                  )}
                 </div>
               </section>
             )}

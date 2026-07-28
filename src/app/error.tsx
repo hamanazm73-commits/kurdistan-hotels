@@ -28,6 +28,26 @@ export default function Error({
         sessionStorage.setItem(KEY, String(Date.now()));
         window.location.reload();
       }
+      return;
+    }
+
+    // Report anything else. A broken page used to be invisible — the visitor
+    // saw this screen, left, and nobody found out. Stale chunks are excluded
+    // above: they resolve themselves on the reload and would be pure noise.
+    try {
+      fetch("/api/client-error", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: msg.slice(0, 500),
+          digest: error?.digest,
+          path: window.location.pathname + window.location.search,
+          ua: navigator.userAgent,
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch {
+      /* reporting must never break the error screen itself */
     }
   }, [error]);
 
