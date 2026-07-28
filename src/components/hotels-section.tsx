@@ -135,6 +135,9 @@ export function HotelsSection() {
     });
 
     list = [...list].sort((a, b) => {
+      // A hotel that can't be booked shouldn't outrank one that can, whichever
+      // order the visitor picked.
+      if (!!a.closed !== !!b.closed) return a.closed ? 1 : -1;
       switch (sort) {
         case "price_low":
           return effectivePrice(a) - effectivePrice(b);

@@ -15,6 +15,7 @@ import {
   Maximize2,
   CreditCard,
   Eye,
+  Moon,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -457,7 +458,21 @@ export function HotelDetailClient({
                 {t("rooms_left", { n: hotel.available })}
               </p>
               <div className="mt-4 flex flex-col gap-2">
-                <BookingDialog hotel={hotel} />
+                {/* closed: no booking, but WhatsApp and the phone number below
+                    stay live so a guest can ask when it reopens */}
+                {hotel.closed ? (
+                  <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-center">
+                    <p className="flex items-center justify-center gap-1.5 font-semibold text-amber-700 dark:text-amber-400">
+                      <Moon className="size-4" />
+                      {t("closed_badge")}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t("closed_detail")}
+                    </p>
+                  </div>
+                ) : (
+                  <BookingDialog hotel={hotel} />
+                )}
                 {hotel.phone && (
                   <a
                     href={buildHotelWhatsAppUrl(hotel.phone, name, t("whatsapp_msg"), {

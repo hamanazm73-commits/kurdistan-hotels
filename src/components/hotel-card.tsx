@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Phone,
   TrendingDown,
+  Moon,
 } from "lucide-react";
 
 function WhatsAppIcon({ className }: { className?: string }) {
@@ -180,7 +181,11 @@ export function HotelCard({
               fill
               sizes={CARD_SIZES}
               unoptimized={isRawSrc(cover)}
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className={cn(
+                "object-cover transition-transform duration-500 group-hover:scale-105",
+                // a closed hotel reads as resting rather than removed
+                hotel.closed && "grayscale-[35%] brightness-75",
+              )}
             />
           </Link>
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
@@ -199,9 +204,15 @@ export function HotelCard({
             {hasDiscount && (
               <Badge variant="destructive">−{pct}%</Badge>
             )}
-            {isNew && (
+            {isNew && !hotel.closed && (
               <Badge className="bg-sky-500 text-white hover:bg-sky-500">
                 ✨ {t("badge_new")}
+              </Badge>
+            )}
+            {hotel.closed && (
+              <Badge className="gap-1 bg-slate-800 text-white hover:bg-slate-800">
+                <Moon className="size-3" />
+                {t("closed_badge")}
               </Badge>
             )}
             {goodPrice && showPrice && (
@@ -437,7 +448,16 @@ export function HotelCard({
                   <WhatsAppIcon className="size-4" />
                 </a>
               )}
-              <BookingDialog hotel={hotel} />
+              {/* closed: booking is off, but the contact buttons above stay —
+                  "when do you reopen?" is a conversation worth having */}
+              {hotel.closed ? (
+                <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-muted px-3 py-2 text-xs font-semibold text-muted-foreground">
+                  <Moon className="size-3.5" />
+                  {t("closed_short")}
+                </span>
+              ) : (
+                <BookingDialog hotel={hotel} />
+              )}
             </div>
           </div>
         </div>

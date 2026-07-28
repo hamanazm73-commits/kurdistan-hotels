@@ -145,6 +145,7 @@ const empty = {
   }[],
   featured: false,
   recommended: false,
+  closed: false,
   discountActive: false,
   oldPrice: 0,
   newPrice: 0,
@@ -484,6 +485,7 @@ export function HotelFormDialog({
       })),
       featured: h.featured,
       recommended: h.recommended,
+      closed: h.closed ?? false,
       discountActive: h.discount?.active ?? false,
       oldPrice: h.discount?.oldPrice ?? 0,
       newPrice: h.discount?.newPrice ?? 0,
@@ -568,6 +570,7 @@ export function HotelFormDialog({
         .filter((s) => s.rooms.length > 0),
       featured: f.featured,
       recommended: f.recommended,
+      closed: f.closed,
       discount: {
         active: f.discountActive,
         oldPrice: Number(f.oldPrice),
@@ -1185,6 +1188,19 @@ export function HotelFormDialog({
               </Button>
             </div>
           </Field>
+
+          {/* Available to owners too: closing for renovation or the off-season
+              is their call, not the platform's. */}
+          <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
+            <ToggleRow
+              label={t("admin_closed")}
+              checked={form.closed}
+              onChange={(v) => set("closed", v)}
+            />
+            <p className="mt-2 text-xs text-muted-foreground">
+              {t("admin_closed_hint")}
+            </p>
+          </div>
 
           {!restricted && (
             <>

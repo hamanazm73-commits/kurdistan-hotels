@@ -165,6 +165,11 @@ export interface Hotel {
   lng?: number;
   /** when true, the hotel is hidden from the public site (still shown in admin) */
   hidden?: boolean;
+  /** The owner has closed the hotel for now — renovation, off-season, full.
+      Unlike `hidden` it stays listed and reachable: booking is off, but the
+      phone and WhatsApp buttons still work, because a guest asking when it
+      reopens is exactly the conversation the owner wants. */
+  closed?: boolean;
   /** online-payment options; guests pay the hotel directly via these links */
   payments?: PaymentMethod[];
   /** this hotel's own IQD-per-USD rate for the $ view; when unset (or 0) the
