@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { alternatesFor, asLang } from "@/lib/hreflang";
+import { getPublicHotels } from "@/lib/hotels-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Hero } from "@/components/hero";
@@ -37,7 +38,30 @@ export async function generateMetadata({
   return { alternates: alternatesFor("/", asLang((await searchParams).lang)) };
 }
 
-export default function HomePage() {
+/**
+ * The hotels themselves, as structured data. The city pages already do this;
+ * the homepage is where most crawlers land first and it was only describing
+ * the FAQ, so Google had no idea it was looking at a hotel listing.
+ */
+async function hotelsJsonLd() {
+  const hotels = await getPublicHotels();
+  if (hotels.length === 0) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Hotels in Kurdistan",
+    numberOfItems: hotels.length,
+    itemListElement: hotels.slice(0, 30).map((h, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://hotelskurdistan.com/hotels/${h.id}`,
+      name: h.name,
+    })),
+  };
+}
+
+export default async function HomePage() {
+  const hotelsLd = await hotelsJsonLd();
   return (
     <>
       <script
@@ -46,6 +70,14 @@ export default function HomePage() {
           __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
         }}
       />
+      {hotelsLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(hotelsLd).replace(/</g, "\\u003c"),
+          }}
+        />
+      )}
       <SiteHeader />
       <main>
         <Hero />

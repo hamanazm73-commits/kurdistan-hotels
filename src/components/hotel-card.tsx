@@ -30,6 +30,7 @@ import { Card } from "@/components/ui/card";
 import { SparkleStar } from "./sparkle-star";
 import { CountUp } from "./count-up";
 import { useI18n } from "@/lib/i18n";
+import { recordContactClick } from "@/lib/contact-click";
 import {
   effectivePrice,
   pickLang,
@@ -282,7 +283,10 @@ export function HotelCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 title={t("view_on_map")}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  recordContactClick(hotel.id, "map");
+                }}
                 className="inline-flex items-center gap-1 transition-colors hover:text-primary hover:underline"
               >
                 <MapPin className="size-3.5" />
@@ -407,7 +411,10 @@ export function HotelCard({
                   title={t("call_cta")}
                   aria-label={t("call_cta")}
                   className="inline-flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow transition hover:opacity-90 active:scale-95"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    recordContactClick(hotel.id, "call");
+                  }}
                 >
                   <Phone className="size-4" />
                 </a>
@@ -422,7 +429,10 @@ export function HotelCard({
                   rel="noopener noreferrer"
                   title={t("whatsapp_cta")}
                   className="inline-flex size-9 items-center justify-center rounded-full bg-[#25D366] text-white shadow transition hover:bg-[#1ebe5d] active:scale-95"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    recordContactClick(hotel.id, "whatsapp");
+                  }}
                 >
                   <WhatsAppIcon className="size-4" />
                 </a>

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { HotelStats } from "./hotel-stats";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -322,6 +323,7 @@ export function HotelsPanel({ ownerHotelId }: { ownerHotelId?: string } = {}) {
                     </Badge>
                   )}
                 </div>
+                <HotelStats hotel={h} />
                 <div className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground">
                   <span>{tCity(h.city)} ·</span>
                   {isEditingPrice ? (

@@ -180,6 +180,11 @@ export interface Hotel {
   /** epoch ms of recent bookings, newest first, pruned to the last 7 days —
       lets a card say how many bookings, not just when the last one was */
   recentBookingsAt?: number[];
+  /** lifetime taps on WhatsApp / call / map, by kind */
+  contactClicks?: Partial<Record<"whatsapp" | "call" | "map", number>>;
+  /** epoch ms of those taps, pruned to the last 30 days, so the owner's panel
+      can report real recent activity rather than an ever-growing total */
+  contactClicksAt?: number[];
   /** how many approved guest reviews this hotel has. Denormalized by
       syncHotelReviewStats so the listing doesn't query reviews per card. */
   reviewCount?: number;

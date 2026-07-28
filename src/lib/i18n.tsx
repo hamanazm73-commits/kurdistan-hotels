@@ -392,6 +392,10 @@ const ckb: Dict = {
   whatsapp_cta: "پەیوەندی بە WhatsApp",
   whatsapp_msg: "سڵاو، دەمەوێت دەربارەی حیجز لە",
   wa_via: "لە ڕێگەی:",
+  stat_views: "بینین",
+  stat_contacts: "پەیوەندی (٣٠ ڕۆژ)",
+  stat_bookings: "حیجز (٧ ڕۆژ)",
+  stat_reviews: "هەڵسەنگاندن",
 
   loading: "چاوەڕێبە...",
 };
@@ -765,6 +769,10 @@ const en: Dict = {
   whatsapp_cta: "Chat on WhatsApp",
   whatsapp_msg: "Hello, I'd like to inquire about a booking at",
   wa_via: "Via:",
+  stat_views: "views",
+  stat_contacts: "contacts (30d)",
+  stat_bookings: "bookings (7d)",
+  stat_reviews: "reviews",
 
   loading: "Loading...",
 };
@@ -1138,6 +1146,10 @@ const ar: Dict = {
   whatsapp_cta: "تواصل واتساب",
   whatsapp_msg: "مرحبا، أريد الاستفسار عن حجز في",
   wa_via: "عبر:",
+  stat_views: "مشاهدة",
+  stat_contacts: "تواصل (30 يوم)",
+  stat_bookings: "حجز (7 أيام)",
+  stat_reviews: "تقييم",
 
   loading: "جاري التحميل...",
 };
@@ -1511,6 +1523,10 @@ const kmr: Dict = {
   whatsapp_cta: "WhatsApp-ê bike",
   whatsapp_msg: "Silav, ez dixwazim li ser rezervasyonê bipirsinim li",
   wa_via: "Bi rêya:",
+  stat_views: "dîtin",
+  stat_contacts: "pêwendî (30 roj)",
+  stat_bookings: "rezervasyon (7 roj)",
+  stat_reviews: "nirxandin",
 
   loading: "Bisekine...",
 };

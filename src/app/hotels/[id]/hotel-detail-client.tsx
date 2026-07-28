@@ -27,6 +27,7 @@ import { StarRating } from "@/components/star-rating";
 import { CountUp } from "@/components/count-up";
 import { ShareButton } from "@/components/share-button";
 import { recordView } from "@/lib/recently-viewed";
+import { recordContactClick } from "@/lib/contact-click";
 import { track } from "@/lib/analytics";
 import { useHotels } from "@/lib/use-hotels";
 import { useSiteConfig } from "@/lib/site-config";
@@ -262,6 +263,7 @@ export function HotelDetailClient({
                 target="_blank"
                 rel="noopener noreferrer"
                 title={t("view_on_map")}
+                onClick={() => recordContactClick(hotel.id, "map")}
                 className="flex items-center gap-1 transition-colors hover:text-primary hover:underline"
               >
                 <MapPin className="size-4" />
@@ -406,15 +408,20 @@ export function HotelDetailClient({
                     </p>
                   )}
                   {hotel.phone && (
-                    <p className="flex items-center gap-2">
+                    <a
+                      href={`tel:${hotel.phone}`}
+                      onClick={() => recordContactClick(hotel.id, "call")}
+                      className="flex items-center gap-2 font-medium text-primary hover:underline"
+                    >
                       <Phone className="size-4" />
                       <span dir="ltr">{hotel.phone}</span>
-                    </p>
+                    </a>
                   )}
                   <a
                     href={mapsUrl(hotel)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => recordContactClick(hotel.id, "map")}
                     className="inline-flex items-center gap-2 font-medium text-primary hover:underline"
                   >
                     <MapPin className="size-4" />
@@ -459,6 +466,7 @@ export function HotelDetailClient({
                     })}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => recordContactClick(hotel.id, "whatsapp")}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-[#1ebe5d] active:scale-95"
                   >
                     <WhatsAppIcon className="size-4" />
