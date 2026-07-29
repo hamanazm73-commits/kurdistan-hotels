@@ -317,32 +317,39 @@ export function BookingDialog({
               <Label>{t("book_child_ages")}</Label>
               <div className="flex flex-wrap gap-2">
                 {childAges.map((age, i) => (
-                  <label
-                    key={i}
-                    className="flex items-center gap-1.5 rounded-lg border bg-muted/40 px-2.5 py-1.5"
-                  >
+                  <div key={i} className="flex items-center gap-1.5">
                     <span className="text-xs text-muted-foreground">
                       {i + 1}.
                     </span>
-                    <select
-                      value={age}
-                      onChange={(e) =>
+                    <Select
+                      value={String(age)}
+                      onValueChange={(v) =>
                         setChildAges((prev) =>
-                          prev.map((a, j) =>
-                            j === i ? Number(e.target.value) : a,
-                          ),
+                          prev.map((a, j) => (j === i ? Number(v ?? -1) : a)),
                         )
                       }
-                      className="bg-transparent text-sm font-semibold outline-none"
                     >
-                      <option value={-1}>{t("book_child_age_ph")}</option>
-                      {Array.from({ length: 18 }, (_, n) => (
-                        <option key={n} value={n}>
-                          {n === 0 ? t("book_child_under1") : n}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                      <SelectTrigger className="h-9 w-28">
+                        <SelectValue>
+                          {(v: string | null) => {
+                            const n = Number(v ?? -1);
+                            if (n < 0) return t("book_child_age_ph");
+                            return n === 0 ? t("book_child_under1") : String(n);
+                          }}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent className="max-h-64">
+                        <SelectItem value="-1">
+                          {t("book_child_age_ph")}
+                        </SelectItem>
+                        {Array.from({ length: 18 }, (_, n) => (
+                          <SelectItem key={n} value={String(n)}>
+                            {n === 0 ? t("book_child_under1") : n}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 ))}
               </div>
             </div>
