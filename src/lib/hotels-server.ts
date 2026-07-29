@@ -42,6 +42,27 @@ export const getApprovedReviews = cache(
   },
 );
 
+/**
+ * Strip a hotel down to what a card shows before handing it to the client.
+ *
+ * Some covers are still stored as base64 data URIs — 607 KB across 13 hotels —
+ * and serialising those into the page turned a 102 KB document into 1.4 MB.
+ * A base64 cover is dropped here and arrives from the live read a moment
+ * later; a hosted URL is cheap, so that one stays.
+ */
+export function trimForList(h: Hotel): Hotel {
+  const cover = typeof h.image === "string" ? h.image : "";
+  const inlineCover = cover.startsWith("data:");
+  return {
+    ...h,
+    image: inlineCover ? "" : cover,
+    // the gallery and per-season prices belong to the detail page
+    images: [],
+    seasons: [],
+    video: "",
+  } as Hotel;
+}
+
 export interface FeaturedReview extends ApprovedReview {
   hotelId: string;
 }

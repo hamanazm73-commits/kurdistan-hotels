@@ -3,6 +3,7 @@ import { alternatesFor, asLang } from "@/lib/hreflang";
 import {
   getPublicHotels,
   getRecentApprovedReviews,
+  trimForList,
 } from "@/lib/hotels-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -93,7 +94,7 @@ export default async function HomePage() {
         {/* the server already read these for the JSON-LD; handing them to the
             list means hotels are in the HTML instead of appearing only after
             the bundle boots and Firestore answers */}
-        <HotelsSection initialHotels={hotels} />
+        <HotelsSection initialHotels={hotels.map(trimForList)} />
         <BrowseByCity />
         <TrustSection />
         <ReviewsStrip reviews={reviews} hotels={hotels} />
