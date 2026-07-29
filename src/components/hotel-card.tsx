@@ -185,7 +185,7 @@ export function HotelCard({
               sizes={CARD_SIZES}
               unoptimized={isRawSrc(cover)}
               className={cn(
-                "object-cover transition-transform duration-500 group-hover:scale-105",
+                "img-fade object-cover transition-transform duration-500 group-hover:scale-105",
                 // a closed hotel reads as resting rather than removed
                 hotel.closed && "grayscale-[35%] brightness-75",
               )}

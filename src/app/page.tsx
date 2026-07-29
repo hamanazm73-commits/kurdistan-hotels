@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { alternatesFor, asLang } from "@/lib/hreflang";
-import { getPublicHotels } from "@/lib/hotels-server";
+import {
+  getPublicHotels,
+  getRecentApprovedReviews,
+} from "@/lib/hotels-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Hero } from "@/components/hero";
@@ -10,6 +13,7 @@ import { BrowseByCity } from "@/components/browse-by-city";
 import { TrustSection } from "@/components/trust-section";
 import { OwnerCta } from "@/components/owner-cta";
 import { FaqSection } from "@/components/faq-section";
+import { ReviewsStrip } from "@/components/reviews-strip";
 import { SeoAbout } from "@/components/seo-about";
 import { FAQ_ITEMS } from "@/lib/site-content";
 
@@ -61,7 +65,11 @@ async function hotelsJsonLd() {
 }
 
 export default async function HomePage() {
-  const hotelsLd = await hotelsJsonLd();
+  const [hotelsLd, reviews, hotels] = await Promise.all([
+    hotelsJsonLd(),
+    getRecentApprovedReviews(6),
+    getPublicHotels(),
+  ]);
   return (
     <>
       <script
@@ -85,6 +93,8 @@ export default async function HomePage() {
         <HotelsSection />
         <BrowseByCity />
         <TrustSection />
+        <ReviewsStrip reviews={reviews} hotels={hotels} />
+        <hr className="section-seam mx-auto max-w-5xl" />
         <OwnerCta />
         <FaqSection />
         <SeoAbout />

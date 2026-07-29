@@ -392,3 +392,64 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   margin-inline-start: 0;
   padding: 0;
 }
+
+/* Reading-progress bar. A scroll-driven animation runs on the compositor, so
+   this needs no scroll listener and costs nothing per frame. Browsers without
+   animation-timeline leave it at scaleX(0) — invisible rather than broken. */
+@keyframes scroll-progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.scroll-progress {
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: scroll-progress-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+}
+/* RTL reads the other way, so the bar should grow from the right edge */
+[dir="rtl"] .scroll-progress {
+  transform-origin: 100% 50%;
+}
+
+/* Photos fade in once decoded instead of snapping in line by line. */
+@keyframes img-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.img-fade {
+  animation: img-fade-in 0.4s ease-out both;
+}
+
+/* A hairline gold divider for the seam between sections. */
+.section-seam {
+  height: 1px;
+  border: 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklch, var(--gold) 45%, transparent),
+    transparent
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress,
+  .img-fade {
+    animation: none;
+  }
+  .scroll-progress {
+    transform: scaleX(0);
+  }
+}

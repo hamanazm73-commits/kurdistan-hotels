@@ -42,6 +42,45 @@ export const getApprovedReviews = cache(
   },
 );
 
+export interface FeaturedReview extends ApprovedReview {
+  hotelId: string;
+}
+
+/**
+ * The newest approved reviews across every hotel, for the homepage strip.
+ * Read on the server so the words are in the HTML — nothing extra for the
+ * visitor to download, and search engines see the praise too.
+ */
+export const getRecentApprovedReviews = cache(
+  async (limit = 6): Promise<FeaturedReview[]> => {
+    const db = getAdminDb();
+    if (!db) return [];
+    try {
+      const snap = await db
+        .collection("reviews")
+        .where("status", "==", "approved")
+        .get();
+      return snap.docs
+        .map((d) => {
+          const r = d.data();
+          return {
+            hotelId: String(r.hotelId ?? ""),
+            name: String(r.name ?? ""),
+            rating: Number(r.rating ?? 0),
+            comment: String(r.comment ?? ""),
+            createdAt: Number(r.createdAt ?? 0),
+          };
+        })
+        // a short, glowing review carries the strip better than a long gripe
+        .filter((r) => r.rating >= 4 && r.comment.length >= 10)
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, limit);
+    } catch {
+      return [];
+    }
+  },
+);
+
 /**
  * Fetch a single hotel by id on the server (for per-page SEO metadata,
  * structured data, and a server-rendered first paint on the detail page).

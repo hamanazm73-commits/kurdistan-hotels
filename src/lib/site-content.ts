@@ -433,3 +433,19 @@ export const ORIGIN_OTHER_LABEL: L = {
   ar: "مدينة أخرى",
   kmr: "Bajarekî din",
 };
+
+/* ---------------- Homepage "what guests said" strip ---------------- */
+
+export const REVIEWS_STRIP_EYEBROW: L = {
+  ckb: "قسەی میوانەکان",
+  en: "Guest reviews",
+  ar: "آراء الضيوف",
+  kmr: "Gotinên mêvanan",
+};
+
+export const REVIEWS_STRIP_HEADING: L = {
+  ckb: "میوانەکان چی دەڵێن؟",
+  en: "What guests say",
+  ar: "ماذا يقول الضيوف؟",
+  kmr: "Mêvan çi dibêjin?",
+};
