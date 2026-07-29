@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n";
 import { useHotels } from "@/lib/use-hotels";
 import { watchBookings, updateBookingStatus } from "@/lib/hotels-db";
-import { formatPrice, roomTypeLabel, type Booking, type BookingStatus } from "@/lib/types";
+import { formatPrice, roomTypeLabel, partyLine, partyTotal, type Booking, type BookingStatus } from "@/lib/types";
 
 type Range = "week" | "month" | "all";
 const DAY_MS = 86_400_000;
@@ -205,6 +205,14 @@ function buildDecisionWhatsApp(
 
 export function BookingsPanel({ hotelId }: { hotelId?: string }) {
   const { t, tCity, lang } = useI18n();
+  // labels for the shared party formatter, so every surface reads the same
+  const partyLabels = {
+    males: t("book_males"),
+    females: t("book_females"),
+    children: t("book_children"),
+    male: t("book_male"),
+    female: t("book_female"),
+  };
   const { hotels } = useHotels();
   const [rows, setRows] = useState<(Booking & { id: string })[]>([]);
   const [loading, setLoading] = useState(true);
@@ -517,43 +525,6 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
               </span>
               <span className="text-muted-foreground">{t("book_nights")}</span>
               <span className="font-medium">{b.nights} {t("per_night").replace("/", "").trim()}</span>
-              {!!b.guests && (
-                <>
-                  <span className="text-muted-foreground">{t("book_guests")}</span>
-                  <span className="font-medium">{b.guests}</span>
-                </>
-              )}
-              {!!b.children && (
-                <>
-                  <span className="text-muted-foreground">{t("book_children")}</span>
-                  <span className="font-medium">
-                    {b.children}
-                    {b.childAges?.length ? ` (${b.childAges.join(", ")})` : ""}
-                  </span>
-                </>
-              )}
-              {(!!b.males || !!b.females) && (
-                <>
-                  <span className="text-muted-foreground">{t("book_gender")}</span>
-                  <span className="font-medium">
-                    {[
-                      b.males ? `${t("book_males")} ${b.males}` : "",
-                      b.females ? `${t("book_females")} ${b.females}` : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </span>
-                </>
-              )}
-              {/* bookings made before the split stored one gender for everyone */}
-              {!b.males && !b.females && b.gender && (
-                <>
-                  <span className="text-muted-foreground">{t("book_gender")}</span>
-                  <span className="font-medium">
-                    {t(b.gender === "male" ? "book_male" : "book_female")}
-                  </span>
-                </>
-              )}
               {b.fromCity && (
                 <>
                   <span className="text-muted-foreground">{t("book_from_city")}</span>
@@ -561,6 +532,37 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                 </>
               )}
             </div>
+
+            {/* who's staying — its own block, so the owner reads the party at
+                a glance instead of hunting through the grid */}
+            {partyLine(b, partyLabels) && (
+              <div className="mt-3 rounded-lg border bg-muted/40 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                    <Users className="size-3.5" />
+                    {t("book_party")}
+                  </span>
+                  <span className="text-xs font-bold text-gold">
+                    {t("book_party_total", { n: partyTotal(b) })}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm font-medium">
+                  {partyLine(b, partyLabels)}
+                </p>
+                {!!b.childAges?.length && (
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t("book_child_ages")}:{" "}
+                    {b.childAges
+                      .map((a) =>
+                        a === 0
+                          ? t("book_child_under1")
+                          : t("book_years", { n: a }),
+                      )
+                      .join("، ")}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* phone + whatsapp */}
             <div className="mt-3 flex items-center gap-2 border-t pt-3">
@@ -624,41 +626,24 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                 <TableCell>
                   {b.name}
                   {/* who's staying, kept under the name so the table stays narrow */}
-                  {(!!b.guests || !!b.children || b.gender || b.fromCity) && (
+                  {(!!partyLine(b, partyLabels) || b.fromCity) && (
                     <span className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs font-normal text-muted-foreground">
-                      {!!b.guests && (
+                      {!!partyLine(b, partyLabels) && (
                         <span className="inline-flex items-center gap-1">
                           <Users className="size-3 shrink-0" />
-                          {b.guests}
-                          {(!!b.males || !!b.females) && (
-                            <span className="opacity-80">
-                              {" "}
-                              (
-                              {[
-                                b.males ? `${t("book_males")} ${b.males}` : "",
-                                b.females
-                                  ? `${t("book_females")} ${b.females}`
-                                  : "",
-                              ]
-                                .filter(Boolean)
-                                .join(" · ")}
-                              )
-                            </span>
-                          )}
+                          {partyLine(b, partyLabels)}
                         </span>
                       )}
-                      {!!b.children && (
+                      {!!b.childAges?.length && (
                         <span className="inline-flex items-center gap-1">
                           <Baby className="size-3 shrink-0" />
-                          {b.children}
-                          {b.childAges?.length
-                            ? ` (${b.childAges.join(", ")})`
-                            : ""}
-                        </span>
-                      )}
-                      {!b.males && !b.females && b.gender && (
-                        <span>
-                          {t(b.gender === "male" ? "book_male" : "book_female")}
+                          {b.childAges
+                            .map((a) =>
+                              a === 0
+                                ? t("book_child_under1")
+                                : t("book_years", { n: a }),
+                            )
+                            .join("، ")}
                         </span>
                       )}
                       {b.fromCity && (

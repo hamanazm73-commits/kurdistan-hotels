@@ -1,6 +1,15 @@
 import "server-only";
 import nodemailer from "nodemailer";
-import type { Booking, Feedback } from "./types";
+import { partyLine, partyTotal, type Booking, type Feedback } from "./types";
+
+/** Notifications are bilingual — the owner may read either script. */
+const NOTIFY_PARTY_LABELS = {
+  males: "پیاو/M",
+  females: "ژن/F",
+  children: "منداڵ/C",
+  male: "پیاو / Male",
+  female: "ژن / Female",
+};
 
 /**
  * Best-effort booking notification to Telegram. No-op when the env vars
@@ -25,22 +34,15 @@ export async function notifyBooking(b: Booking) {
     `<b>ژوور / Room:</b> ${esc(b.roomType)}\n` +
     `<b>بەروار / Check-in:</b> ${esc(b.checkIn)}\n` +
     `<b>شەو / Nights:</b> ${esc(b.nights)}` +
-    (b.guests
-      ? `\n<b>گەورەسالان / Adults:</b> ${esc(b.guests)}${
-          b.males || b.females
-            ? ` (${[
-                b.males ? `پیاو/M ${b.males}` : "",
-                b.females ? `ژن/F ${b.females}` : "",
-              ]
-                .filter(Boolean)
-                .join(" · ")})`
-            : ""
-        }`
+    (partyLine(b, NOTIFY_PARTY_LABELS)
+      ? `\n<b>کێ دەمێنێتەوە / Party:</b> ${esc(
+          partyLine(b, NOTIFY_PARTY_LABELS),
+        )} — ${esc(partyTotal(b))} کەس`
       : "") +
-    (b.children
-      ? `\n<b>منداڵ / Children:</b> ${esc(b.children)}${
-          b.childAges?.length ? ` (${esc(b.childAges.join(", "))})` : ""
-        }`
+    (b.childAges?.length
+      ? `\n<b>تەمەنی منداڵ / Child ages:</b> ${esc(
+          b.childAges.map((a) => (a === 0 ? "<1" : a)).join("، "),
+        )}`
       : "") +
     (b.gender
       ? `\n<b>ڕەگەز / Gender:</b> ${b.gender === "male" ? "نێر / Male" : "مێ / Female"}`
@@ -143,27 +145,18 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
           ${row("بەروار / Check-in", b.checkIn)}
           ${row("شەو / Nights", b.nights)}
           ${
-            b.guests
+            partyLine(b, NOTIFY_PARTY_LABELS)
               ? row(
-                  "گەورەسالان / Adults",
-                  `${b.guests}${
-                    b.males || b.females
-                      ? ` (${[
-                          b.males ? `پیاو/M ${b.males}` : "",
-                          b.females ? `ژن/F ${b.females}` : "",
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")})`
-                      : ""
-                  }`,
+                  "کێ دەمێنێتەوە / Party",
+                  `${partyLine(b, NOTIFY_PARTY_LABELS)} — ${partyTotal(b)} کەس`,
                 )
               : ""
           }
           ${
-            b.children
+            b.childAges?.length
               ? row(
-                  "منداڵ / Children",
-                  `${b.children}${b.childAges?.length ? ` (${b.childAges.join(", ")})` : ""}`,
+                  "تەمەنی منداڵ / Child ages",
+                  b.childAges.map((a) => (a === 0 ? "<1" : a)).join("، "),
                 )
               : ""
           }

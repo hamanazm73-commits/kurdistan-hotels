@@ -275,6 +275,39 @@ export interface Booking {
   createdAt?: number;
 }
 
+/** Everyone staying, including children. */
+export function partyTotal(
+  b: Pick<Booking, "guests" | "males" | "females" | "children">,
+): number {
+  const adults = b.guests ?? (b.males ?? 0) + (b.females ?? 0);
+  return adults + (b.children ?? 0);
+}
+
+/**
+ * The party on one line — "Men 1 · Women 1 · Children 2". Shared by the
+ * dashboard and the notifications so the owner reads the same thing
+ * everywhere. Falls back to the single gender older bookings stored.
+ */
+export function partyLine(
+  b: Pick<Booking, "males" | "females" | "children" | "gender">,
+  L: {
+    males: string;
+    females: string;
+    children: string;
+    male: string;
+    female: string;
+  },
+): string {
+  const parts: string[] = [];
+  if (b.males) parts.push(`${L.males} ${b.males}`);
+  if (b.females) parts.push(`${L.females} ${b.females}`);
+  if (!b.males && !b.females && b.gender) {
+    parts.push(b.gender === "male" ? L.male : L.female);
+  }
+  if (b.children) parts.push(`${L.children} ${b.children}`);
+  return parts.join(" · ");
+}
+
 export type ReviewStatus = "pending" | "approved" | "rejected";
 
 /** A guest's rating + comment on a hotel. New reviews are "pending" until an

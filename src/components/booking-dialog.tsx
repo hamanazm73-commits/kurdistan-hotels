@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Sparkles, Minus, Plus } from "lucide-react";
+import { Sparkles, Minus, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -279,81 +279,103 @@ export function BookingDialog({
             />
           </div>
 
-          {/* who's staying — taps only, no typing */}
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-3">
-            <Stepper
-              label={t("book_males")}
-              value={males}
-              min={0}
-              max={20}
-              onChange={setMales}
-            />
-            <Stepper
-              label={t("book_females")}
-              value={females}
-              min={0}
-              max={20}
-              onChange={setFemales}
-            />
-            <Stepper
-              label={t("book_children")}
-              value={childAges.length}
-              min={0}
-              max={10}
-              onChange={(n) =>
-                // keep the ages already picked; new children start unset
-                setChildAges((prev) =>
-                  n < prev.length
-                    ? prev.slice(0, n)
-                    : [...prev, ...Array(n - prev.length).fill(-1)],
-                )
-              }
-            />
-          </div>
-
-          {/* a child's age decides their price and bed, so ask per child */}
-          {childAges.length > 0 && (
-            <div className="grid gap-2">
-              <Label>{t("book_child_ages")}</Label>
-              <div className="flex flex-wrap gap-2">
-                {childAges.map((age, i) => (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground">
-                      {i + 1}.
-                    </span>
-                    <Select
-                      value={String(age)}
-                      onValueChange={(v) =>
-                        setChildAges((prev) =>
-                          prev.map((a, j) => (j === i ? Number(v ?? -1) : a)),
-                        )
-                      }
-                    >
-                      <SelectTrigger className="h-9 w-28">
-                        <SelectValue>
-                          {(v: string | null) => {
-                            const n = Number(v ?? -1);
-                            if (n < 0) return t("book_child_age_ph");
-                            return n === 0 ? t("book_child_under1") : String(n);
-                          }}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent className="max-h-64">
-                        <SelectItem value="-1">
-                          {t("book_child_age_ph")}
-                        </SelectItem>
-                        {Array.from({ length: 18 }, (_, n) => (
-                          <SelectItem key={n} value={String(n)}>
-                            {n === 0 ? t("book_child_under1") : n}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
-              </div>
+          {/* who's staying — one panel, taps only, with a running total so the
+              guest can see at a glance that the party adds up */}
+          <div className="rounded-xl border bg-muted/30 p-4">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <span className="flex items-center gap-1.5 text-sm font-semibold">
+                <Users className="size-4 text-gold" />
+                {t("book_party")}
+              </span>
+              <span className="rounded-full bg-gold/15 px-2.5 py-0.5 text-sm font-bold text-gold">
+                {t("book_party_total", { n: guests + childAges.length })}
+              </span>
             </div>
-          )}
+
+            <div className="grid gap-4 sm:grid-cols-3 sm:gap-3">
+              <Stepper
+                label={t("book_males")}
+                value={males}
+                min={0}
+                max={20}
+                onChange={setMales}
+              />
+              <Stepper
+                label={t("book_females")}
+                value={females}
+                min={0}
+                max={20}
+                onChange={setFemales}
+              />
+              <Stepper
+                label={t("book_children")}
+                value={childAges.length}
+                min={0}
+                max={10}
+                onChange={(n) =>
+                  // keep the ages already picked; new children start unset
+                  setChildAges((prev) =>
+                    n < prev.length
+                      ? prev.slice(0, n)
+                      : [...prev, ...Array(n - prev.length).fill(-1)],
+                  )
+                }
+              />
+            </div>
+
+            {/* a child's age decides their price and bed, so ask per child */}
+            {childAges.length > 0 && (
+              <div className="mt-4 border-t pt-3">
+                <Label className="text-xs text-muted-foreground">
+                  {t("book_child_ages")}
+                </Label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {childAges.map((age, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-1.5 rounded-lg border bg-background px-2 py-1"
+                    >
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {t("book_child_n", { n: i + 1 })}
+                      </span>
+                      <Select
+                        value={String(age)}
+                        onValueChange={(v) =>
+                          setChildAges((prev) =>
+                            prev.map((a, j) => (j === i ? Number(v ?? -1) : a)),
+                          )
+                        }
+                      >
+                        <SelectTrigger className="h-8 w-24 border-0 bg-transparent px-1 shadow-none">
+                          <SelectValue>
+                            {(v: string | null) => {
+                              const n = Number(v ?? -1);
+                              if (n < 0) return t("book_child_age_ph");
+                              return n === 0
+                                ? t("book_child_under1")
+                                : t("book_years", { n });
+                            }}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="max-h-64">
+                          <SelectItem value="-1">
+                            {t("book_child_age_ph")}
+                          </SelectItem>
+                          {Array.from({ length: 18 }, (_, n) => (
+                            <SelectItem key={n} value={String(n)}>
+                              {n === 0
+                                ? t("book_child_under1")
+                                : t("book_years", { n })}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* where they're travelling from */}
           <div className="grid gap-2">
