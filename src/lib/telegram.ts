@@ -1,6 +1,55 @@
 import "server-only";
+import { createHash } from "crypto";
 
 const API = "https://api.telegram.org";
+
+/** Public origin of this deployment, for registering the webhook URL. */
+function siteOrigin(): string {
+  const explicit =
+    process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || "";
+  if (explicit) return explicit.replace(/\/+$/, "");
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  return "https://hotelskurdistan.com";
+}
+
+/**
+ * The secret Telegram echoes back on every update. Derived from the bot token
+ * when none is configured, so button presses work with no extra setup — and
+ * it stays secret, because only someone with the token could compute it.
+ */
+export function webhookSecret(): string {
+  const explicit = process.env.TELEGRAM_WEBHOOK_SECRET;
+  if (explicit) return explicit;
+  const token = process.env.TELEGRAM_BOT_TOKEN || "";
+  if (!token) return "";
+  return createHash("sha256").update(`tg-webhook:${token}`).digest("hex").slice(0, 48);
+}
+
+// Registering is idempotent but pointless to repeat, so do it once per instance.
+let webhookChecked = false;
+
+/**
+ * Make sure Telegram knows where to deliver button presses. Without this the
+ * approve/reject buttons render but do nothing, since Telegram has nowhere to
+ * send the callback. Best-effort: never throws, never blocks the caller.
+ */
+export async function ensureWebhook(): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const secret = webhookSecret();
+  if (!token || !secret || webhookChecked) return;
+  webhookChecked = true;
+  const want = `${siteOrigin()}/api/telegram/webhook`;
+  try {
+    const info = await (
+      await fetch(`${API}/bot${token}/getWebhookInfo`)
+    ).json();
+    if (info?.result?.url === want) return;
+    await tgSetWebhook(want, secret);
+  } catch {
+    webhookChecked = false; // let a later call retry
+  }
+}
 
 /** Telegram notifications are on only when a bot token is configured. */
 export function telegramEnabled(): boolean {
@@ -50,6 +99,8 @@ export async function notifyNewReview(input: {
 }): Promise<void> {
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!chatId) return;
+  // the message carries buttons, so make sure presses have somewhere to land
+  await ensureWebhook();
   const stars = "⭐".repeat(Math.max(1, Math.min(5, Math.round(input.rating))));
   const text =
     `🆕 <b>هەڵسەنگاندنی نوێ</b>\n` +

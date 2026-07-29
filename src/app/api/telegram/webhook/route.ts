@@ -6,6 +6,7 @@ import {
   tgEditText,
   tgSend,
   tgSetWebhook,
+  webhookSecret,
 } from "@/lib/telegram";
 
 export const runtime = "nodejs";
@@ -34,7 +35,7 @@ interface TgUpdate {
  */
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  const secret = webhookSecret();
   if (!secret || url.searchParams.get("setup") !== secret) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
@@ -46,7 +47,7 @@ export async function GET(req: Request) {
 /** Telegram calls this on every message / button press. */
 export async function POST(req: Request) {
   // Reject spoofed calls: Telegram echoes our secret in this header.
-  const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
+  const secret = webhookSecret();
   if (secret) {
     const got = req.headers.get("x-telegram-bot-api-secret-token");
     if (got !== secret) return NextResponse.json({ ok: true });
@@ -75,8 +76,14 @@ export async function POST(req: Request) {
   // Approve / reject button press.
   const cq = update.callback_query;
   if (cq) {
-    // Only the configured owner may moderate.
-    if (!ownerChatId || String(cq.from?.id) !== String(ownerChatId)) {
+    // Only the configured owner may moderate. The press counts when it comes
+    // from the owner themselves, or from inside the chat we notify — in a
+    // group that chat id is the group's, never the presser's user id.
+    const allowed =
+      !!ownerChatId &&
+      (String(cq.from?.id) === String(ownerChatId) ||
+        String(cq.message?.chat?.id) === String(ownerChatId));
+    if (!allowed) {
       await tgAnswerCallback(cq.id, "⛔");
       return NextResponse.json({ ok: true });
     }
