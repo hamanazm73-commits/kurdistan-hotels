@@ -21,15 +21,15 @@ export async function GET(req: Request) {
   const near = (url.searchParams.get("near") || "").trim();
   if (q.length < 3) return NextResponse.json({ results: [] });
 
-  const query = [q, near, "Kurdistan, Iraq"].filter(Boolean).join(", ");
-  const api = new URL("https://nominatim.openstreetmap.org/search");
-  api.searchParams.set("q", query);
-  api.searchParams.set("format", "jsonv2");
-  api.searchParams.set("limit", "5");
-  api.searchParams.set("countrycodes", "iq");
-  api.searchParams.set("addressdetails", "0");
-
-  try {
+  /** One Nominatim lookup. `countrycodes` already pins us to Iraq, so the
+      query itself carries no country text. */
+  async function search(query: string) {
+    const api = new URL("https://nominatim.openstreetmap.org/search");
+    api.searchParams.set("q", query);
+    api.searchParams.set("format", "jsonv2");
+    api.searchParams.set("limit", "5");
+    api.searchParams.set("countrycodes", "iq");
+    api.searchParams.set("addressdetails", "0");
     const res = await fetch(api, {
       headers: {
         "User-Agent": "KurdistanHotels/1.0 (https://hotelskurdistan.com)",
@@ -38,20 +38,31 @@ export async function GET(req: Request) {
       // the same address resolves to the same place; let the CDN keep it a day
       next: { revalidate: 86_400 },
     });
-    if (!res.ok) return NextResponse.json({ results: [] });
+    if (!res.ok) return [];
     const raw = (await res.json()) as {
       lat: string;
       lon: string;
       display_name: string;
     }[];
-    const results = raw
+    return raw
       .map((r) => ({
         lat: Number(r.lat),
         lng: Number(r.lon),
         label: String(r.display_name ?? ""),
       }))
       .filter((r) => Number.isFinite(r.lat) && Number.isFinite(r.lng));
-    return NextResponse.json({ results });
+  }
+
+  // Narrow first, then widen: an address plus its city is the most precise,
+  // but piling on context makes a loose address ("city centre") match nothing,
+  // so fall back to the plain address rather than giving up.
+  const attempts = near ? [`${q}, ${near}`, q, near] : [q];
+  try {
+    for (const attempt of attempts) {
+      const results = await search(attempt);
+      if (results.length) return NextResponse.json({ results });
+    }
+    return NextResponse.json({ results: [] });
   } catch {
     return NextResponse.json({ results: [] });
   }
