@@ -22,6 +22,7 @@ import {
   sameRoomType,
   roomTypeId,
   roomTypeLabel,
+  type Hotel,
 } from "@/lib/types";
 import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
@@ -40,10 +41,15 @@ const SORT_LABEL: Record<Sort, string> = {
   views: "sort_views",
 };
 
-export function HotelsSection() {
+export function HotelsSection({
+  initialHotels,
+}: {
+  /** server-rendered hotels, so the list is filled on the first paint */
+  initialHotels?: Hotel[];
+}) {
   const { t, tCity, lang } = useI18n();
   const { format } = useCurrency();
-  const { hotels, loading } = useHotels();
+  const { hotels, loading } = useHotels(initialHotels);
   const { hidePrices } = useSiteConfig();
 
   const [search, setSearch] = useState("");

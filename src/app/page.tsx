@@ -90,7 +90,10 @@ export default async function HomePage() {
       <main>
         <Hero />
         <RecentlyViewedRow />
-        <HotelsSection />
+        {/* the server already read these for the JSON-LD; handing them to the
+            list means hotels are in the HTML instead of appearing only after
+            the bundle boots and Firestore answers */}
+        <HotelsSection initialHotels={hotels} />
         <BrowseByCity />
         <TrustSection />
         <ReviewsStrip reviews={reviews} hotels={hotels} />
