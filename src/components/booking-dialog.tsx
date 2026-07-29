@@ -292,7 +292,9 @@ export function BookingDialog({
               </span>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3 sm:gap-3">
+            {/* stacked on a phone — three of these side by side would squeeze
+                below the width the +/- controls need */}
+            <div className="grid gap-3 sm:grid-cols-3">
               <Stepper
                 label={t("book_males")}
                 value={males}
@@ -532,15 +534,17 @@ function Stepper({
   onChange: (n: number) => void;
 }) {
   return (
-    <div className="grid min-w-0 gap-2">
-      <Label>{label}</Label>
-      <div className="flex items-center gap-2">
+    <div className="grid min-w-0 gap-1.5">
+      <Label className="text-xs text-muted-foreground">{label}</Label>
+      {/* the controls sit inside their own box: without it, this stepper's +
+          lands beside the next one's − and the two groups read as one */}
+      <div className="flex items-center justify-between gap-1 rounded-lg border bg-background p-1">
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="size-10 shrink-0 rounded-full"
-          aria-label="-"
+          className="size-8 shrink-0 rounded-md"
+          aria-label={`${label} -`}
           onClick={() => onChange(Math.max(min, value - 1))}
           disabled={value <= min}
         >
@@ -548,16 +552,16 @@ function Stepper({
         </Button>
         <span
           aria-live="polite"
-          className="min-w-10 flex-1 text-center text-lg font-bold tabular-nums"
+          className="min-w-6 text-center text-base font-bold tabular-nums"
         >
           {value}
         </span>
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           size="icon"
-          className="size-10 shrink-0 rounded-full"
-          aria-label="+"
+          className="size-8 shrink-0 rounded-md"
+          aria-label={`${label} +`}
           onClick={() => onChange(Math.min(max, value + 1))}
           disabled={value >= max}
         >
