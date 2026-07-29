@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CalendarDays, BedDouble, Trash2, Inbox } from "lucide-react";
+import { CalendarDays, BedDouble, Trash2, Inbox, Star } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Card } from "@/components/ui/card";
@@ -17,6 +17,15 @@ import {
 } from "@/lib/my-bookings";
 import { mediaSrc, paymentLabel, paymentColor, roomTypeLabel } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+/** Whether the stay has finished, so it makes sense to ask how it went.
+    Kept out of render, like the other date helpers, since it reads the clock. */
+function stayIsOver(checkIn: string, nights: number): boolean {
+  if (!checkIn) return false;
+  const out = new Date(`${checkIn}T00:00:00`);
+  out.setDate(out.getDate() + Math.max(1, nights));
+  return Date.now() > out.getTime();
+}
 
 /** How each live booking status looks on the guest's "My bookings" page. */
 const STATUS_META: Record<string, { key: string; cls: string }> = {
@@ -169,6 +178,24 @@ export default function MyBookingsPage() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Once the stay is over, ask. Nothing ever asked before, and
+                      a review system nobody is invited to stays empty — which
+                      is why the site had one review across every hotel. */}
+                  {stayIsOver(b.checkIn, b.nights) && (
+                    <Link
+                      href={`/hotels/${b.hotelId}#reviews`}
+                      className="flex items-center justify-between gap-2 border-t bg-gold/10 p-3 transition hover:bg-gold/20"
+                    >
+                      <span className="flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-400">
+                        <Star className="size-4" />
+                        {t("rv_ask_title")}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {t("rv_ask_cta")}
+                      </span>
+                    </Link>
+                  )}
 
                   {hotel?.payments && hotel.payments.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2 border-t bg-muted/30 p-3">

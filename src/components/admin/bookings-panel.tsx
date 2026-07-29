@@ -2,7 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, Inbox, Phone, CalendarDays, BedDouble, MapPin, Building2, X, Check, Ban, UserX, Users, Baby } from "lucide-react";
+import {
+  Loader2,
+  Inbox,
+  Phone,
+  CalendarDays,
+  BedDouble,
+  MapPin,
+  Building2,
+  X,
+  Check,
+  Ban,
+  UserX,
+  Users,
+  Baby,
+  Star,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -178,6 +193,32 @@ function waNumber(phone: string): string {
 function buildWhatsApp(phone: string, customerName: string): string {
   const msg = encodeURIComponent(`سڵاو ${customerName}، دەربارەی حیجزەکەت پەیوەندیت پێوەکرا.`);
   return `https://wa.me/${waNumber(phone)}?text=${msg}`;
+}
+
+/** Whether the stay has finished, so asking for a review makes sense. */
+function stayIsOver(checkIn: string, nights: number): boolean {
+  if (!checkIn) return false;
+  const out = new Date(`${checkIn}T00:00:00`);
+  out.setDate(out.getDate() + Math.max(1, nights));
+  return Date.now() > out.getTime();
+}
+
+/**
+ * A WhatsApp message asking a departed guest to leave a review, with a link
+ * straight to the hotel's review section.
+ *
+ * The review system was complete — guest form, moderation, counts on the cards
+ * — and had one review across the whole site, because nothing ever asked.
+ */
+function buildReviewRequestWhatsApp(
+  b: Booking,
+  t: (k: string, v?: Record<string, string | number>) => string,
+): string {
+  const link = b.hotelId
+    ? `https://hotelskurdistan.com/hotels/${b.hotelId}#reviews`
+    : "https://hotelskurdistan.com";
+  const text = [t("bk_review_wa", { name: b.name }), "", link].join("\n");
+  return `https://wa.me/${waNumber(b.phone)}?text=${encodeURIComponent(text)}`;
 }
 
 /**
@@ -585,6 +626,21 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
               </a>
             </div>
 
+            {/* Once they've checked out, one tap asks for a review. Most
+                guests never come back to the site on their own, which is why
+                the review system sat empty. */}
+            {b.phone && stayIsOver(b.checkIn, b.nights) && (
+              <a
+                href={buildReviewRequestWhatsApp(b, t)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 flex items-center justify-center gap-2 rounded-lg border border-gold/40 bg-gold/10 py-2 text-sm font-semibold text-amber-700 transition hover:bg-gold/20 dark:text-amber-400"
+              >
+                <Star className="size-4" />
+                {t("bk_ask_review")}
+              </a>
+            )}
+
             {statusOf(b) !== "cancelled" && statusOf(b) !== "noshow" && (
               <div className="mt-3 border-t pt-3">
                 <BookingActions b={b} />
@@ -688,7 +744,18 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                   <StatusBadge b={b} />
                 </TableCell>
                 <TableCell className="text-end">
-                  <div className="flex justify-end">
+                  <div className="flex items-center justify-end gap-1.5">
+                    {b.phone && stayIsOver(b.checkIn, b.nights) && (
+                      <a
+                        href={buildReviewRequestWhatsApp(b, t)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t("bk_ask_review")}
+                        className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg border border-gold/40 bg-gold/10 text-amber-700 transition hover:bg-gold/20 dark:text-amber-400"
+                      >
+                        <Star className="size-4" />
+                      </a>
+                    )}
                     <BookingActions b={b} compact />
                   </div>
                 </TableCell>
