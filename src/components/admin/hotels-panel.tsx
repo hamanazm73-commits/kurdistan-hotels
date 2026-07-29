@@ -17,6 +17,7 @@ import {
   EyeOff,
   Moon,
   Sun,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -701,6 +702,48 @@ export function HotelFormDialog({
     if (hotelRef.current) scheduleAutoSave();
   }
 
+  /**
+   * Look the address up and drop the pin there, so an owner never has to find
+   * coordinates by hand. `force` is the button; without it we only fill an
+   * empty field, so a pin placed on the map is never overwritten.
+   */
+  const [geoStatus, setGeoStatus] = useState<
+    "idle" | "searching" | "found" | "none"
+  >("idle");
+  const geocode = useCallback(async (force: boolean) => {
+    const f = formRef.current;
+    const q = f.address.trim();
+    if (q.length < 3) return;
+    if (!force && f.coords.trim()) return;
+    setGeoStatus("searching");
+    try {
+      const res = await fetch(
+        `/api/geocode?q=${encodeURIComponent(q)}&near=${encodeURIComponent(f.city ?? "")}`,
+      );
+      const data = (await res.json()) as {
+        results?: { lat: number; lng: number }[];
+      };
+      const hit = data.results?.[0];
+      if (!hit) {
+        setGeoStatus("none");
+        return;
+      }
+      setRef.current("coords", `${hit.lat.toFixed(6)}, ${hit.lng.toFixed(6)}`);
+      setGeoStatus("found");
+    } catch {
+      setGeoStatus("none");
+    }
+  }, []);
+
+  // Fill the coordinates a moment after they stop typing the address.
+  const address = form.address;
+  const hasCoords = !!form.coords.trim();
+  useEffect(() => {
+    if (hasCoords || address.trim().length < 3) return;
+    const id = setTimeout(() => geocode(false), 900);
+    return () => clearTimeout(id);
+  }, [address, hasCoords, geocode]);
+
   // ---- seasonal-pricing (date range) helpers ----
   function setSeason(i: number, patch: Partial<(typeof form.seasons)[number]>) {
     set(
@@ -880,10 +923,38 @@ export function HotelFormDialog({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label={t("admin_address")}>
-              <Input
-                value={form.address}
-                onChange={(e) => set("address", e.target.value)}
-              />
+              <div className="flex gap-1.5">
+                <Input
+                  value={form.address}
+                  onChange={(e) => set("address", e.target.value)}
+                  className="min-w-0 flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="size-9 shrink-0"
+                  title={t("admin_find_on_map")}
+                  disabled={form.address.trim().length < 3}
+                  onClick={() => geocode(true)}
+                >
+                  {geoStatus === "searching" ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <MapPin className="size-4" />
+                  )}
+                </Button>
+              </div>
+              {geoStatus === "found" && (
+                <p className="text-xs font-medium text-emerald-600">
+                  ✓ {t("admin_coords_found")}
+                </p>
+              )}
+              {geoStatus === "none" && (
+                <p className="text-xs text-muted-foreground">
+                  {t("admin_coords_notfound")}
+                </p>
+              )}
             </Field>
             <Field label={t("admin_phone")}>
               <Input

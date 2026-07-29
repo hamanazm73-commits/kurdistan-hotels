@@ -93,6 +93,9 @@ const ckb: Dict = {
   admin_coords_bad: "کۆردینات نەدۆزرایەوە — تکایە وەک ٣٦.١٩١١, ٤٤.٠٠٩٢ بینووسە",
   admin_coords_pick:
     "کرتە لەسەر نەخشەکە بکە (یان پینەکە ڕابکێشە) بۆ دانانی شوێنی وردی هۆتێلەکە.",
+  admin_find_on_map: "دۆزینەوە لە نەخشە",
+  admin_coords_found: "شوێنەکە دۆزرایەوە — لە نەخشەکە پشکنینی بکە",
+  admin_coords_notfound: "نەدۆزرایەوە — لە نەخشەکە کرتە بکە بۆ دانانی شوێنەکە",
   admin_coords_hint:
     "لە گووگڵ ماپس، کرتەی ڕاست (یان دووردرێژ) لەسەر شوێنی هۆتێلەکە بکە — ژمارەکان دەردەکەون، کۆپیان بکە و لێرە دایبنێ. بەتاڵ بیهێڵەرەوە = لە ناوەندی شارەکە دەردەکەوێت.",
   nav_blog: "بلاگ",
@@ -557,6 +560,9 @@ const en: Dict = {
   admin_coords_bad: "No coordinates found — write them like 36.1911, 44.0092",
   admin_coords_pick:
     "Click the map (or drag the pin) to set the hotel's exact spot.",
+  admin_find_on_map: "Find on map",
+  admin_coords_found: "Location found — check it on the map",
+  admin_coords_notfound: "Not found — click the map to set the spot",
   admin_coords_hint:
     "In Google Maps, right-click (or long-press) the hotel's spot — the numbers appear; copy and paste them here. Leave empty to show it at the city centre.",
   nav_blog: "Blog",
@@ -1021,6 +1027,9 @@ const ar: Dict = {
   admin_coords_bad: "ماكو إحداثيات — اكتبها مثل 36.1911, 44.0092",
   admin_coords_pick:
     "انقر على الخريطة (أو اسحب الدبوس) لتحديد موقع الفندق بدقة.",
+  admin_find_on_map: "ابحث على الخريطة",
+  admin_coords_found: "تم إيجاد الموقع — تحقق منه على الخريطة",
+  admin_coords_notfound: "لم يُعثر عليه — انقر على الخريطة لتحديد الموقع",
   admin_coords_hint:
     "بخرائط جوجل، دوس كلك يمين (أو ضغطة طويلة) على مكان الفندق — تطلع الأرقام؛ انسخها والصقها هنا. اتركه فارغ حتى يظهر بمركز المدينة.",
   nav_blog: "المدونة",
@@ -1485,6 +1494,9 @@ const kmr: Dict = {
   admin_coords_bad: "Koordînat nehatin dîtin — wek 36.1911, 44.0092 binivîse",
   admin_coords_pick:
     "Li ser nexşeyê bitikîne (an pîskê bikişîne) da cihê rast ê otêlê destnîşan bike.",
+  admin_find_on_map: "Li ser nexşeyê bibîne",
+  admin_coords_notfound: "Nehat dîtin — li ser nexşeyê bitikîne",
+  admin_coords_found: "Cih hate dîtin — li ser nexşeyê kontrol bike",
   admin_coords_hint:
     "Li Google Maps, li ser cihê otêlê rast-klîk (an pêlek dirêj) bike — hejmar xuya dibin; wan kopî bike û li vir deyne. Vala bihêle da ku li navenda bajêr xuya bibe.",
   nav_blog: "Blog",
