@@ -532,7 +532,21 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                   </span>
                 </>
               )}
-              {b.gender && (
+              {(!!b.males || !!b.females) && (
+                <>
+                  <span className="text-muted-foreground">{t("book_gender")}</span>
+                  <span className="font-medium">
+                    {[
+                      b.males ? `${t("book_males")} ${b.males}` : "",
+                      b.females ? `${t("book_females")} ${b.females}` : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </span>
+                </>
+              )}
+              {/* bookings made before the split stored one gender for everyone */}
+              {!b.males && !b.females && b.gender && (
                 <>
                   <span className="text-muted-foreground">{t("book_gender")}</span>
                   <span className="font-medium">
@@ -616,6 +630,21 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                         <span className="inline-flex items-center gap-1">
                           <Users className="size-3 shrink-0" />
                           {b.guests}
+                          {(!!b.males || !!b.females) && (
+                            <span className="opacity-80">
+                              {" "}
+                              (
+                              {[
+                                b.males ? `${t("book_males")} ${b.males}` : "",
+                                b.females
+                                  ? `${t("book_females")} ${b.females}`
+                                  : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")}
+                              )
+                            </span>
+                          )}
                         </span>
                       )}
                       {!!b.children && (
@@ -627,7 +656,7 @@ export function BookingsPanel({ hotelId }: { hotelId?: string }) {
                             : ""}
                         </span>
                       )}
-                      {b.gender && (
+                      {!b.males && !b.females && b.gender && (
                         <span>
                           {t(b.gender === "male" ? "book_male" : "book_female")}
                         </span>

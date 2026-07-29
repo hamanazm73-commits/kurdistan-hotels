@@ -25,7 +25,18 @@ export async function notifyBooking(b: Booking) {
     `<b>ژوور / Room:</b> ${esc(b.roomType)}\n` +
     `<b>بەروار / Check-in:</b> ${esc(b.checkIn)}\n` +
     `<b>شەو / Nights:</b> ${esc(b.nights)}` +
-    (b.guests ? `\n<b>گەورەسالان / Adults:</b> ${esc(b.guests)}` : "") +
+    (b.guests
+      ? `\n<b>گەورەسالان / Adults:</b> ${esc(b.guests)}${
+          b.males || b.females
+            ? ` (${[
+                b.males ? `پیاو/M ${b.males}` : "",
+                b.females ? `ژن/F ${b.females}` : "",
+              ]
+                .filter(Boolean)
+                .join(" · ")})`
+            : ""
+        }`
+      : "") +
     (b.children
       ? `\n<b>منداڵ / Children:</b> ${esc(b.children)}${
           b.childAges?.length ? ` (${esc(b.childAges.join(", "))})` : ""
@@ -131,7 +142,23 @@ export async function sendBookingEmail(b: Booking, to: string | undefined) {
           ${row("ژوور / Room", b.roomType)}
           ${row("بەروار / Check-in", b.checkIn)}
           ${row("شەو / Nights", b.nights)}
-          ${b.guests ? row("گەورەسالان / Adults", b.guests) : ""}
+          ${
+            b.guests
+              ? row(
+                  "گەورەسالان / Adults",
+                  `${b.guests}${
+                    b.males || b.females
+                      ? ` (${[
+                          b.males ? `پیاو/M ${b.males}` : "",
+                          b.females ? `ژن/F ${b.females}` : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")})`
+                      : ""
+                  }`,
+                )
+              : ""
+          }
           ${
             b.children
               ? row(

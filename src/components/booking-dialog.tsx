@@ -77,9 +77,12 @@ export function BookingDialog({
   const [checkIn, setCheckIn] = useState("");
   const [nights, setNights] = useState("1");
   const [roomType, setRoomType] = useState(initialRoomType ?? "");
-  const [guests, setGuests] = useState(1);
+  // adults split by gender — a party is rarely all one gender (a couple is
+  // 1 + 1), so count each rather than asking for a single answer
+  const [males, setMales] = useState(1);
+  const [females, setFemales] = useState(0);
   const [childAges, setChildAges] = useState<number[]>([]);
-  const [gender, setGender] = useState<"male" | "female" | "">("");
+  const guests = males + females;
   const [fromCity, setFromCity] = useState("");
   const [fromCityOther, setFromCityOther] = useState("");
 
@@ -124,6 +127,11 @@ export function BookingDialog({
       toast.error(t("book_required"));
       return;
     }
+    // both gender counters can reach zero — somebody has to be staying
+    if (guests < 1) {
+      toast.error(t("book_need_guest"));
+      return;
+    }
     if (room && room.available === 0) {
       toast.error(t("book_room_full"));
       return;
@@ -143,6 +151,8 @@ export function BookingDialog({
           checkIn,
           nights: Number(nights) || 1,
           guests,
+          males,
+          females,
           ...(childAges.length
             ? {
                 children: childAges.length,
@@ -150,7 +160,6 @@ export function BookingDialog({
                 childAges: childAges.filter((a) => a >= 0),
               }
             : {}),
-          ...(gender ? { gender } : {}),
           ...(originCity ? { fromCity: originCity } : {}),
         }),
       });
@@ -216,9 +225,9 @@ export function BookingDialog({
       setCheckIn("");
       setNights("1");
       setRoomType("");
-      setGuests(1);
+      setMales(1);
+      setFemales(0);
       setChildAges([]);
-      setGender("");
       setFromCity("");
       setFromCityOther("");
     } catch {
@@ -273,11 +282,18 @@ export function BookingDialog({
           {/* who's staying — taps only, no typing */}
           <div className="grid gap-4 sm:grid-cols-2 sm:gap-3">
             <Stepper
-              label={t("book_guests")}
-              value={guests}
-              min={1}
+              label={t("book_males")}
+              value={males}
+              min={0}
               max={20}
-              onChange={setGuests}
+              onChange={setMales}
+            />
+            <Stepper
+              label={t("book_females")}
+              value={females}
+              min={0}
+              max={20}
+              onChange={setFemales}
             />
             <Stepper
               label={t("book_children")}
@@ -331,23 +347,6 @@ export function BookingDialog({
               </div>
             </div>
           )}
-
-          <div className="grid gap-2">
-            <Label>{t("book_gender")}</Label>
-            <div className="flex gap-2">
-              {(["male", "female"] as const).map((g) => (
-                <Button
-                  key={g}
-                  type="button"
-                  variant={gender === g ? "default" : "outline"}
-                  className="h-10 flex-1 rounded-full"
-                  onClick={() => setGender(gender === g ? "" : g)}
-                >
-                  {t(g === "male" ? "book_male" : "book_female")}
-                </Button>
-              ))}
-            </div>
-          </div>
 
           {/* where they're travelling from */}
           <div className="grid gap-2">

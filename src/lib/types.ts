@@ -258,13 +258,17 @@ export interface Booking {
   roomPrice: number;
   checkIn: string;
   nights: number;
-  /** how many adults are staying (hotels need this for the room) */
+  /** how many adults are staying — the sum of `males` and `females` */
   guests?: number;
+  /** adults by gender: a party is rarely all one gender, so hotels need the
+      split (a couple is 1 + 1), not a single answer for everyone */
+  males?: number;
+  females?: number;
   /** how many children are staying */
   children?: number;
   /** each child's age — hotels price and place children by age */
   childAges?: number[];
-  /** the guest's gender, as some hotels must record it */
+  /** single gender kept for bookings made before the split existed */
   gender?: "male" | "female";
   /** where the guest is travelling from */
   fromCity?: string;
