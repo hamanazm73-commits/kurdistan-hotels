@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { getPublicHotels } from "@/lib/hotels-server";
+import { getPublicHotels, trimForList } from "@/lib/hotels-server";
 import { CityPageBody, type CityIntro } from "./city-page-body";
 
 const SITE = "https://hotelskurdistan.com";
@@ -211,7 +211,7 @@ export default async function CityHotelsPage({
         cityValue={seo.city}
         intro={seo.intro}
         others={others}
-        initialHotels={cityHotels}
+        initialHotels={cityHotels.map(trimForList)}
       />
       <SiteFooter />
     </>
