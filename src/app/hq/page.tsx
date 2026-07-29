@@ -19,6 +19,7 @@ import { FeedbackPanel } from "@/components/admin/feedback-panel";
 import { BlogPanel } from "@/components/admin/blog-panel";
 import { ReviewsPanel } from "@/components/admin/reviews-panel";
 import { LeadsPanel } from "@/components/admin/leads-panel";
+import { ReviewRepliesPanel } from "@/components/admin/review-replies-panel";
 import { AdminsPanel } from "@/components/admin/admins-panel";
 import { ExchangeRateCard } from "@/components/admin/exchange-rate";
 import { ComingSoonCard } from "@/components/admin/coming-soon-card";
@@ -118,12 +119,17 @@ export default function AdminPage() {
             <TabsList>
               <TabsTrigger value="hotel">{t("admin_my_hotel")}</TabsTrigger>
               <TabsTrigger value="bookings">{t("admin_bookings")}</TabsTrigger>
+              <TabsTrigger value="reviews">{t("admin_reviews")}</TabsTrigger>
             </TabsList>
             <TabsContent value="hotel" className="mt-6">
               <HotelsPanel ownerHotelId={hotelId ?? undefined} />
             </TabsContent>
             <TabsContent value="bookings" className="mt-6">
               <BookingsPanel hotelId={hotelId ?? undefined} />
+            </TabsContent>
+            <TabsContent value="reviews" className="mt-6">
+              {/* replying only — moderation stays with the platform */}
+              <ReviewRepliesPanel hotelId={hotelId ?? ""} />
             </TabsContent>
           </Tabs>
         </main>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Star, Send } from "lucide-react";
+import { Star, Send , CornerDownLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,8 @@ interface PublicReview {
   rating: number;
   comment: string;
   createdAt: number;
+  /** the hotel's answer, when it has given one */
+  reply?: string;
 }
 
 function Stars({ value, className }: { value: number; className?: string }) {
@@ -129,6 +131,18 @@ export function HotelReviews({ hotelId }: { hotelId: string }) {
               <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
                 {r.comment}
               </p>
+              {/* the hotel's own answer, indented under what it answers */}
+              {r.reply && (
+                <div className="mt-3 rounded-lg border-s-2 border-gold bg-muted/40 p-3 ps-3">
+                  <p className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+                    <CornerDownLeft className="size-3.5" />
+                    {t("rv_reply_from")}
+                  </p>
+                  <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                    {r.reply}
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </div>

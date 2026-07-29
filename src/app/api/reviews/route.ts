@@ -34,6 +34,9 @@ export async function GET(req: Request) {
           rating: Number(r.rating ?? 0),
           comment: String(r.comment ?? ""),
           createdAt: Number(r.createdAt ?? 0),
+          // the hotel's own answer, shown under the review
+          reply: String(r.reply ?? ""),
+          repliedAt: Number(r.repliedAt ?? 0),
         };
       })
       .sort((a, b) => b.createdAt - a.createdAt);

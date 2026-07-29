@@ -320,6 +320,10 @@ export interface Review {
   comment: string;
   status?: ReviewStatus;
   createdAt?: number;
+  /** The hotel's answer, shown under the review. A measured reply to a
+      complaint often does more for trust than the complaint costs. */
+  reply?: string;
+  repliedAt?: number;
 }
 
 /** Average rating (rounded to 1 decimal) + count from a list of reviews. */
