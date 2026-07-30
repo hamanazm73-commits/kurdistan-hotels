@@ -16,9 +16,14 @@ const FALLBACK_IMG =
  * doesn't mean hunting for them again. Renders nothing until there are at least
  * two — one tile is just the page you came from.
  */
-export function RecentlyViewedRow() {
+export function RecentlyViewedRow({
+  initialHotels,
+}: {
+  /** the page's server-rendered hotels, so the strip resolves ids at once */
+  initialHotels?: Hotel[];
+}) {
   const { t, lang, tCity } = useI18n();
-  const { hotels } = useHotels();
+  const { hotels } = useHotels(initialHotels);
   const ids = useRecentlyViewed();
 
   const seen = ids

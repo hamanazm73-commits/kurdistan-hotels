@@ -71,6 +71,8 @@ export default async function HomePage() {
     getRecentApprovedReviews(6),
     getPublicHotels(),
   ]);
+  // trimmed once, shared by every list on the page
+  const listHotels = hotels.map(trimForList);
   return (
     <>
       <script
@@ -90,11 +92,11 @@ export default async function HomePage() {
       <SiteHeader />
       <main>
         <Hero />
-        <RecentlyViewedRow />
+        <RecentlyViewedRow initialHotels={listHotels} />
         {/* the server already read these for the JSON-LD; handing them to the
             list means hotels are in the HTML instead of appearing only after
             the bundle boots and Firestore answers */}
-        <HotelsSection initialHotels={hotels.map(trimForList)} />
+        <HotelsSection initialHotels={listHotels} />
         <BrowseByCity />
         <TrustSection />
         <ReviewsStrip reviews={reviews} hotels={hotels} />
