@@ -228,9 +228,13 @@ export interface Hotel {
   recentBookingsAt?: number[];
   /** lifetime taps on WhatsApp / call / map, by kind */
   contactClicks?: Partial<Record<"whatsapp" | "call" | "map", number>>;
-  /** epoch ms of those taps, pruned to the last 30 days, so the owner's panel
-      can report real recent activity rather than an ever-growing total */
-  contactClicksAt?: number[];
+  /** When and how each of those taps happened, pruned to the last 30 days.
+      The owner's panel reports real recent activity rather than an
+      ever-growing total, and lists the times so an unexplained message can be
+      matched to a tap — the only attribution the guest can't erase, since the
+      text we prefill is a draft in their own app.
+      Older rows are bare epoch numbers; readers must tolerate both. */
+  contactClicksAt?: (number | { at: number; kind?: string })[];
   /** how many approved guest reviews this hotel has. Denormalized by
       syncHotelReviewStats so the listing doesn't query reviews per card. */
   reviewCount?: number;

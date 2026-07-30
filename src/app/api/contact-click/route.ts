@@ -47,14 +47,26 @@ export async function POST(req: Request) {
     const ref = db.collection("hotels").doc(hotelId);
     const now = Date.now();
     const prev = (await ref.get()).data()?.contactClicksAt;
+
+    // Each entry carries when and how, so the owner can line an unexplained
+    // WhatsApp message up against a tap a minute earlier. That matching is the
+    // only attribution that holds: the text we prefill is a draft in the
+    // guest's own app and they can clear it before sending.
+    //
+    // Older rows are bare timestamps; keep reading those rather than dropping
+    // the history when the shape changed.
     const kept = (Array.isArray(prev) ? prev : [])
-      .map(Number)
-      .filter((ts) => Number.isFinite(ts) && now - ts < WINDOW_MS);
+      .map((e) =>
+        typeof e === "number"
+          ? { at: e, kind: "" }
+          : { at: Number(e?.at), kind: String(e?.kind ?? "") },
+      )
+      .filter((e) => Number.isFinite(e.at) && now - e.at < WINDOW_MS);
 
     await ref.update({
       // a lifetime total, for the owner's own sense of scale
       [`contactClicks.${kind}`]: FieldValue.increment(1),
-      contactClicksAt: [now, ...kept].slice(0, MAX_STAMPS),
+      contactClicksAt: [{ at: now, kind }, ...kept].slice(0, MAX_STAMPS),
     });
     return NextResponse.json({ ok: true });
   } catch {
