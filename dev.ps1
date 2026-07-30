@@ -19,5 +19,6 @@ if (-not (Test-Path (Join-Path $nodeDir "node.exe"))) {
 $env:Path = "$nodeDir;$env:Path"
 Set-Location $PSScriptRoot
 Write-Host ("Using Node " + (& (Join-Path $nodeDir "node.exe") --version) + " from " + $nodeDir) -ForegroundColor Green
-Write-Host "Starting... open http://localhost:3000 when you see 'Ready'" -ForegroundColor Cyan
+$devPort = if ($env:PORT) { $env:PORT } else { "3000" }
+Write-Host "Starting... open http://localhost:$devPort when you see 'Ready'" -ForegroundColor Cyan
 & (Join-Path $nodeDir "npm.cmd") run dev

@@ -444,9 +444,77 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   );
 }
 
+/* ---- Journal styling ----
+   The blog is the site's editorial face, so its cards get a little more
+   craft than a plain border: a gold hairline that lights up on hover and a
+   soft lift, without the heavy shadows used on hotel cards. */
+.journal-card {
+  position: relative;
+  isolation: isolate;
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+.journal-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklch, var(--gold) 55%, transparent),
+    transparent 45%,
+    color-mix(in oklch, var(--gold) 30%, transparent)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.journal-card:hover::after {
+  opacity: 1;
+}
+
+/* A slow drift over a cover photo — the image keeps breathing while the
+   reader is on the page, so a still hero doesn't feel like a screenshot. */
+@keyframes cover-drift {
+  0%,
+  100% {
+    transform: scale(1.04) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: scale(1.08) translate3d(0, -1.2%, 0);
+  }
+}
+.cover-drift {
+  animation: cover-drift 18s ease-in-out infinite;
+}
+
+/* The eyebrow rule beside a section label. */
+.eyebrow-rule::after {
+  content: "";
+  display: block;
+  height: 2px;
+  width: 2.5rem;
+  margin-top: 0.55rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--gold),
+    color-mix(in oklch, var(--gold) 20%, transparent)
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scroll-progress,
-  .img-fade {
+  .img-fade,
+  .cover-drift {
     animation: none;
   }
   .scroll-progress {

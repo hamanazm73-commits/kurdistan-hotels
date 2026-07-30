@@ -117,12 +117,18 @@ export default async function BlogPostPage({
                 priority
                 sizes="100vw"
                 unoptimized={isRawSrc(cover)}
-                className="object-cover"
+                className="cover-drift object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
             </div>
             <div className="absolute inset-x-0 bottom-0">
               <div className="mx-auto max-w-3xl px-6 pb-8 sm:pb-10">
+                {/* a gold rule above the headline — the editorial cue that
+                    this is an article, not a page that happens to have a photo */}
+                <span
+                  aria-hidden
+                  className="mb-4 block h-0.5 w-12 rounded-full bg-gold"
+                />
                 <h1 className="text-3xl font-extrabold leading-tight text-white drop-shadow-sm sm:text-4xl md:text-5xl">
                   {post.title}
                 </h1>
@@ -186,7 +192,7 @@ export default async function BlogPostPage({
       {more.length > 0 && (
         <section className="border-t bg-muted/30">
           <div className="mx-auto max-w-6xl px-6 py-12">
-            <h2 className="mb-5 text-lg font-bold">زیاتر بخوێنەوە</h2>
+            <h2 className="eyebrow-rule mb-6 text-lg font-bold">زیاتر بخوێنەوە</h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {more.map((p) => {
                 const c = p.coverImage ? mediaSrc(p.coverImage) : "";
@@ -195,7 +201,7 @@ export default async function BlogPostPage({
                     key={p.id}
                     href={`/blog/${p.slug}`}
                     dir={postDir(p.lang)}
-                    className="group overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                    className="journal-card group overflow-hidden rounded-2xl border bg-card shadow-sm hover:-translate-y-1.5 hover:shadow-xl"
                   >
                     {c && (
                       <div className="relative aspect-16/10 overflow-hidden bg-muted">
@@ -206,6 +212,10 @@ export default async function BlogPostPage({
                           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                           unoptimized={isRawSrc(c)}
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
                         />
                       </div>
                     )}

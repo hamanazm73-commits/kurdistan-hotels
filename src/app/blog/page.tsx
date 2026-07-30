@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, CalendarDays, ArrowLeft } from "lucide-react";
+import { Clock, CalendarDays, ArrowLeft, Sparkles } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getPublishedPosts } from "@/lib/posts-server";
@@ -85,9 +85,11 @@ export default async function BlogIndexPage() {
       <main className="relative mx-auto max-w-6xl px-6 pb-16">
         {/* the same soft gold glow the hotels section opens with, so the blog
             reads as part of the site rather than a page bolted on beside it */}
+        {/* max-w keeps the blur inside a 375px phone — at a fixed 26rem it
+            pushed the page 21px wider than the viewport */}
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-6 -z-10 h-56 w-[26rem] -translate-x-1/2 rounded-full bg-gold/20 blur-3xl"
+          className="pointer-events-none absolute left-1/2 top-6 -z-10 h-56 w-[26rem] max-w-full -translate-x-1/2 rounded-full bg-gold/20 blur-3xl"
         />
 
         <header className="py-12 text-center sm:py-16">
@@ -97,10 +99,21 @@ export default async function BlogIndexPage() {
           <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">
             <span className="text-gradient-gold">گۆڤاری گەشتیاری</span>
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+          {/* a gold rule under the title — the mark of a masthead rather than
+              just another page heading */}
+          <span
+            aria-hidden
+            className="mx-auto mt-5 block h-px w-24 bg-gradient-to-r from-transparent via-gold to-transparent"
+          />
+          <p className="mx-auto mt-5 max-w-xl leading-relaxed text-muted-foreground">
             ڕێنمایی گەشت، شوێنی سەیرکردن و هۆتێل لە کوردستان — Travel guides for
             Erbil, Sulaymaniyah, Duhok and Dukan.
           </p>
+          {posts.length > 0 && (
+            <p className="mt-4 text-xs font-semibold tracking-wide text-muted-foreground">
+              {posts.length} بابەت
+            </p>
+          )}
         </header>
 
         {posts.length === 0 ? (
@@ -115,7 +128,7 @@ export default async function BlogIndexPage() {
               <Link
                 href={`/blog/${lead.slug}`}
                 dir={postDir(lead.lang)}
-                className="group grid overflow-hidden rounded-3xl border bg-card shadow-sm transition hover:shadow-xl md:grid-cols-2"
+                className="journal-card group grid overflow-hidden rounded-3xl border bg-card shadow-sm hover:-translate-y-1 hover:shadow-2xl md:grid-cols-2"
               >
                 {lead.coverImage && (
                   <div className="relative aspect-16/10 overflow-hidden bg-muted md:aspect-auto md:h-full">
@@ -128,10 +141,17 @@ export default async function BlogIndexPage() {
                       unoptimized={isRawSrc(mediaSrc(lead.coverImage))}
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
+                    {/* a whisper of gold over the photo, so the cover belongs
+                        to the page rather than sitting on top of it */}
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"
+                    />
                   </div>
                 )}
                 <div className="flex flex-col justify-center gap-3 p-6 sm:p-8">
-                  <span className="w-fit rounded-full bg-gold/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-amber-400">
+                  <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-xs font-bold text-amber-700 ring-1 ring-gold/25 dark:text-amber-400">
+                    <Sparkles className="size-3.5" />
                     نوێترین
                   </span>
                   <h2 className="text-2xl font-extrabold leading-snug transition-colors group-hover:text-primary sm:text-3xl">
@@ -162,7 +182,7 @@ export default async function BlogIndexPage() {
                     key={p.id}
                     href={`/blog/${p.slug}`}
                     dir={postDir(p.lang)}
-                    className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+                    className="journal-card group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-sm hover:-translate-y-1.5 hover:shadow-xl"
                   >
                     {p.coverImage && (
                       <div className="relative aspect-16/10 overflow-hidden bg-muted">
@@ -173,6 +193,10 @@ export default async function BlogIndexPage() {
                           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                           unoptimized={isRawSrc(mediaSrc(p.coverImage))}
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"
                         />
                       </div>
                     )}
@@ -191,6 +215,10 @@ export default async function BlogIndexPage() {
                         lang={p.lang}
                         className="mt-auto pt-2"
                       />
+                      <span className="inline-flex items-center gap-1 pt-1 text-sm font-semibold text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                        بیخوێنەوە
+                        <ArrowLeft className="size-3.5 rtl:rotate-180" />
+                      </span>
                     </div>
                   </Link>
                 ))}
