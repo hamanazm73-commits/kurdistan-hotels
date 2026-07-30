@@ -17,7 +17,7 @@ export function PostContent({ content }: { content: string }) {
   const flushPara = () => {
     if (!para.length) return;
     blocks.push(
-      <p key={`p${blocks.length}`} className="leading-relaxed">
+      <p key={`p${blocks.length}`} className="leading-8">
         {para.join(" ")}
       </p>,
     );
@@ -26,9 +26,17 @@ export function PostContent({ content }: { content: string }) {
   const flushList = () => {
     if (!list.length) return;
     blocks.push(
-      <ul key={`u${blocks.length}`} className="list-disc space-y-1 ps-6">
+      <ul key={`u${blocks.length}`} className="space-y-2 ps-1">
         {list.map((it, i) => (
-          <li key={i}>{it}</li>
+          <li key={i} className="flex gap-2.5 leading-8">
+            {/* a gold dot rather than a bullet glyph — a list marker is one of
+                the few places a house colour can show without shouting */}
+            <span
+              aria-hidden
+              className="mt-3 size-1.5 shrink-0 rounded-full bg-gold"
+            />
+            <span>{it}</span>
+          </li>
         ))}
       </ul>,
     );
@@ -46,7 +54,7 @@ export function PostContent({ content }: { content: string }) {
       flushList();
       flushPara();
       blocks.push(
-        <h3 key={`h3${blocks.length}`} className="mt-6 text-lg font-bold">
+        <h3 key={`h3${blocks.length}`} className="mt-8 text-lg font-bold tracking-tight">
           {line.slice(4)}
         </h3>,
       );
@@ -56,7 +64,7 @@ export function PostContent({ content }: { content: string }) {
       flushList();
       flushPara();
       blocks.push(
-        <h2 key={`h2${blocks.length}`} className="mt-8 text-xl font-bold">
+        <h2 key={`h2${blocks.length}`} className="mt-10 text-2xl font-extrabold tracking-tight">
           {line.slice(3)}
         </h2>,
       );
@@ -74,6 +82,8 @@ export function PostContent({ content }: { content: string }) {
   flushPara();
 
   return (
-    <div className="space-y-4 text-[15px] text-foreground/90">{blocks}</div>
+    // 17px with generous leading: this is long-form reading, not UI text,
+    // and Kurdish and Arabic script in particular need the extra line height
+    <div className="space-y-5 text-[17px] text-foreground/85">{blocks}</div>
   );
 }

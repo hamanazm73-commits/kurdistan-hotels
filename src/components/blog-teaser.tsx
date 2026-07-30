@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { BookOpen, ArrowLeft } from "lucide-react";
+import { BookOpen, ArrowLeft, Clock } from "lucide-react";
 import { getPublishedPosts } from "@/lib/posts-server";
 import { mediaSrc, isRawSrc } from "@/lib/types";
+import { readingMinutes } from "@/lib/posts";
 
 /**
  * The three newest posts, on the home page.
@@ -58,14 +59,18 @@ export async function BlogTeaser() {
                 </div>
               )}
               <div className="p-4">
-                <h3 className="line-clamp-2 font-bold group-hover:text-primary">
+                <h3 className="line-clamp-2 font-bold leading-snug group-hover:text-primary">
                   {p.title}
                 </h3>
                 {p.excerpt && (
-                  <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">
+                  <p className="mt-1.5 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
                     {p.excerpt}
                   </p>
                 )}
+                <p className="mt-2.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
+                  <Clock className="size-3.5" />
+                  {readingMinutes(p.content)} min
+                </p>
               </div>
             </Link>
           );
