@@ -11,6 +11,7 @@ import { Hero } from "@/components/hero";
 import { HotelsSection } from "@/components/hotels-section";
 import { RecentlyViewedRow } from "@/components/recently-viewed-row";
 import { BrowseByCity } from "@/components/browse-by-city";
+import { BlogTeaser } from "@/components/blog-teaser";
 import { TrustSection } from "@/components/trust-section";
 import { OwnerCta } from "@/components/owner-cta";
 import { FaqSection } from "@/components/faq-section";
@@ -98,6 +99,7 @@ export default async function HomePage() {
             the bundle boots and Firestore answers */}
         <HotelsSection initialHotels={listHotels} />
         <BrowseByCity />
+        <BlogTeaser />
         <TrustSection />
         <ReviewsStrip reviews={reviews} hotels={hotels} />
         <hr className="section-seam mx-auto max-w-5xl" />
