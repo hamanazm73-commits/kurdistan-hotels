@@ -138,6 +138,5 @@ export const CITIES = [
   "Erbil",
   "Sulaymaniyah",
   "Duhok",
-  "Halabja",
   "Kirkuk",
 ] as const;

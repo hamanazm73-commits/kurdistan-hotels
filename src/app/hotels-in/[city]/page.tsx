@@ -59,18 +59,6 @@ const CITY_SEO: Record<
       ar: "دهوك مدينة جميلة بين الجبال في شمال كردستان، قرب سد دهوك والمناظر الطبيعية الخلابة. فنادق دهوك قاعدة رائعة لمحبّي الطبيعة والعائلات.",
     },
   },
-  halabja: {
-    city: "Halabja",
-    ckb: "هەڵەبجە",
-    en: "Halabja",
-    ar: "حلبجة",
-    aka: [],
-    intro: {
-      ckb: "هەڵەبجە شارێکی مێژوویی گرنگە لە ڕۆژهەڵاتی کوردستان، دەوردراو بە شاخ و سروشتی جوان. مانەوە لە هۆتێلەکانی هەڵەبجە دەرگایەکە بۆ ناسینی مێژوو و کولتووری ناوچەکە.",
-      en: "Halabja is a historically significant town in eastern Kurdistan, surrounded by mountains and beautiful countryside. Staying in Halabja's hotels is a gateway to the region's history and culture.",
-      ar: "حلبجة مدينة تاريخية مهمة في شرق كردستان، محاطة بالجبال والريف الجميل. الإقامة في فنادق حلبجة بوابة لتاريخ المنطقة وثقافتها.",
-    },
-  },
   kirkuk: {
     city: "Kirkuk",
     ckb: "کەرکوک",

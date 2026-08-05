@@ -9,7 +9,6 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Hero } from "@/components/hero";
 import { HotelsSection } from "@/components/hotels-section";
-import { RecentlyViewedRow } from "@/components/recently-viewed-row";
 import { BrowseByCity } from "@/components/browse-by-city";
 import { BlogTeaser } from "@/components/blog-teaser";
 import { TrustSection } from "@/components/trust-section";
@@ -93,7 +92,6 @@ export default async function HomePage() {
       <SiteHeader />
       <main>
         <Hero />
-        <RecentlyViewedRow initialHotels={listHotels} />
         {/* the server already read these for the JSON-LD; handing them to the
             list means hotels are in the HTML instead of appearing only after
             the bundle boots and Firestore answers */}

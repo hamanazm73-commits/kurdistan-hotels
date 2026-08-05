@@ -13,7 +13,6 @@ const CITY_SLUGS = [
   "erbil",
   "sulaymaniyah",
   "duhok",
-  "halabja",
   "kirkuk",
   "dukan",
 ];

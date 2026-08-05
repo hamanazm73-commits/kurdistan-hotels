@@ -62,6 +62,9 @@ const nextConfig: NextConfig = {
     return [
       { source: "/admin", destination: "/", permanent: false },
       { source: "/admin/:path*", destination: "/", permanent: false },
+      // Halabja is no longer one of the cities we list, but Google has the
+      // page — send it to the hotels rather than answering 404.
+      { source: "/hotels-in/halabja", destination: "/#hotels", permanent: true },
     ];
   },
 };
