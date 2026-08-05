@@ -58,9 +58,13 @@ const CreateSchema = z.object({
   note: z.string().max(1000).optional(),
 });
 
+/** Same limits as CreateSchema: a lead typed wrong is corrected here, and the
+    two paths writing the same fields must agree on what fits in them. */
 const UpdateSchema = z.object({
   id: z.string().min(1).max(200),
   status: z.enum(LEAD_STATUSES).optional(),
+  hotelName: z.string().min(1).max(120).optional(),
+  city: z.string().max(60).optional(),
   note: z.string().max(1000).optional(),
   phone: z.string().max(40).optional(),
 });

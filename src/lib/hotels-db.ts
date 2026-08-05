@@ -450,7 +450,13 @@ export async function addLead(lead: {
 
 export async function updateLead(
   id: string,
-  patch: { status?: LeadStatus; note?: string; phone?: string },
+  patch: {
+    status?: LeadStatus;
+    hotelName?: string;
+    city?: string;
+    note?: string;
+    phone?: string;
+  },
 ): Promise<void> {
   const res = await fetch("/api/leads", {
     method: "PATCH",

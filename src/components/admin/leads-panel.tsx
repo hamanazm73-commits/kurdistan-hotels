@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Search,
   MapPin,
+  Pencil,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,18 @@ export function LeadsPanel() {
   const [note, setNote] = useState("");
   const [adding, setAdding] = useState(false);
 
+  /** The lead being corrected, and the draft of it. A visit turns a guessed
+      name into the real one and a wrong number into the right one — before
+      this the only way to fix either was to delete the lead and lose its
+      stage along with it. */
+  const [editing, setEditing] = useState<string | null>(null);
+  const [draft, setDraft] = useState({
+    hotelName: "",
+    city: "",
+    phone: "",
+    note: "",
+  });
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -129,11 +142,56 @@ export function LeadsPanel() {
     }
   }
 
+  function startEdit(l: Lead & { id: string }) {
+    setEditing(l.id);
+    setDraft({
+      hotelName: l.hotelName,
+      city: l.city ?? "",
+      phone: l.phone ?? "",
+      note: l.note ?? "",
+    });
+  }
+
+  async function saveEdit(id: string) {
+    const hotelName = draft.hotelName.trim();
+    if (!hotelName) {
+      toast.error(t("lead_name_required"));
+      return;
+    }
+
+    // Trimmed here and sent whole rather than diffed: emptying the phone is a
+    // real edit, and a patch that only carried changed-and-non-empty fields
+    // would silently refuse to clear one.
+    const patch = {
+      hotelName,
+      city: draft.city.trim(),
+      phone: draft.phone.trim(),
+      note: draft.note.trim(),
+    };
+
+    setBusy(id);
+    try {
+      await updateLead(id, patch);
+      setItems((prev) => prev.map((l) => (l.id === id ? { ...l, ...patch } : l)));
+      setEditing(null);
+      toast.success(t("admin_saved"));
+    } catch {
+      toast.error(t("lead_save_failed"));
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function remove(id: string) {
+    // The list is a record of visits and phone calls; one stray tap on a small
+    // icon should not be able to drop that silently.
+    if (!confirm(t("admin_confirm_delete"))) return;
+
     setBusy(id);
     try {
       await deleteLead(id);
       setItems((prev) => prev.filter((l) => l.id !== id));
+      toast.success(t("admin_deleted"));
     } catch {
       toast.error(t("lead_save_failed"));
     } finally {
@@ -274,6 +332,86 @@ export function LeadsPanel() {
         <div className="space-y-2">
           {shown.map((l) => (
             <Card key={l.id} className="p-3">
+              {editing === l.id ? (
+                /* Corrected in place rather than in a dialog: the stage chips
+                   below stay visible, so it is obvious this is the same lead
+                   being fixed and not a new one being written. */
+                <div className="flex flex-col gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-1.5">
+                      <Label htmlFor={`ed-name-${l.id}`}>{t("lead_hotel")}</Label>
+                      <Input
+                        id={`ed-name-${l.id}`}
+                        value={draft.hotelName}
+                        onChange={(e) =>
+                          setDraft((d) => ({ ...d, hotelName: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor={`ed-city-${l.id}`}>{t("lead_city")}</Label>
+                      <Select
+                        value={draft.city || undefined}
+                        onValueChange={(v) =>
+                          setDraft((d) => ({ ...d, city: String(v) }))
+                        }
+                      >
+                        <SelectTrigger id={`ed-city-${l.id}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CITIES.map((c) => (
+                            <SelectItem key={c} value={c}>
+                              {tCity(c)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor={`ed-phone-${l.id}`}>{t("lead_phone")}</Label>
+                      <Input
+                        id={`ed-phone-${l.id}`}
+                        dir="ltr"
+                        inputMode="tel"
+                        value={draft.phone}
+                        onChange={(e) =>
+                          setDraft((d) => ({ ...d, phone: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor={`ed-note-${l.id}`}>{t("lead_note")}</Label>
+                      <Input
+                        id={`ed-note-${l.id}`}
+                        value={draft.note}
+                        onChange={(e) =>
+                          setDraft((d) => ({ ...d, note: e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      disabled={busy === l.id}
+                      onClick={() => void saveEdit(l.id)}
+                      className="gap-1.5"
+                    >
+                      {busy === l.id && <Loader2 className="size-4 animate-spin" />}
+                      {t("admin_save")}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={busy === l.id}
+                      onClick={() => setEditing(null)}
+                    >
+                      {t("admin_cancel")}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-semibold">{l.hotelName}</p>
@@ -316,15 +454,26 @@ export function LeadsPanel() {
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="size-9 text-muted-foreground hover:text-foreground"
+                    title={t("admin_edit")}
+                    disabled={busy === l.id}
+                    onClick={() => startEdit(l)}
+                  >
+                    <Pencil className="size-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="size-9 text-muted-foreground hover:text-destructive"
                     title={t("admin_delete")}
                     disabled={busy === l.id}
-                    onClick={() => remove(l.id)}
+                    onClick={() => void remove(l.id)}
                   >
                     <Trash2 className="size-4" />
                   </Button>
                 </div>
               </div>
+              )}
 
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {STATUSES.map((s) => (
