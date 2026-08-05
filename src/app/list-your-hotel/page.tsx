@@ -34,7 +34,10 @@ export default function ListYourHotelPage() {
       <OwnerLanding />
       {/* the page pitched, then left the owner to phone or email; this is the
           same ask, filled in once */}
-      <section className="mx-auto max-w-2xl px-6 pb-16">
+      {/* no bottom padding: the footer already brings its own mt-24, and this
+          page was adding pb-16 on top of it — 160px of empty dark under the
+          form where every other page has 96 */}
+      <section className="mx-auto max-w-2xl px-6">
         <HotelApplicationForm />
       </section>
       <SiteFooter />
