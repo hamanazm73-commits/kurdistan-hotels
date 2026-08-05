@@ -9,7 +9,6 @@ import {
   Menu,
   Heart,
   Map as MapIcon,
-  BookOpen,
 } from "lucide-react";
 import { BrandMark } from "./brand-mark";
 import { Button } from "@/components/ui/button";
@@ -82,17 +81,6 @@ export function SiteHeader() {
           >
             <MapIcon className="size-4" />
             {t("nav_map")}
-          </Button>
-          {/* The blog was only reachable from the footer. Search engines treat
-              a page linked only from there as an afterthought, and so do
-              readers. */}
-          <Button
-            variant="ghost"
-            nativeButton={false}
-            render={<Link href="/blog" />}
-          >
-            <BookOpen className="size-4" />
-            {t("nav_blog")}
           </Button>
           <Button
             variant="ghost"
@@ -203,15 +191,6 @@ export function SiteHeader() {
                 >
                   <MapIcon className="size-4" />
                   {t("nav_map")}
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="justify-start"
-                  nativeButton={false}
-                  render={<Link href="/blog" />}
-                >
-                  <BookOpen className="size-4" />
-                  {t("nav_blog")}
                 </Button>
                 <Button
                   variant="ghost"

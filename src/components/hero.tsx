@@ -120,24 +120,12 @@ export function Hero() {
 
   // real figures, computed from the hotels shown on the site (excludes hidden)
   const visible = hotels.filter((h) => !h.hidden);
-  // total rooms on the site: sum tracked room counts per hotel, and when a
-  // hotel hasn't set counts, fall back to how many room types it lists
-  const roomsTotal = visible.reduce((sum, h) => {
-    const tracked = (h.rooms ?? []).filter(
-      (r) => typeof r.available === "number",
-    );
-    const n = tracked.length
-      ? tracked.reduce((s, r) => s + Math.max(0, r.available ?? 0), 0)
-      : (h.rooms?.length ?? 0);
-    return sum + n;
-  }, 0);
   const stats = [
     { labelKey: "stat_hotels", value: String(visible.length) },
     {
       labelKey: "stat_cities",
       value: String(new Set(visible.map((h) => h.city)).size),
     },
-    { labelKey: "stat_rooms", value: String(roomsTotal) },
   ];
 
   return (
@@ -268,9 +256,9 @@ export function Hero() {
           initial="hidden"
           animate="show"
           custom={5}
-          className="mx-auto mt-20 max-w-md overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md"
+          className="mx-auto mt-20 max-w-sm overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md"
         >
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-2">
             {stats.map(({ labelKey, value }, i) => (
               <AnimatedStat
                 key={labelKey}

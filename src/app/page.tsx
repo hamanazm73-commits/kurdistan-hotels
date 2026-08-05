@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
 import { alternatesFor, asLang } from "@/lib/hreflang";
-import {
-  getPublicHotels,
-  getRecentApprovedReviews,
-  trimForList,
-} from "@/lib/hotels-server";
+import { getPublicHotels, trimForList } from "@/lib/hotels-server";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Hero } from "@/components/hero";
 import { HotelsSection } from "@/components/hotels-section";
 import { BrowseByCity } from "@/components/browse-by-city";
-import { BlogTeaser } from "@/components/blog-teaser";
-import { OwnerCta } from "@/components/owner-cta";
 import { FaqSection } from "@/components/faq-section";
-import { ReviewsStrip } from "@/components/reviews-strip";
-import { SeoAbout } from "@/components/seo-about";
 import { FAQ_ITEMS } from "@/lib/site-content";
 
 // FAQ structured data (in the default site language, matching what the page
@@ -65,9 +57,8 @@ async function hotelsJsonLd() {
 }
 
 export default async function HomePage() {
-  const [hotelsLd, reviews, hotels] = await Promise.all([
+  const [hotelsLd, hotels] = await Promise.all([
     hotelsJsonLd(),
-    getRecentApprovedReviews(6),
     getPublicHotels(),
   ]);
   // trimmed once, shared by every list on the page
@@ -96,12 +87,7 @@ export default async function HomePage() {
             the bundle boots and Firestore answers */}
         <HotelsSection initialHotels={listHotels} />
         <BrowseByCity />
-        <BlogTeaser />
-        <ReviewsStrip reviews={reviews} hotels={hotels} />
-        <hr className="section-seam mx-auto max-w-5xl" />
-        <OwnerCta />
         <FaqSection />
-        <SeoAbout />
       </main>
       <SiteFooter />
     </>
