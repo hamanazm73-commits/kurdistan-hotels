@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s — Kurdistan Hotels",
   },
   description:
-    "هۆتێلەکانی کوردستان — حیجزی هۆتێل لە هەولێر، سلێمانی، دهۆک، دووکان، هەڵەبجە و کەرکووک. فنادق كردستان · Find and book hotels across Kurdistan — compare prices and book directly.",
+    "هۆتێلەکانی کوردستان — حیجزی هۆتێل لە هەولێر، سلێمانی، دهۆک، دووکان و کەرکووک. فنادق كردستان · Find and book hotels across Kurdistan — compare prices and book directly.",
   keywords: [
     // brand + common variant spellings people actually type
     "Kurdistan hotels",
@@ -42,7 +42,6 @@ export const metadata: Metadata = {
     "Dohuk hotels",
     "Dukan hotels",
     "Dokan hotels",
-    "Halabja hotels",
     "Kirkuk hotels",
     // native scripts
     "هۆتێلەکانی کوردستان",
@@ -59,7 +58,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Kurdistan Hotels — هۆتێلەکانی کوردستان",
     description:
-      "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
+      "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok and Kirkuk.",
     type: "website",
     url: "https://hotelskurdistan.com",
     images: [
@@ -104,7 +103,7 @@ const jsonLd = {
       logo: "https://hotelskurdistan.com/logo-square.png",
       image: "https://hotelskurdistan.com/logo-square.png",
       description:
-        "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok, Halabja and Kirkuk.",
+        "Discover and book the finest hotels across Kurdistan — Dukan, Erbil, Sulaymaniyah, Duhok and Kirkuk.",
       areaServed: [
         "Kurdistan",
         "Erbil",
@@ -118,7 +117,6 @@ const jsonLd = {
         "Dohuk",
         "Dukan",
         "Dokan",
-        "Halabja",
         "Kirkuk",
         "Kerkuk",
       ],

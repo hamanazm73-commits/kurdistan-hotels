@@ -11,7 +11,6 @@ import { Hero } from "@/components/hero";
 import { HotelsSection } from "@/components/hotels-section";
 import { BrowseByCity } from "@/components/browse-by-city";
 import { BlogTeaser } from "@/components/blog-teaser";
-import { TrustSection } from "@/components/trust-section";
 import { OwnerCta } from "@/components/owner-cta";
 import { FaqSection } from "@/components/faq-section";
 import { ReviewsStrip } from "@/components/reviews-strip";
@@ -98,7 +97,6 @@ export default async function HomePage() {
         <HotelsSection initialHotels={listHotels} />
         <BrowseByCity />
         <BlogTeaser />
-        <TrustSection />
         <ReviewsStrip reviews={reviews} hotels={hotels} />
         <hr className="section-seam mx-auto max-w-5xl" />
         <OwnerCta />

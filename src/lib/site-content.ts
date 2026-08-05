@@ -32,28 +32,28 @@ export const SEO_ABOUT: SeoAboutBlock[] = [
     dir: "rtl",
     label: "کوردی",
     heading: "هۆتێلەکانی کوردستان",
-    body: "هۆتێلەکانی کوردستان پلاتفۆرمێکە بۆ دۆزینەوە و حیجزکردنی هۆتێل لە هەموو هەرێمی کوردستان — هەولێر، سلێمانی، دهۆک، دووکان، هەڵەبجە و کەرکووک. بە ئاسانی هۆتێل بدۆزەرەوە، نرخەکان بەراورد بکە و ڕاستەوخۆ لەگەڵ هۆتێلەکە حیجز بکە.",
+    body: "هۆتێلەکانی کوردستان پلاتفۆرمێکە بۆ دۆزینەوە و حیجزکردنی هۆتێل لە هەموو هەرێمی کوردستان — هەولێر، سلێمانی، دهۆک، دووکان و کەرکووک. بە ئاسانی هۆتێل بدۆزەرەوە، نرخەکان بەراورد بکە و ڕاستەوخۆ لەگەڵ هۆتێلەکە حیجز بکە.",
   },
   {
     lang: "ar",
     dir: "rtl",
     label: "عربي",
     heading: "فنادق كردستان",
-    body: "فنادق كردستان منصّة للبحث عن الفنادق وحجزها في جميع أنحاء إقليم كردستان — أربيل (هەولێر)، السليمانية، دهوك، دوكان، حلبجة وكركوك. ابحث عن فندق، قارن الأسعار واحجز مباشرة مع الفندق دون رسوم إضافية.",
+    body: "فنادق كردستان منصّة للبحث عن الفنادق وحجزها في جميع أنحاء إقليم كردستان — أربيل (هەولێر)، السليمانية، دهوك، دوكان وكركوك. ابحث عن فندق، قارن الأسعار واحجز مباشرة مع الفندق دون رسوم إضافية.",
   },
   {
     lang: "en",
     dir: "ltr",
     label: "English",
     heading: "Hotels in Kurdistan",
-    body: "Kurdistan Hotels helps you find and book hotels across the Kurdistan Region — Erbil (Hawler), Sulaymaniyah (Slemani), Duhok, Dukan, Halabja and Kirkuk. Search for a hotel, compare prices and book directly with the hotel, with no extra fees.",
+    body: "Kurdistan Hotels helps you find and book hotels across the Kurdistan Region — Erbil (Hawler), Sulaymaniyah (Slemani), Duhok, Dukan and Kirkuk. Search for a hotel, compare prices and book directly with the hotel, with no extra fees.",
   },
   {
     lang: "kmr",
     dir: "ltr",
     label: "Kurmancî",
     heading: "Otêlên Kurdistanê",
-    body: "Otêlên Kurdistanê alîkariya te dike ku li seranserê Herêma Kurdistanê otêlan bibînî û rezerve bikî — Hewlêr, Silêmanî, Dihok, Dûkan, Helebce û Kerkûk. Otêlekê bigere, bihayan bide ber hev û rasterast bi otêlê re rezerve bike.",
+    body: "Otêlên Kurdistanê alîkariya te dike ku li seranserê Herêma Kurdistanê otêlan bibînî û rezerve bikî — Hewlêr, Silêmanî, Dihok, Dûkan û Kerkûk. Otêlekê bigere, bihayan bide ber hev û rasterast bi otêlê re rezerve bike.",
   },
 ];
 

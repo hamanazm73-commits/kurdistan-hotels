@@ -2,9 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { Check } from "lucide-react";
+import {
+  Check,
+  ShieldCheck,
+  Wallet,
+  Headset,
+  Zap,
+  ArrowLeft,
+} from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { TRUST_HEADING, TRUST_ITEMS } from "@/lib/site-content";
 import type { Lang } from "@/lib/types";
+
+const TRUST_ICONS = {
+  "shield-check": ShieldCheck,
+  wallet: Wallet,
+  headset: Headset,
+  zap: Zap,
+} as const;
 
 /** The four languages, each with its own-script name and a warm greeting. */
 const OPTIONS: {
@@ -27,9 +42,11 @@ const ORBS = [
 ];
 
 export function LanguageWelcome() {
-  const { setLang } = useI18n();
+  const { setLang, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<Lang | null>(null);
+  // "lang" asks which language; "intro" is the welcome that follows it
+  const [step, setStep] = useState<"lang" | "intro">("lang");
 
   // First visit = no saved language yet. Decide on the client to avoid any
   // server/client mismatch (nothing renders on the server).
@@ -54,8 +71,8 @@ export function LanguageWelcome() {
   function choose(l: Lang) {
     setPicked(l);
     setLang(l); // persists to localStorage → never shows again
-    // let the little "selected" beat play before closing
-    setTimeout(() => setOpen(false), 480);
+    // let the little "selected" beat play, then move to the welcome
+    setTimeout(() => setStep("intro"), 480);
   }
 
   return (
@@ -93,6 +110,9 @@ export function LanguageWelcome() {
           {/* centre when it fits, scroll when the screen is short */}
           <div className="relative h-full overflow-y-auto">
             <div className="flex min-h-full items-center justify-center px-5 py-8">
+              {step === "intro" ? (
+                <IntroStep lang={lang} onEnter={() => setOpen(false)} />
+              ) : (
               <motion.div
                 initial={{ scale: 0.92, y: 26, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -170,10 +190,122 @@ export function LanguageWelcome() {
                   دواتر دەتوانیت لە سەرەوەی سایتەکە زمان بگۆڕیت
                 </p>
               </motion.div>
+              )}
             </div>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+/** Enter labels, in the language the visitor just chose. */
+const ENTER: Record<Lang, string> = {
+  ckb: "دەستپێبکە",
+  ar: "ابدأ",
+  en: "Get started",
+  kmr: "Dest pê bike",
+};
+
+/**
+ * The welcome that follows the language choice: the site's name, then the
+ * reasons to book here, each sliding in after the last.
+ */
+function IntroStep({ lang, onEnter }: { lang: Lang; onEnter: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="w-full max-w-md text-center sm:max-w-2xl"
+    >
+      {/* the name, arriving first */}
+      <motion.img
+        src="/logo-square.png"
+        alt=""
+        width={64}
+        height={64}
+        initial={{ scale: 0, rotate: -25 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: "spring", stiffness: 190, damping: 13 }}
+        className="mx-auto size-16 rounded-2xl shadow-lg shadow-black/40 sm:size-20"
+      />
+      <motion.h1
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.5 }}
+        className="mt-4 text-2xl font-extrabold text-white sm:text-4xl"
+      >
+        هۆتێلەکانی کوردستان
+      </motion.h1>
+
+      {/* the gold rule draws itself under the name */}
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ delay: 0.35, duration: 0.55, ease: "easeOut" }}
+        className="mx-auto mt-3 h-0.5 w-24 origin-center rounded-full bg-gradient-to-r from-transparent via-gold to-transparent"
+      />
+
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45, duration: 0.5 }}
+        className="mt-4 text-base font-semibold text-gold sm:text-lg"
+      >
+        {TRUST_HEADING[lang]}
+      </motion.p>
+
+      <div className="mt-6 grid gap-2.5 sm:mt-8 sm:grid-cols-2 sm:gap-3">
+        {TRUST_ITEMS.map((item, i) => {
+          const Icon = TRUST_ICONS[item.icon];
+          return (
+            <motion.div
+              key={item.icon}
+              initial={{ opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 + i * 0.13, duration: 0.5 }}
+              className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-start"
+            >
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  delay: 0.7 + i * 0.13,
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 14,
+                }}
+                className="grid size-10 shrink-0 place-items-center rounded-xl bg-gold/15 text-gold"
+              >
+                <Icon className="size-5" />
+              </motion.span>
+              <span className="min-w-0">
+                <span className="block text-sm font-bold text-white">
+                  {item.title[lang]}
+                </span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-white/55">
+                  {item.desc[lang]}
+                </span>
+              </span>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      <motion.button
+        type="button"
+        onClick={onEnter}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2, duration: 0.45 }}
+        whileHover={{ scale: 1.04 }}
+        whileTap={{ scale: 0.96 }}
+        className="mt-7 inline-flex items-center gap-2 rounded-full bg-gold px-8 py-3 text-base font-bold text-gold-foreground shadow-lg shadow-black/30"
+      >
+        {ENTER[lang]}
+        <ArrowLeft className="size-5 ltr:rotate-180" />
+      </motion.button>
+    </motion.div>
   );
 }
